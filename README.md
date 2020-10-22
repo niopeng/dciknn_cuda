@@ -5,7 +5,6 @@ This is the CUDA GPU implementation + Python interface (using PyTorch) of priori
 ### Prerequisites
 * NVCC version >= 8.0 (Note: this should match the CUDA version that PyTorch is built with)
 * PyTorch >= 1.4.0
-* run `python setup.py install`
 
 ### Setup
 
