@@ -19,7 +19,7 @@ from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 import os
 
 setup(
-    name='dci',
+    name='dciknn_cuda',
     ext_modules=[
         CUDAExtension('_dci_cuda', [
             './src/dci_cuda.cpp',
