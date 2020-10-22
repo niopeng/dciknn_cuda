@@ -39,7 +39,7 @@ def main():
     #                                                                                                                                           #
     #############################################################################################################################################
     num_neighbours = 10  # The k in k-NN
-    num_queries = 1
+    num_queries = 2
 
     query = torch.randn((num_queries, dim)).to(device)
 
@@ -60,8 +60,8 @@ def main():
     dci_db.add(data)
     # Query
     indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
-    print("Nearest Indices", indices)
-    print("Indices Distances", dists)
+    print("Nearest Indices:", indices)
+    print("Indices Distances:", dists)
     dci_db.clear()
 
 
