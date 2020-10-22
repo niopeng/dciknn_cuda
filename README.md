@@ -12,12 +12,12 @@ The library can be compiled using Python distutils.
 
 **Note:** If your Python interpreter is named differently, e.g.: "python3", you will need to replace all occurrences of "python" with "python3" in the commands below.
 
-If your Python installation is local (e.g. part of Anaconda), run the following command:
+If your Python installation is local (e.g. part of Anaconda), run the following command from the root directory of the code base to compile and install as a Python package:
 ```bash
 python setup.py install
 ```
 
-Otherwise, if you have sudo access, run the following command from the root directory of the code base to compile and install as a Python package:
+Otherwise, if you have sudo access, run the following command instead:
 ```bash
 sudo python setup.py install
 ```
