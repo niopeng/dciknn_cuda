@@ -71,7 +71,7 @@ class DCI(object):
         _dci_add(self._dci_inst, self._dim, self.num_points, data.flatten(), self._block_size, self._thread_size)
         self._array = data
     
-    # query is num_queries x dim
+    # query is num_queries x dim, returns num_queries x num_neighbours
     def query(self, query, num_neighbours=-1, num_outer_iterations=5000, blind=False):
         if len(query.shape) < 2:
             _query = query.unsqueeze(0)
