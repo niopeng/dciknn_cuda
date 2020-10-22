@@ -10,7 +10,7 @@ setup(
             './src/dci_cuda_kernel.cu',
             './src/util_kernel.cu',
         ], include_dirs=[
-            os.path.abspath(os.path.join(os.path.dirname( __file__ ), 'include')),
+            os.path.abspath(os.path.join(os.path.dirname(__file__), 'include')),
         ]
         )
     ],

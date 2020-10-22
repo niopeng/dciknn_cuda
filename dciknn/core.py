@@ -21,7 +21,7 @@ from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _d
 
 class DCI(object):
     
-    def __init__(self, dim, num_comp_indices = 2, num_simp_indices = 7, bs = 100, ts = 10):
+    def __init__(self, dim, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10):
         
         if not torch.cuda.is_available():
             raise RuntimeError("DCI CUDA version requires GPU access, please check CUDA driver.")
@@ -55,50 +55,36 @@ class DCI(object):
     
     def _check_data(self, arr):
         if arr.shape[1] != self.dim:
-            raise ValueError("mismatch between array dimension (%d) and the declared dimension of this DCI instance (%d)" % (arr.shape[1],self.dim))
+            raise ValueError("mismatch between tensor dimension (%d) and the declared dimension of this DCI instance (%d)" % (arr.shape[1], self.dim))
         if arr.dtype != torch.float:
-            raise TypeError("array must consist of double-precision floats")
+            raise TypeError("tensor must consist of double-precision floats")
         if not arr.is_contiguous():
-            raise ValueError("the memory layout of array must be in row-major (C-order)")
+            raise ValueError("the memory layout of tensor must be in row-major (C-order)")
         if not arr.is_cuda:
-            raise TypeError("array must be a cuda tensor")
+            raise TypeError("tensor must be a cuda tensor")
 
-    # Indices can be None, a slice object, an integer, an array or list of integers - best to use np.intc type
     def add(self, data):
-        
         if self.num_points > 0:
-            raise RuntimeError("DCI class does not support insertion of more than one array. Must combine all arrays into one array before inserting")
-        
+            raise RuntimeError("DCI class does not support insertion of more than one tensor. Must combine all tensors into one tensor before inserting")
         self._check_data(data)
-
         self.num_points = data.shape[0]
-
         _dci_add(self._dci_inst, self._dim, self.num_points, data.flatten(), self._block_size, self._thread_size)
-
         self._array = data
     
     # query is num_queries x dim
-    def query(self, query, num_neighbours = -1, num_outer_iterations = 5000, blind = False):
-        
+    def query(self, query, num_neighbours=-1, num_outer_iterations=5000, blind=False):
         if len(query.shape) < 2:
             _query = query.unsqueeze(0)
         else:
             _query = query
-
         self._check_data(_query)
-        
         if num_neighbours < 0:
             num_neighbours = self.num_points
-        
         self._ensure_positive_integer(num_neighbours)
-
         max_num_candidates = 10 * num_neighbours
-        
         # num_queries x num_neighbours
         _query_result = _dci_query(self._dci_inst, self._dim, _query.shape[0], _query.flatten(), num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
-
         half = _query_result.shape[0] // 2
-
         return _query_result[:half], _query_result[half:]
     
     def clear(self):
