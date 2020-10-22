@@ -2,11 +2,11 @@
 
 This is the CUDA GPU implementation + Python interface (using PyTorch) of prioritized DCI. The paper can be found at https://arxiv.org/abs/1703.00440.
 
-### Prerequisites
+## Prerequisites
 * NVCC version >= 8.0 (Note: this should match the CUDA version that PyTorch is built with)
 * PyTorch >= 1.4.0
 
-### Setup
+## Setup
 
 The library can be compiled using Python distutils.
 
@@ -27,18 +27,18 @@ If you do not have sudo access, run the following command instead:
 python setup.py install --user
 ```
 
-### Directory Layout
+## Directory Layout
 * `src`, all of the `*.cpp`, `.cu` files
 * `include`, the header files
 * `dciknn`, the Python interface
 
-### Important Files
+## Important Files
 * `src/dci_cuda.cpp`: defines the PyTorch extension functions
 * `src/util_kernel.cu`: matrix multiplication and random distribution generation functions
 * `src/dci_cuda_kernel.cu`: main components of prioritized DCI
 * `dciknn/core.py`: defines Python interface
 
-### Reference
+## Reference
 
 Please cite the following paper if you found this library useful in your research:
 
