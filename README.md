@@ -27,6 +27,16 @@ If you do not have sudo access, run the following command instead:
 python setup.py install --user
 ```
 
+
+## Getting Started
+
+An example code using the PyTorch interface is provided. In the root directory of the code base, execute the following command:
+
+```bash
+python example.py
+```
+
+
 ## Directory Layout
 * `src`, all of the `*.cpp`, `.cu` files
 * `include`, the header files
