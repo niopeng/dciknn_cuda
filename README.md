@@ -3,7 +3,7 @@
 This is the CUDA GPU implementation + Python interface (using PyTorch) of Dynamic Continuous Indexing (DCI) . The paper can be found [here](https://arxiv.org/abs/1512.00442).
 
 ## Prerequisites
-* NVCC version >= 8.0 (Note: this should match the CUDA version that PyTorch is built with)
+* NVCC version >= 9.2 (Note: this should match the CUDA version that PyTorch is built with)
 * PyTorch >= 1.4.0
 
 ## Setup
