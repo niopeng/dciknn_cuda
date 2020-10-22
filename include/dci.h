@@ -21,7 +21,7 @@ typedef struct idx_elem {
 
 // sorting alg we are using
 __device__
-void mixSort(idx_elem arr[], int n);
+void mix_sort(idx_elem arr[], int n);
 
 float compute_dist(const float* const vec1, const float* const vec2,
 		const int dim);
