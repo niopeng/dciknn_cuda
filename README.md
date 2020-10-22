@@ -38,4 +38,20 @@ python setup.py install --user
 * `src/dci_cuda_kernel.cu`: main components of prioritized DCI
 * `dciknn/core.py`: defines Python interface
 
+### Reference
 
+Please cite the following paper if you found this library useful in your research:
+
+### [Fast _k_-Nearest Neighbour Search via Dynamic Continuous Indexing](https://arxiv.org/abs/1512.00442)
+[Ke Li](https://people.eecs.berkeley.edu/~ke.li/), [Jitendra Malik](https://people.eecs.berkeley.edu/~malik/)\
+*International Conference on Machine Learning (ICML)*, 2016
+
+```
+@inproceedings{li2016fast,
+  title={Fast k-nearest neighbour search via {Dynamic Continuous Indexing}},
+  author={Li, Ke and Malik, Jitendra},
+  booktitle={International Conference on Machine Learning},
+  pages={671--679},
+  year={2016}
+}
+```
