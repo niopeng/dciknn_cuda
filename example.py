@@ -16,7 +16,6 @@ Copyright (C) 2020    Ke Li, Shichong Peng
 '''
 from dciknn_cuda import DCI
 import torch
-import sys
 
 
 def main():
