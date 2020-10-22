@@ -52,7 +52,7 @@ void dci_init(dci* const dci_inst, const int dim, const int num_comp_indices,
 		const int num_simp_indices);
 
 __device__
-void insertionSort(idx_elem arr[], int n);
+void insertion_sort(idx_elem arr[], int n);
 
 // // Note: the data itself is not kept in the index and must be kept in-place
 void dci_add(dci* const dci_inst, const int dim, const int num_points,

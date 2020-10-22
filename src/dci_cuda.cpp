@@ -1,5 +1,4 @@
 #include <torch/extension.h>
-
 #include <cuda_runtime.h>
 #include "dci.h"
 

@@ -69,7 +69,6 @@ void matmul_device(const cublasOperation_t op_A, const cublasOperation_t op_B,
     cublasDestroy(handle);
 }
 
-// taken from https://developer.download.nvidia.com/compute/DevZone/docs/html/CUDALibraries/doc/CURAND_Library.pdf
 __global__ void init_curand_state(unsigned int seed, curandState_t* states) {
     int id = blockDim.x * blockIdx.x + threadIdx.x;
     curand_init(seed, id, 0, &states[id]);

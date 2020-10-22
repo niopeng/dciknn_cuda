@@ -79,7 +79,7 @@ void dci_gen_proj_vec(float* const proj_vec, const int dim,
 	cudaDeviceSynchronize();
 }
 
-	/* Initializes the master DCI data structure.  */
+/* Initializes the master DCI data structure.  */
 void dci_init(dci* const dci_inst, const int dim, const int num_comp_indices,
 		const int num_simp_indices) {
 	int num_indices = num_comp_indices * num_simp_indices;
@@ -103,15 +103,15 @@ void dci_init(dci* const dci_inst, const int dim, const int num_comp_indices,
 __global__ void sort_indices(dci* const dci_inst, const int num_indices,
 		const int num_points, const int points_per_block) {
 	int chunk_size = (num_indices + blockDim.x - 1) / blockDim.x;
-	int index;
+	int idx;
 	int num_points_in_block = min(
 			(int) (dci_inst->num_points - blockIdx.x * points_per_block),
 			points_per_block);
 	for (int j = 0; j < chunk_size; j++) {
-		index = threadIdx.x * chunk_size + j;
-		if (index < num_indices) {
-			mixSort(
-					&(dci_inst->indices[index * dci_inst->num_points
+		idx = threadIdx.x * chunk_size + j;
+		if (idx < num_indices) {
+			mix_sort(
+					&(dci_inst->indices[idx * dci_inst->num_points
 							+ points_per_block * blockIdx.x]),
 					num_points_in_block);
 		}
@@ -125,12 +125,12 @@ __global__ void copy_to_indices(dci* const dci_inst, float* const data_proj,
 	int n = num_indices * num_points;
 	int chunk_size = (n + blockDim.x * gridDim.x - 1)
 			/ (blockDim.x * gridDim.x);
-	int index;
+	int idx;
 	for (int j = 0; j < chunk_size; j++) {
-		index = i * chunk_size + j;
-		if (index < n) {
-			dci_inst->indices[index].key = data_proj[index];
-			dci_inst->indices[index].value = index % num_points;
+		idx = i * chunk_size + j;
+		if (idx < n) {
+			dci_inst->indices[idx].key = data_proj[idx];
+			dci_inst->indices[idx].value = idx % num_points;
 		}
 	}
 }
@@ -176,18 +176,13 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points,
 	cudaFree(data_proj);
 }
 
-/* Insertion sort. Taken from StackOverflow */
 __device__
-void insertionSort(idx_elem arr[], int n) {
+void insertion_sort(idx_elem arr[], int n) {
 	int i, j;
 	idx_elem key;
 	for (i = 1; i < n; i++) {
 		key = arr[i];
 		j = i - 1;
-
-		/* Move elements of arr[0..i-1], that are
-		 greater than key, to one position ahead
-		 of their current position */
 		while (j >= 0 && arr[j].key > key.key) {
 			arr[j + 1] = arr[j];
 			j = j - 1;
@@ -196,9 +191,9 @@ void insertionSort(idx_elem arr[], int n) {
 	}
 }
 
-/* Modified Quicksort to use "MixSort" below. */
+/* Modified quick_sort to use "mix_sort" below. */
 __device__
-void quickSort(idx_elem arr[], int n) {
+void quick_sort(idx_elem arr[], int n) {
 	// arbitrary pivot
 	float pivot_key = arr[n / 2].key;
 	idx_elem swp;
@@ -219,10 +214,10 @@ void quickSort(idx_elem arr[], int n) {
 			high--;
 		} else {
 			if (high > 0) {
-				mixSort(arr, high + 1);
+				mix_sort(arr, high + 1);
 			}
 			if (low < n - 1) {
-				mixSort(&arr[low], n - low);
+				mix_sort(&arr[low], n - low);
 			}
 			return;
 		}
@@ -233,16 +228,16 @@ void quickSort(idx_elem arr[], int n) {
  Insertion Sort. Otherwise, it uses Quick Sort. The reasoning is that if there are
  too few data points, then Quick Sort's overhead may be too large. */
 __device__
-void mixSort(idx_elem arr[], int n) {
+void mix_sort(idx_elem arr[], int n) {
 	if (n > 64) {
-		quickSort(arr, n);
+		quick_sort(arr, n);
 	} else {
-		insertionSort(arr, n);
+		insertion_sort(arr, n);
 	}
 }
 
 __device__
-static inline int dci_next_closest_proj(const idx_elem* const index,
+static inline int dci_next_closest_proj(const idx_elem* const idx,
 		int* const left_pos, int* const right_pos, const float query_proj,
 		const int num_elems) {
 	int cur_pos;
@@ -256,8 +251,8 @@ static inline int dci_next_closest_proj(const idx_elem* const index,
 	} else if (*right_pos >= upper_bound) {
 		cur_pos = *left_pos;
 		(*left_pos) -= blockDim.x;
-	} else if (index[min(*right_pos, num_elems - 1)].key - query_proj
-			< query_proj - index[max(*left_pos, 0)].key) {
+	} else if (idx[min(*right_pos, num_elems - 1)].key - query_proj
+			< query_proj - idx[max(*left_pos, 0)].key) {
 		cur_pos = *right_pos;
 		(*right_pos) += blockDim.x;
 	} else {
@@ -271,7 +266,7 @@ static inline int dci_next_closest_proj(const idx_elem* const index,
 // Returns an integer from -1 to num_elems - 1 inclusive
 // Could return -1 if all elements are greater or equal to key
 __device__
-static inline int dci_search_index(const idx_elem* const index, const float key,
+static inline int dci_search_index(const idx_elem* const idx, const float key,
 		const int num_elems) {
 	int start_pos, end_pos, cur_pos;
 
@@ -280,7 +275,7 @@ static inline int dci_search_index(const idx_elem* const index, const float key,
 	cur_pos = (start_pos + end_pos + 2) / 2;
 
 	while (start_pos < end_pos) {
-		if (index[cur_pos].key < key) {
+		if (idx[cur_pos].key < key) {
 			start_pos = cur_pos;
 		} else {
 			end_pos = cur_pos - 1;
@@ -297,55 +292,54 @@ __device__ void search_index(const dci* const dci_inst,
 		int* const left_pos, int* const right_pos, const int points_per_block) {
 	int total = num_indices;
 	int chunk_size = (total + blockDim.x - 1) / blockDim.x;
-	int index;
+	int idx;
 	for (int j = 0; j < chunk_size; j++) {
-		index = threadIdx.x * chunk_size + j;
-		if (index < total) {
-			left_pos[index] = dci_search_index(
-					&(dci_inst->indices[index * (dci_inst->num_points)
+		idx = threadIdx.x * chunk_size + j;
+		if (idx < total) {
+			left_pos[idx] = dci_search_index(
+					&(dci_inst->indices[idx * (dci_inst->num_points)
 							+ blockIdx.x * points_per_block]),
-					query_proj[index],
+					query_proj[idx],
 					min(dci_inst->num_points - blockIdx.x * points_per_block,
 							points_per_block)) - blockDim.x + 1;
-			right_pos[index] = left_pos[index] + blockDim.x;
+			right_pos[idx] = left_pos[idx] + blockDim.x;
 		}
 	}
 }
 
-/* Find the closest point at index */
-__device__ void find_closest(const dci* const dci_inst,
+__device__ void init_index_priority(const dci* const dci_inst,
 		const float* const query_proj, const int num_indices,
 		int* const left_pos, int* const right_pos, float* const index_priority,
 		int* const cur_pos, const int points_per_block) {
 	int total = num_indices;
 	int chunk_size = (total + blockDim.x - 1) / blockDim.x;
-	int index;
+	int idx;
 	int num_points_in_block = min(
 			(int) (dci_inst->num_points - blockIdx.x * points_per_block),
 			points_per_block);
 	for (int j = 0; j < chunk_size; j++) {
-		index = threadIdx.x * chunk_size + j;
-		if (index < total && num_points_in_block > 0) {
-			cur_pos[index] = dci_next_closest_proj(
-					&(dci_inst->indices[index * (dci_inst->num_points)
+		idx = threadIdx.x * chunk_size + j;
+		if (idx < total && num_points_in_block > 0) {
+			cur_pos[idx] = dci_next_closest_proj(
+					&(dci_inst->indices[idx * (dci_inst->num_points)
 							+ blockIdx.x * points_per_block]),
-					&(left_pos[index]), &(right_pos[index]), query_proj[index],
+					&(left_pos[idx]), &(right_pos[idx]), query_proj[idx],
 					num_points_in_block);
 			int position;
-			if ((cur_pos[index] < 0) && (cur_pos[index] > -blockDim.x)) {
+			if ((cur_pos[idx] < 0) && (cur_pos[idx] > -blockDim.x)) {
 				position = 0;
-			} else if ((cur_pos[index] < (num_points_in_block + blockDim.x - 1))
-					&& (cur_pos[index] >= num_points_in_block)) {
+			} else if ((cur_pos[idx] < (num_points_in_block + blockDim.x - 1))
+					&& (cur_pos[idx] >= num_points_in_block)) {
 				position = num_points_in_block - 1;
 			} else {
-				position = cur_pos[index];
+				position = cur_pos[idx];
 			}
 			assert(position >= 0); // There should be at least one point in the index
 			assert(position < num_points_in_block);
-			index_priority[index] = abs_d(
-					dci_inst->indices[position + index * (dci_inst->num_points)
+			index_priority[idx] = abs_d(
+					dci_inst->indices[position + idx * (dci_inst->num_points)
 							+ blockIdx.x * points_per_block].key
-							- query_proj[index]);
+							- query_proj[idx]);
 		}
 	}
 }
@@ -443,7 +437,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		__syncthreads();
 
 		/* Populate the closest indices */
-		find_closest(dci_inst, query_proj, num_indices, left_pos, right_pos,
+		init_index_priority(dci_inst, query_proj, num_indices, left_pos, right_pos,
 				index_priority, cur_pos, points_per_block);
 
 		/* Synchronize the threads */
@@ -584,8 +578,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						}
 					}
 				}
-
-				// __syncthreads();
 				if (threadIdx.x == 0) {
 					m++;
 				}
@@ -617,10 +609,10 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 }
 
-__global__ void mixSort_kernel(idx_elem* const d_top_candidates,
+__global__ void mix_sort_kernel(idx_elem* const d_top_candidates,
 		const int total) {
 	if (threadIdx.x == 0 && blockIdx.x == 0) {
-		mixSort(d_top_candidates, total);
+		mix_sort(d_top_candidates, total);
 	}
 }
 
@@ -634,24 +626,24 @@ __global__ void update_top(const dci* const dci_inst,
 	extern __shared__ double top_index[];
 
 	unsigned int tid = threadIdx.x;
-	unsigned int index = blockIdx.x * blockDim.x + tid;
+	unsigned int idx = blockIdx.x * blockDim.x + tid;
 	top_priority[tid] = DBL_MAX;
-	top_index[tid] = index % dci_inst->num_simp_indices;
+	top_index[tid] = idx % dci_inst->num_simp_indices;
 
-	while (index < dci_inst->num_simp_indices) {
+	while (idx < dci_inst->num_simp_indices) {
 		double cur_priority = index_priority[comp_index
-				* dci_inst->num_simp_indices + index];
+				* dci_inst->num_simp_indices + idx];
 		if (top_priority[tid] > cur_priority) {
 			top_priority[tid] = cur_priority;
-			top_index[tid] = index % dci_inst->num_simp_indices;
+			top_index[tid] = idx % dci_inst->num_simp_indices;
 		}
-		index += gridDim.x * blockDim.x;
+		idx += gridDim.x * blockDim.x;
 	}
 	__syncthreads();
-	index = blockIdx.x * blockDim.x + tid;
+	idx = blockIdx.x * blockDim.x + tid;
 	// block-wide reduction
 	for (unsigned int offset = blockDim.x >> 1; offset > 0; offset >>= 1) {
-		if (tid < offset && index < dci_inst->num_simp_indices) {
+		if (tid < offset && idx < dci_inst->num_simp_indices) {
 			double cur_priority = index_priority[comp_index
 					* dci_inst->num_simp_indices + tid];
 			double compare_priority = index_priority[comp_index
@@ -694,48 +686,48 @@ void get_top_candidates(int* const nearest_neighbours,
 
 __global__ void init_dist(float* const candidate_map, const int total,
 		const float value) {
-	int index, i = blockDim.x * blockIdx.x + threadIdx.x;
+	int idx, i = blockDim.x * blockIdx.x + threadIdx.x;
 	int chunk_size = (total + blockDim.x * gridDim.x - 1)
 			/ (blockDim.x * gridDim.x);
 	int j;
 	// initialize the counters
 	for (j = 0; j < chunk_size; j++) {
-		index = i * chunk_size + j;
-		if (index < total) {
-			candidate_map[index] = value;
+		idx = i * chunk_size + j;
+		if (idx < total) {
+			candidate_map[idx] = value;
 		}
 	}
 }
 
 __global__ void init_candidates(idx_elem* const candidate_map, const int total,
 		const float value) {
-	int index, i = blockDim.x * blockIdx.x + threadIdx.x;
+	int idx, i = blockDim.x * blockIdx.x + threadIdx.x;
 	int chunk_size = (total + blockDim.x * gridDim.x - 1)
 			/ (blockDim.x * gridDim.x);
 	int j;
 	// initialize the counters
 	for (j = 0; j < chunk_size; j++) {
-		index = i * chunk_size + j;
-		if (index < total) {
-			candidate_map[index].key = value;
-			candidate_map[index].value = -1;
+		idx = i * chunk_size + j;
+		if (idx < total) {
+			candidate_map[idx].key = value;
+			candidate_map[idx].value = -1;
 		}
 	}
 }
 
-__global__ void count_blind_candidates(idx_elem* const candidate_map,
+__global__ void get_blind_candidate_count(idx_elem* const candidate_map,
 		int* const d_all_candidates, const int total) {
-	int index, i = blockDim.x * blockIdx.x + threadIdx.x;
+	int idx, i = blockDim.x * blockIdx.x + threadIdx.x;
 	int chunk_size = (total + blockDim.x * gridDim.x - 1)
 			/ (blockDim.x * gridDim.x);
 	int j;
-	// add the counts as negative number in order to utilize mixSort later on
+	// maintain counts as negative numbers for candidate_map.key in order to reuse mix_sort (ascending)
 	for (j = 0; j < chunk_size; j++) {
-		index = i * chunk_size + j;
-		if (index < total) {
-			candidate_map[d_all_candidates[index]].key--;
-			candidate_map[d_all_candidates[index]].value =
-					d_all_candidates[index];
+		idx = i * chunk_size + j;
+		if (idx < total) {
+			candidate_map[d_all_candidates[idx]].key--;
+			candidate_map[d_all_candidates[idx]].value =
+					d_all_candidates[idx];
 		}
 	}
 }
@@ -755,10 +747,10 @@ void get_top_blind_candidates(int* const nearest_neighbours,
 	init_candidates<<<block_size, thread_size>>>(candidate_map, total, 0);
 	// synch all blocks
 	cudaDeviceSynchronize();
-	count_blind_candidates<<<block_size, thread_size>>>(candidate_map, d_all_candidates, total);
+	get_blind_candidate_count<<<block_size, thread_size>>>(candidate_map, d_all_candidates, total);
 	// synch all blocks
 	cudaDeviceSynchronize();
-	mixSort_kernel<<<1, 1>>>(candidate_map, total);
+	mix_sort_kernel<<<1, 1>>>(candidate_map, total);
 	for (i = 0; i < max_possible_num_candidates; i++) {
 		nearest_neighbours[i] = candidate_map[i].value;
 	}
