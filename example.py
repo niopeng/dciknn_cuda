@@ -18,6 +18,13 @@ from dciknn_cuda import DCI
 import torch
 
 
+def gen_data(ambient_dim, intrinsic_dim, num_points):
+    latent_data = torch.randn((num_points, intrinsic_dim))
+    transformation = torch.randn((intrinsic_dim, ambient_dim))
+    data = torch.dot(latent_data, transformation)
+    return data     # num_points x ambient_dim
+
+
 def main():
     assert torch.cuda.is_available()
     device = torch.device('cuda')
@@ -29,8 +36,13 @@ def main():
     #############################################################################################################################################
     dim = 1000
     num_pts = 1000
+    num_queries = 2
 
-    data = torch.randn((num_pts, dim)).to(device)
+    intrinsic_dim = 50
+    data_and_queries = gen_data(dim, intrinsic_dim, num_pts + num_queries)
+
+    data = data_and_queries[:num_pts, :].copy().to(device)
+    query = data_and_queries[num_pts:, :].copy().to(device)
 
     #############################################################################################################################################
     #                                                                                                                                           #
@@ -38,9 +50,6 @@ def main():
     #                                                                                                                                           #
     #############################################################################################################################################
     num_neighbours = 10  # The k in k-NN
-    num_queries = 2
-
-    query = torch.randn((num_queries, dim)).to(device)
 
     #############################################################################################################################################
     #                                                                                                                                           #
