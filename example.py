@@ -41,8 +41,8 @@ def main():
     intrinsic_dim = 50
     data_and_queries = gen_data(dim, intrinsic_dim, num_pts + num_queries)
 
-    data = data_and_queries[:num_pts, :].copy().to(device)
-    query = data_and_queries[num_pts:, :].copy().to(device)
+    data = data_and_queries[:num_pts, :].detach().clone().to(device)
+    query = data_and_queries[num_pts:, :].detach().clone().to(device)
 
     #############################################################################################################################################
     #                                                                                                                                           #
