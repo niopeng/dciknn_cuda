@@ -21,7 +21,7 @@ import torch
 def gen_data(ambient_dim, intrinsic_dim, num_points):
     latent_data = torch.randn((num_points, intrinsic_dim))
     transformation = torch.randn((intrinsic_dim, ambient_dim))
-    data = torch.dot(latent_data, transformation)
+    data = torch.matmul(latent_data, transformation)
     return data     # num_points x ambient_dim
 
 
