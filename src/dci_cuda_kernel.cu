@@ -408,12 +408,14 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	__shared__ float top_index_priority;
 	__shared__ int k, top_h, position, m, i;
+	__shared__ bool could_break; // Bug fix: resolve infinite loop if thread 0 exits first
 	float last_top_candidate_dist = -1.0; // The distance of the k^th closest candidate found so far
 	int num_candidates = 0, last_top_candidate = -1;
 
 	// init variables
 	if (threadIdx.x == 0) {
 		k = 0;
+		could_break = false;
 	}
 
 	int max_possible_num_candidates = min(query_config.max_num_candidates,
@@ -599,6 +601,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							>= query_config.num_outer_iterations
 									* dci_inst->num_simp_indices
 							|| num_candidates >= query_config.max_num_candidates) {
+						could_break = true;
 						break;
 					}
 				}
@@ -606,6 +609,9 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			}
 			/* Synchronize the threads */
 			__syncthreads();
+			if (could_break) {
+			    break;
+			}
 		}
 		// free variables
 		if (threadIdx.x == 0) {
