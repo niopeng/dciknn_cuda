@@ -27,7 +27,7 @@ def gen_data(ambient_dim, intrinsic_dim, num_points):
 
 def main():
     assert torch.cuda.is_available()
-    device = torch.device('cuda')
+    device = torch.device('cuda:1')
 
     #############################################################################################################################################
     #                                                                                                                                           #
@@ -63,7 +63,7 @@ def main():
     num_outer_iterations = 5000
 
     # initialize the DCI instance
-    dci_db = DCI(dim, num_comp_indices, num_simp_indices, block_size, thread_size)
+    dci_db = DCI(dim, num_comp_indices, num_simp_indices, block_size, thread_size, device=1)
     # Add data
     dci_db.add(data)
     # Query

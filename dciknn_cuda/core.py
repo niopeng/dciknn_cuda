@@ -21,7 +21,7 @@ from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _d
 
 class DCI(object):
     
-    def __init__(self, dim, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10):
+    def __init__(self, dim, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10, device=0):
         
         if not torch.cuda.is_available():
             raise RuntimeError("DCI CUDA version requires GPU access, please check CUDA driver.")
@@ -29,7 +29,7 @@ class DCI(object):
         self._dim = dim
         self._num_comp_indices = num_comp_indices
         self._num_simp_indices = num_simp_indices
-        self._dci_inst = _dci_new(dim, num_comp_indices, num_simp_indices)
+        self._dci_inst = _dci_new(dim, num_comp_indices, num_simp_indices, device)
         self._array = None
         self._block_size = bs
         self._thread_size = ts

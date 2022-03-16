@@ -18,6 +18,8 @@
 #include <torch/extension.h>
 #include <cuda_runtime.h>
 #include "dci.h"
+#include <c10/cuda/CUDAGuard.h>
+#include <torch/torch.h>
 
 
 typedef struct py_dci {
@@ -30,6 +32,7 @@ namespace py = pybind11;
 static void py_dci_free_wrap(PyObject *py_dci_inst_wrapper) {
 
     py_dci *py_dci_inst = (py_dci *)PyCapsule_GetPointer(py_dci_inst_wrapper, "py_dci_inst");
+    const at::cuda::OptionalCUDAGuard device_guard(py_dci_inst->dci_inst.devID);
 
     if (py_dci_inst->py_array) {
         Py_DECREF(py_dci_inst->py_array);
@@ -41,16 +44,19 @@ static void py_dci_free_wrap(PyObject *py_dci_inst_wrapper) {
 
 static void py_tensor_free(PyObject *py_tensor_wrapper) {
     torch::Tensor *py_tensor = (torch::Tensor *)PyCapsule_GetPointer(py_tensor_wrapper, "py_tensor");
+    const at::cuda::OptionalCUDAGuard device_guard(device_of(*py_tensor));
     cudaFree(py_tensor);
 }
 
 py::handle py_dci_new(const int dim, const int num_comp_indices,
-    const int num_simp_indices) {
+    const int num_simp_indices, const int deviceId) {
+    const at::cuda::OptionalCUDAGuard device_guard(deviceId);
     py_dci *py_dci_inst;
     cudaMallocManaged((void **) &py_dci_inst, sizeof(py_dci));
 
     // initialize DCI instance
     dci_init(&(py_dci_inst->dci_inst), dim, num_comp_indices, num_simp_indices);
+    py_dci_inst->dci_inst.devID = deviceId;
 
     // Returns new reference
     PyObject *py_dci_inst_wrapper = PyCapsule_New(py_dci_inst, "py_dci_inst", py_dci_free_wrap);
@@ -59,6 +65,7 @@ py::handle py_dci_new(const int dim, const int num_comp_indices,
 
 void py_dci_add(py::handle py_dci_inst_wrapper, const int dim, const int num_points,
     torch::Tensor py_data, const int block_size, const int thread_size) {
+    const at::cuda::OptionalCUDAGuard device_guard(device_of(py_data));
 
     PyObject *py_obj = py_dci_inst_wrapper.ptr();
     py_dci *py_dci_inst = (py_dci *)PyCapsule_GetPointer(py_obj, "py_dci_inst");
@@ -76,6 +83,7 @@ static torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim,
     torch::Tensor py_query, const int num_neighbours, const bool blind, const int num_outer_iterations,
     const int max_num_candidates, const int block_size,
     const int thread_size) {
+    const at::cuda::OptionalCUDAGuard device_guard(device_of(py_query));
 
     PyObject *py_obj = py_dci_inst_wrapper.ptr();
     py_dci *py_dci_inst = (py_dci *)PyCapsule_GetPointer(py_obj, "py_dci_inst");
@@ -108,6 +116,7 @@ static torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim,
 }
 
 void py_dci_clear(py::handle py_dci_inst_wrapper) {
+    const at::cuda::OptionalCUDAGuard device_guard(1);
 
     PyObject *py_obj = py_dci_inst_wrapper.ptr();
 
@@ -122,6 +131,7 @@ void py_dci_clear(py::handle py_dci_inst_wrapper) {
 }
 
 void py_dci_reset(py::handle py_dci_inst_wrapper) {
+    const at::cuda::OptionalCUDAGuard device_guard(1);
 
     PyObject *py_obj = py_dci_inst_wrapper.ptr();
 
@@ -136,6 +146,7 @@ void py_dci_reset(py::handle py_dci_inst_wrapper) {
 }
 
 void py_dci_free(py::handle py_dci_inst_wrapper) {
+    const at::cuda::OptionalCUDAGuard device_guard(1);
 
     PyObject *py_obj = py_dci_inst_wrapper.ptr();
 
