@@ -15,8 +15,12 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 Copyright (C) 2020    Ke Li, Shichong Peng
 '''
 
+from unittest.util import sorted_list_difference
 import torch
-from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _dci_free
+from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _dci_free, _dci_test
+
+from math import sqrt
+from joblib import Parallel, delayed
 
 
 class DCI(object):
@@ -83,6 +87,7 @@ class DCI(object):
         self._ensure_positive_integer(num_neighbours)
         max_num_candidates = 10 * num_neighbours
         # num_queries x num_neighbours
+
         _query_result = _dci_query(self._dci_inst, self._dim, _query.shape[0], _query.flatten(), num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
         half = _query_result.shape[0] // 2
         return _query_result[:half].reshape(_query.shape[0], -1), _query_result[half:].reshape(_query.shape[0], -1)
@@ -101,3 +106,79 @@ class DCI(object):
         _dci_free(self._dci_inst)
         self.num_points = 0
         self._array = None
+
+
+class MDCI(object):
+    def __init__(self, dim, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10, devices=[0]):
+        # if len(devices) < 2:
+        #     raise RuntimeError("You should specify at least two GPU for multi-GPU DCI to work")
+        
+        self.devices = devices
+        self.num_devices = len(devices)
+        self.dcis = [DCI(dim, num_comp_indices, num_simp_indices, bs, ts, dev) for dev in devices]
+        self.data_per_device = 0
+        
+    
+    def add(self, data):
+        self.data_per_device = data.shape[0] // self.num_devices + 1
+        for dev_ind in range(self.num_devices):
+            device = self.devices[dev_ind]
+            cur_data = data[dev_ind * self.data_per_device: dev_ind * self.data_per_device + self.data_per_device].to(device)
+            self.dcis[dev_ind].add(cur_data)
+        
+    def query(self, query, num_neighbours=-1, num_outer_iterations=5000, blind=False):
+        dists = []
+        nns = []
+        if num_neighbours <= 0:
+            raise RuntimeError('num_neighbours must be positive')
+
+        if len(query.shape) < 2:
+            _query = query.unsqueeze(0)
+        else:
+            _query = query
+        _query = _query.detach().clone()
+
+
+        max_num_candidates = 10 * num_neighbours
+        # num_queries x num_neighbours
+        # print('hyererr', self._array.device, self._thread_size)
+
+        queries = [_query.to(self.devices[dev_ind]).flatten() for dev_ind in self.devices]
+        res = _dci_test([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[0], queries, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
+        print(res)
+        print(res[0].shape)
+
+
+        for ind, cur_res in enumerate(res):
+            half = cur_res.shape[0] // 2
+            cur_nns, cur_dist = cur_res[:half].reshape(_query.shape[0], -1), cur_res[half:].reshape(_query.shape[0], -1)
+            cur_nns = cur_nns + self.data_per_device * ind
+            dists.append(cur_dist.detach().clone().to(self.devices[0]))
+            nns.append(cur_nns.detach().clone().to(self.devices[0]))
+
+        merged_dists = torch.cat(dists, dim=1)
+        merged_nns = torch.cat(nns, dim=1)
+        _, sort_indices = torch.sort(merged_dists, dim=1)
+        sort_indices = sort_indices[:, :num_neighbours]
+        return torch.gather(merged_nns, 1, sort_indices), torch.gather(merged_dists, 1, sort_indices)
+
+    def clear(self):
+        for dci in self.dcis:
+            dci.clear()
+        
+    def test(self):
+        def t(n):
+            return n ** 5
+
+        def firstn(n):
+            num = 0
+            while num < n:
+                yield delayed(t)(num)
+                num += 1
+
+        # for i in firstn(50):
+            # print(i)
+        res = Parallel(n_jobs=2, prefer='threads')(firstn(500))
+        print(res)
+        
+            

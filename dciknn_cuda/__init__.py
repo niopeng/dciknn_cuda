@@ -15,4 +15,8 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 Copyright (C) 2020    Ke Li, Shichong Peng
 '''
 
-from .core import DCI
+__version__ = "0.1.0"
+__author__ = 'Ke Li, Shichong Peng, Mehran Aghabozorgi'
+__credits__ = 'APEX Lab'
+
+from .core import DCI, MDCI

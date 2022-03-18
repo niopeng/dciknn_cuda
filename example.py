@@ -14,9 +14,13 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 Copyright (C) 2020    Ke Li, Shichong Peng
 '''
-from dciknn_cuda import DCI
+from dciknn_cuda import DCI, MDCI
 import torch
+import random
+import datetime
 
+random.seed(10)
+torch.manual_seed(0)
 
 def gen_data(ambient_dim, intrinsic_dim, num_points):
     latent_data = torch.randn((num_points, intrinsic_dim))
@@ -34,11 +38,14 @@ def main():
     # Data Generation Hyperparameters                                                                                                           #
     #                                                                                                                                           #
     #############################################################################################################################################
-    dim = 1000
-    num_pts = 1000
-    num_queries = 2
+    dim = 800
+    num_pts = 50000
+    num_queries = 5000
+    # dim = 80
+    # num_pts = 1000
+    # num_queries = 100
 
-    intrinsic_dim = 50
+    intrinsic_dim = 400
     data_and_queries = gen_data(dim, intrinsic_dim, num_pts + num_queries)
 
     data = data_and_queries[:num_pts, :].detach().clone().to(device)
@@ -63,15 +70,31 @@ def main():
     num_outer_iterations = 5000
 
     # initialize the DCI instance
-    dci_db = DCI(dim, num_comp_indices, num_simp_indices, block_size, thread_size, device=1)
-    # Add data
+    a = datetime.datetime.now()
+    dci_db = MDCI(dim, num_comp_indices, num_simp_indices, block_size, thread_size, devices=[0, 1])
+
     dci_db.add(data)
     # Query
     indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
     print("Nearest Indices:", indices)
     print("Indices Distances:", dists)
     dci_db.clear()
+    b = datetime.datetime.now()
+    print(b-a)
 
+    data = data_and_queries[:num_pts, :].detach().clone().to(0)
+    query = data_and_queries[num_pts:, :].detach().clone().to(0)
+    a = datetime.datetime.now()
+    dci_db = DCI(dim, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+
+    dci_db.add(data)
+    # Query
+    indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
+    print("Nearest Indices:", indices)
+    print("Indices Distances:", dists)
+    dci_db.clear()
+    b = datetime.datetime.now()
+    print(b-a)
 
 if __name__ == '__main__':
     main()

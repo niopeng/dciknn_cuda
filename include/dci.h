@@ -59,7 +59,7 @@ void dci_gen_proj_vec(float* proj_vec, const int dim,
 		const int num_indices);
 
 void dci_init(dci* const dci_inst, const int dim, const int num_comp_indices,
-		const int num_simp_indices);
+		const int num_simp_indices, const int devId);
 
 __device__
 void insertion_sort(idx_elem arr[], int n);

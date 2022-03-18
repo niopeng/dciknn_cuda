@@ -91,7 +91,7 @@ void dci_gen_proj_vec(float* const proj_vec, const int dim,
 
 /* Initializes the master DCI data structure.  */
 void dci_init(dci* const dci_inst, const int dim, const int num_comp_indices,
-		const int num_simp_indices) {
+		const int num_simp_indices, const int devId) {
 	int num_indices = num_comp_indices * num_simp_indices;
 
 	dci_inst->dim = dim;
@@ -106,7 +106,7 @@ void dci_init(dci* const dci_inst, const int dim, const int num_comp_indices,
 	dci_inst->num_points = 0;
 	dci_inst->indices = NULL;
 	dci_inst->data = NULL;
-	dci_inst->devID = 0;
+	dci_inst->devID = devId;
 }
 
 /* Sort indices */
