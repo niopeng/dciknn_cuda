@@ -109,8 +109,8 @@ class DCI(object):
 
 class MDCI(object):
     def __init__(self, dim, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10, devices=[0]):
-        if len(devices) < 2:
-            raise RuntimeError("You should specify at least two GPU for multi-GPU DCI to work")
+        # if len(devices) < 2:
+        #     raise RuntimeError("You should specify at least two GPU for multi-GPU DCI to work")
         
         self.devices = devices
         self.num_devices = len(devices)
