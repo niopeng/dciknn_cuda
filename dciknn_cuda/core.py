@@ -15,12 +15,11 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 Copyright (C) 2020    Ke Li, Shichong Peng
 '''
 
-from unittest.util import sorted_list_difference
 import torch
-from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _dci_free, _dci_test
+from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _dci_free, _dci_multi_query
+# from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _dci_free
 
 from math import sqrt
-from joblib import Parallel, delayed
 
 
 class DCI(object):
@@ -110,8 +109,8 @@ class DCI(object):
 
 class MDCI(object):
     def __init__(self, dim, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10, devices=[0]):
-        # if len(devices) < 2:
-        #     raise RuntimeError("You should specify at least two GPU for multi-GPU DCI to work")
+        if len(devices) < 2:
+            raise RuntimeError("You should specify at least two GPU for multi-GPU DCI to work")
         
         self.devices = devices
         self.num_devices = len(devices)
@@ -140,14 +139,9 @@ class MDCI(object):
 
 
         max_num_candidates = 10 * num_neighbours
-        # num_queries x num_neighbours
-        # print('hyererr', self._array.device, self._thread_size)
 
         queries = [_query.to(self.devices[dev_ind]).flatten() for dev_ind in self.devices]
-        res = _dci_test([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[0], queries, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
-        print(res)
-        print(res[0].shape)
-
+        res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[0], queries, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
 
         for ind, cur_res in enumerate(res):
             half = cur_res.shape[0] // 2
@@ -165,20 +159,11 @@ class MDCI(object):
     def clear(self):
         for dci in self.dcis:
             dci.clear()
-        
-    def test(self):
-        def t(n):
-            return n ** 5
 
-        def firstn(n):
-            num = 0
-            while num < n:
-                yield delayed(t)(num)
-                num += 1
+    def reset(self):
+        for dci in self.dcis:
+            dci.reset()
 
-        # for i in firstn(50):
-            # print(i)
-        res = Parallel(n_jobs=2, prefer='threads')(firstn(500))
-        print(res)
-        
-            
+    def free(self):
+        for dci in self.dcis:
+            dci.free()

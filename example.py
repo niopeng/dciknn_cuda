@@ -38,9 +38,9 @@ def main():
     # Data Generation Hyperparameters                                                                                                           #
     #                                                                                                                                           #
     #############################################################################################################################################
-    dim = 800
-    num_pts = 50000
-    num_queries = 5000
+    dim = 100
+    num_pts = 3000
+    num_queries = 500
     # dim = 80
     # num_pts = 1000
     # num_queries = 100
@@ -70,31 +70,32 @@ def main():
     num_outer_iterations = 5000
 
     # initialize the DCI instance
-    a = datetime.datetime.now()
-    dci_db = MDCI(dim, num_comp_indices, num_simp_indices, block_size, thread_size, devices=[0, 1])
+    for i in range(10):
+        a = datetime.datetime.now()
+        dci_db = MDCI(dim, num_comp_indices, num_simp_indices, block_size, thread_size, devices=[0, 1])
 
-    dci_db.add(data)
-    # Query
-    indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
-    print("Nearest Indices:", indices)
-    print("Indices Distances:", dists)
-    dci_db.clear()
-    b = datetime.datetime.now()
-    print(b-a)
+        dci_db.add(data)
+        # Query
+        indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
+        print("Nearest Indices:", indices)
+        print("Indices Distances:", dists)
+        dci_db.clear()
+        b = datetime.datetime.now()
+        print(b-a)
 
-    data = data_and_queries[:num_pts, :].detach().clone().to(0)
-    query = data_and_queries[num_pts:, :].detach().clone().to(0)
-    a = datetime.datetime.now()
-    dci_db = DCI(dim, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+        data = data_and_queries[:num_pts, :].detach().clone().to(0)
+        query = data_and_queries[num_pts:, :].detach().clone().to(0)
+        a = datetime.datetime.now()
+        dci_db = DCI(dim, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
-    dci_db.add(data)
-    # Query
-    indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
-    print("Nearest Indices:", indices)
-    print("Indices Distances:", dists)
-    dci_db.clear()
-    b = datetime.datetime.now()
-    print(b-a)
+        dci_db.add(data)
+        # Query
+        indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
+        print("Nearest Indices:", indices)
+        print("Indices Distances:", dists)
+        dci_db.clear()
+        b = datetime.datetime.now()
+        print(b-a)
 
 if __name__ == '__main__':
     main()

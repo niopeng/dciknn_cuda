@@ -20,7 +20,6 @@
 #include "dci.h"
 #include <c10/cuda/CUDAGuard.h>
 #include <torch/torch.h>
-#include "stdio.h"
 #include <thread>
 #include <future>
 #include <vector>
@@ -118,7 +117,7 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     return final_result;
 }
 
-std::vector<torch::Tensor> py_dci_test(std::vector<py::handle> py_dci_inst_wrapper, const int dim, const int num_queries,
+std::vector<torch::Tensor> py_dci_multi_query(std::vector<py::handle> py_dci_inst_wrapper, const int dim, const int num_queries,
     std::vector<torch::Tensor> py_query, const int num_neighbours, const bool blind, const int num_outer_iterations,
     const int max_num_candidates, const int block_size,
     const int thread_size) {
@@ -132,18 +131,6 @@ std::vector<torch::Tensor> py_dci_test(std::vector<py::handle> py_dci_inst_wrapp
         results.push_back(calcs[i].get());
     }
     return results;
-    // printf("wtf is happeining\n");
-    // auto fut = std::async(py_dci_query, py_dci_inst_wrapper, dim, num_queries,
-    // py_query, num_neighbours, blind, num_outer_iterations, max_num_candidates, block_size, thread_size);
-    // printf("wtf is happeining\n");
-    // auto fut2 = std::async(py_dci_query, py_dci_inst_wrapper, dim, num_queries,
-    // py_query, num_neighbours, blind, num_outer_iterations, max_num_candidates, block_size, thread_size);
-    // // auto res1 = fut.get();
-    // // auto res2 = fut2.get();
-    // vector<torch::Tensor> vect{fut.get(), fut2.get()};
-    // return vect;
-    // printf("both done\n");
-    // return res2;
 }
 
 void py_dci_clear(py::handle py_dci_inst_wrapper) {
@@ -195,8 +182,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("_dci_new", &py_dci_new, "Create new DCI instance. (CUDA)");
     m.def("_dci_add", &py_dci_add, "Add data. (CUDA)");
     m.def("_dci_query", &py_dci_query, "Search for nearest neighbours. (CUDA)");
-    m.def("_dci_test", &py_dci_test, "Search for nearest neighbours. (CUDA)");
     m.def("_dci_clear", &py_dci_clear, "Clear DCI. (CUDA)");
     m.def("_dci_reset", &py_dci_reset, "Reset DCI. (CUDA)");
     m.def("_dci_free", &py_dci_free, "Free DCI. (CUDA)");
+    m.def("_dci_multi_query", &py_dci_multi_query, "Search for nearest neighbours. (CUDA)");
 }
