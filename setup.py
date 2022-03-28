@@ -12,16 +12,26 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-Copyright (C) 2020    Ke Li, Shichong Peng
+Copyright (C) 2020    Ke Li, Shichong Peng, Mehran Aghabozorgi
 '''
 from setuptools import setup
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension, include_paths
 import os
+import sys
+
+if sys.version_info[0] < 3:
+    with open('README.md') as f:
+        long_description = f.read()
+else:
+    with open('README.md', encoding='utf-8') as f:
+        long_description = f.read()
 
 setup(
     name='dciknn_cuda',
     packages=['dciknn_cuda'],
-    version='0.1.8',    
+    version='0.1.11',    
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     description='DCI CUDA for fast K nearest neighbour finding',
     url='https://github.com/niopeng/dciknn_cuda',
     author='Ke Li, Shichong Peng, Mehran Aghabozorgi',

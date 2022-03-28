@@ -12,10 +12,10 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-Copyright (C) 2020    Ke Li, Shichong Peng
+Copyright (C) 2020    Ke Li, Shichong Peng, Mehran Aghabozorgi
 '''
 
-__version__ = "0.1.0"
+__version__ = "0.1.11"
 __author__ = 'Ke Li, Shichong Peng, Mehran Aghabozorgi'
 __credits__ = 'APEX Lab'
 

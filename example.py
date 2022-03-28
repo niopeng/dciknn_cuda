@@ -12,7 +12,7 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-Copyright (C) 2020    Ke Li, Shichong Peng
+Copyright (C) 2020    Ke Li, Shichong Peng, Mehran Aghabozorgi
 '''
 from dciknn_cuda import DCI, MDCI
 import torch
@@ -70,7 +70,7 @@ def main():
     num_outer_iterations = 5000
 
     # initialize the DCI instance
-    for i in range(10):
+    for i in range(2):
         a = datetime.datetime.now()
         dci_db = MDCI(dim, num_comp_indices, num_simp_indices, block_size, thread_size, devices=[0, 1])
 

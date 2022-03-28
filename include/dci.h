@@ -12,7 +12,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * Copyright (C) 2020    Ke Li, Shichong Peng
+ * Copyright (C) 2020    Ke Li, Shichong Peng, Mehran Aghabozorgi
  */
 
 #ifndef DCI_H
