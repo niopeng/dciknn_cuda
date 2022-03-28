@@ -31,15 +31,15 @@ python setup.py install --user
 ## Experimental PyPI install
 Simply run:
 ```bash
-pip install -i https://test.pypi.org/simple/ dciknn-cuda==0.1.10
+pip install -i https://test.pypi.org/simple/ dciknn-cuda==0.1.11
 ```
 If you don't have internet access (e.g., in a requested job in clusters), you can run the following before requesting the job:
 ```bash
-pip download -i https://test.pypi.org/simple/ dciknn-cuda==0.1.10
+pip download -i https://test.pypi.org/simple/ dciknn-cuda==0.1.11
 ```
 Then run the following in the requested job:
 ```
-pip install dciknn_cuda-0.1.10.tar.gz
+pip install dciknn_cuda-0.1.11.tar.gz
 ```
 
 
