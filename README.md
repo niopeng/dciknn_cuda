@@ -37,7 +37,7 @@ If you don't have internet access (e.g., in a requested job in clusters), you ca
 ```bash
 pip download -i https://test.pypi.org/simple/ dciknn-cuda==0.1.11
 ```
-Then run the following in the requested job:
+Then run the following in the requested job to install offline:
 ```
 pip install dciknn_cuda-0.1.11.tar.gz
 ```
