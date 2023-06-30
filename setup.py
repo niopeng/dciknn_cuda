@@ -50,7 +50,11 @@ setup(
             './src/util_kernel.cu',
         ], include_dirs=[
             os.path.abspath(os.path.join(os.path.dirname(__file__), 'include')),
-        ]
+        ], extra_compile_args={
+                'cxx': ['-g'],
+                'gcc': ['-g', '-o'],
+                'nvcc': ['-g', '-G'] 
+            }
         )
     ],
     cmdclass={

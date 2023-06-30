@@ -23,7 +23,7 @@
 #include <thread>
 #include <future>
 #include <vector>
-
+#include <stdio.h>
 
 typedef struct py_dci {
     dci dci_inst;
@@ -53,6 +53,9 @@ static void py_tensor_free(PyObject *py_tensor_wrapper) {
 
 py::handle py_dci_new(const int dim, const int num_comp_indices,
     const int num_simp_indices, const int deviceId) {
+
+    printf("py_dci_new in dci_cuda.cpp\n");
+
     const at::cuda::OptionalCUDAGuard device_guard(deviceId);
     py_dci *py_dci_inst;
     cudaMallocManaged((void **) &py_dci_inst, sizeof(py_dci));
@@ -67,6 +70,9 @@ py::handle py_dci_new(const int dim, const int num_comp_indices,
 
 void py_dci_add(py::handle py_dci_inst_wrapper, const int dim, const int num_points,
     torch::Tensor py_data, const int block_size, const int thread_size) {
+
+    printf("py_dci_add in dci_cuda.cpp\n");
+
     const at::cuda::OptionalCUDAGuard device_guard(device_of(py_data));
 
     PyObject *py_obj = py_dci_inst_wrapper.ptr();
@@ -85,6 +91,9 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     torch::Tensor py_query, const int num_neighbours, const bool blind, const int num_outer_iterations,
     const int max_num_candidates, const int block_size,
     const int thread_size) {
+
+    printf("py_dci_query in dci_cuda.cpp\n");
+
     const at::cuda::OptionalCUDAGuard device_guard(device_of(py_query));
 
     PyObject *py_obj = py_dci_inst_wrapper.ptr();
