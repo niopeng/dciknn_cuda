@@ -61,7 +61,7 @@ py::handle py_dci_new(const int dim, const int num_comp_indices,
     cudaMallocManaged((void **) &py_dci_inst, sizeof(py_dci));
 
     // initialize DCI instance
-    dci_init(&(py_dci_inst->dci_inst), dim, num_comp_indices, num_simp_indices, deviceId);
+    dci_init(&(py_dci_inst->dci_inst), dim, 1, num_comp_indices, num_simp_indices, deviceId);
 
     // Returns new reference
     PyObject *py_dci_inst_wrapper = PyCapsule_New(py_dci_inst, "py_dci_inst", py_dci_free_wrap);
@@ -80,7 +80,7 @@ void py_dci_add(py::handle py_dci_inst_wrapper, const int dim, const int num_poi
     float* data = (float *)py_data.data_ptr();
 
     // add data to DCI instance
-    dci_add(&(py_dci_inst->dci_inst), dim, num_points, data, block_size, thread_size);
+    dci_add(&(py_dci_inst->dci_inst), dim, num_points, 1, data, block_size, thread_size);
 
     PyObject *py_tensor_wrapper = PyCapsule_New(&py_data, "py_tensor", py_tensor_free);
     py_dci_inst->py_array = py_tensor_wrapper;
@@ -110,7 +110,7 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     cudaMalloc((void **) &(final_distances), sizeof(float) * output_size);
 
     // query using DCI
-    dci_query(&(py_dci_inst->dci_inst), dim, num_queries, query, num_neighbours,
+    dci_query(&(py_dci_inst->dci_inst), dim, 1, num_queries, query, num_neighbours,
       query_config, final_outputs, final_distances, block_size, thread_size);
 
     auto options = torch::TensorOptions().device(torch::kCUDA);

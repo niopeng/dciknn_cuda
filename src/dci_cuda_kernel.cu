@@ -76,7 +76,7 @@ __global__ void normalize_proj_vecs(float* const proj_vec, const int dim,
 /* Create matrix with proj_vec dim-dimensional normalized gaussian vectors.
  vectors are normalized along each row */
 void dci_gen_proj_vec(float* const proj_vec, const int dim,
-		const int num_indices) {
+		const int num_indices, const int num_heads) {
 	/* Generate the random indices */
 	rng_parallel_device(proj_vec, dim * num_indices, GAUSS_RAND);
 
@@ -91,17 +91,21 @@ void dci_gen_proj_vec(float* const proj_vec, const int dim,
 }
 
 /* Initializes the master DCI data structure.  */
-void dci_init(dci* const dci_inst, const int dim, const int num_comp_indices,
+void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int num_comp_indices,
 		const int num_simp_indices, const int devId) {
+
+	printf("dci_init in dci_cuda_kernel.cu\n");
+
 	int num_indices = num_comp_indices * num_simp_indices;
 
 	dci_inst->dim = dim;
+	dci_inst->num_heads = num_heads;
 	dci_inst->num_comp_indices = num_comp_indices;
 	dci_inst->num_simp_indices = num_simp_indices;
 
 	cudaMallocManaged((void **) &dci_inst->proj_vec,
 			sizeof(float) * dim * num_indices);
-	dci_gen_proj_vec(dci_inst->proj_vec, dim, num_indices);
+	dci_gen_proj_vec(dci_inst->proj_vec, dim, num_indices, num_heads);
 
 	/* Variables that initialize to default values */
 	dci_inst->num_points = 0;
@@ -147,8 +151,11 @@ __global__ void copy_to_indices(dci* const dci_inst, float* const data_proj,
 }
 
 /* Add data to the master DCI data structure.  */
-void dci_add(dci* const dci_inst, const int dim, const int num_points,
+void dci_add(dci* const dci_inst, const int dim, const int num_points, const int num_heads,
 		float* const data, const int block_size, const int thread_size) {
+
+	printf("dci_add in dci_cuda_kernel.cu\n");
+
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	float *data_proj;
 	cudaMallocManaged((void **) &data_proj,
@@ -775,11 +782,13 @@ void get_top_blind_candidates(int* const nearest_neighbours,
 
 // If blind querying is used, nearest_neighbours must be of size num_queries * max_possible_num_candidates; otherwise, it must be of size num_queries * num_neighbours
 // nearest_neighbour_dists can be NULL when blind querying is used
-void dci_query(dci* const dci_inst, const int dim, const int num_queries,
+void dci_query(dci* const dci_inst, const int dim, const int num_heads, const int num_queries,
 		const float* const query, const int num_neighbours,
 		const dci_query_config query_config, int* const nearest_neighbours,
 		float* const nearest_neighbour_dists, const int block_size,
 		const int thread_size) {
+
+	printf("dci_query in dci_cuda_kernel.cu\n");
 
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	int max_possible_num_candidates = min(query_config.max_num_candidates,
