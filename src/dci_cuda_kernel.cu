@@ -51,10 +51,11 @@ static inline float abs_d(float x) {
 
 /* Normalize the input projection vectors. Vectors are normalized along each row. */
 __global__ void normalize_proj_vecs(float* const proj_vec, const int dim,
-		const int num_indices) {
+		const int num_indices, const int num_heads) {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
 	/* Note: Assumes num_blocks = num_threads */
-	int chunk_size = (num_indices + blockDim.x * blockDim.x - 1)
+	int total_indices = num_indices * num_heads;
+	int chunk_size = (total_indices + blockDim.x * blockDim.x - 1)
 			/ (blockDim.x * blockDim.x);
 	int vec_index;
 	for (int j = 0; j < chunk_size; ++j) {
@@ -78,13 +79,13 @@ __global__ void normalize_proj_vecs(float* const proj_vec, const int dim,
 void dci_gen_proj_vec(float* const proj_vec, const int dim,
 		const int num_indices, const int num_heads) {
 	/* Generate the random indices */
-	rng_parallel_device(proj_vec, dim * num_indices, GAUSS_RAND);
+	rng_parallel_device(proj_vec, dim * num_indices * num_heads, GAUSS_RAND);
 
 	/* Normalize */
 	int block_size = 32;
 	int thread_size = 32;
 	normalize_proj_vecs<<<block_size, thread_size>>>(proj_vec, dim,
-			num_indices);
+			num_indices, num_heads);
 
 	/* Synchronize the threads */
 	cudaDeviceSynchronize();
@@ -104,7 +105,7 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 	dci_inst->num_simp_indices = num_simp_indices;
 
 	cudaMallocManaged((void **) &dci_inst->proj_vec,
-			sizeof(float) * dim * num_indices);
+			sizeof(float) * dim * num_indices * num_heads);
 	dci_gen_proj_vec(dci_inst->proj_vec, dim, num_indices, num_heads);
 
 	/* Variables that initialize to default values */
