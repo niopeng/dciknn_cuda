@@ -897,7 +897,7 @@ void dci_clear(dci* const dci_inst) {
 void dci_reset(dci* const dci_inst) {
 	dci_clear(dci_inst);
 	dci_gen_proj_vec(dci_inst->proj_vec, dci_inst->dim,
-			dci_inst->num_comp_indices * dci_inst->num_simp_indices);
+			dci_inst->num_comp_indices * dci_inst->num_simp_indices, dci_init->num_heads);
 }
 
 void dci_free(const dci* const dci_inst) {
