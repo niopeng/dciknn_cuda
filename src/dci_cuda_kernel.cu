@@ -117,7 +117,7 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 
 /* Sort indices */
 __global__ void sort_indices(dci* const dci_inst, const int num_indices,
-		const int num_points, const int points_per_block) {
+		const int num_points, const int num_heads, const int points_per_block) {
 	//int chunk_size = (num_indices + blockDim.x - 1) / blockDim.x;
 	int chunk_size = (num_heads * num_indices + blockDim.x - 1) / blockDim.x;
 	int idx;
@@ -153,7 +153,7 @@ __global__ void sort_indices(dci* const dci_inst, const int num_indices,
 
 /* Copy data in proj_vec to indices */
 __global__ void copy_to_indices(dci* const dci_inst, float* const data_proj,
-		const int num_indices, const int num_points) {
+		const int num_indices, const int num_points, const int num_heads) {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
 	int n = num_indices * num_points * num_heads;
 	int chunk_size = (n + blockDim.x * gridDim.x - 1)
@@ -212,22 +212,22 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 			&(data_proj[data_proj_id]), 
 			dci_inst->devID
 		);
+
+		printf("proj_vec_id: %d\n", proj_vec_id);
+		printf("data_id: %d\n", data_id);
+		printf("data_proj_id: %d\n", data_proj_id);
 	}
 	cudaDeviceSynchronize();
 
-	printf("proj_vec_id: %d\n", proj_vec_id);
-	printf("data_id: %d\n", data_id);
-	printf("data_proj_id: %d\n", data_proj_id);
-
 	/* Add to indices */
-	copy_to_indices	<<<block_size, thread_size>>>(dci_inst, data_proj, num_indices, num_points);
+	copy_to_indices	<<<block_size, thread_size>>>(dci_inst, data_proj, num_indices, num_points, num_heads);
 
 	/* Synchronize the threads */
 	cudaDeviceSynchronize();
 
 	int points_per_block = (dci_inst->num_points + block_size - 1) / block_size;
 	/* Sort the indices */
-	sort_indices<<<block_size, thread_size>>>(dci_inst, num_indices, num_points,
+	sort_indices<<<block_size, thread_size>>>(dci_inst, num_indices, num_points, num_heads
 			points_per_block);
 
 	/* Synchronize the threads */
