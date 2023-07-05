@@ -118,18 +118,35 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 /* Sort indices */
 __global__ void sort_indices(dci* const dci_inst, const int num_indices,
 		const int num_points, const int points_per_block) {
-	int chunk_size = (num_indices + blockDim.x - 1) / blockDim.x;
+	//int chunk_size = (num_indices + blockDim.x - 1) / blockDim.x;
+	int chunk_size = (num_heads * num_indices + blockDim.x - 1) / blockDim.x;
 	int idx;
+	//int num_points_in_block = min(
+	//		(int) (dci_inst->num_points - blockIdx.x * points_per_block),
+	//		points_per_block);
 	int num_points_in_block = min(
-			(int) (dci_inst->num_points - blockIdx.x * points_per_block),
+			(int) (dci_inst->num_points * num_heads - blockIdx.x * points_per_block),
 			points_per_block);
+
 	for (int j = 0; j < chunk_size; j++) {
 		idx = threadIdx.x * chunk_size + j;
-		if (idx < num_indices) {
+		if (idx < num_indices * num_heads) {
+
+			// calculate the distance to the start index of next head, this index should not include
+			// in the sorting
+			int head = (int) (idx / num_indices);
+			int num_elems_to_next_head = 
+				(head + 1) * num_indices * (dci_inst->num_points) - idx * (dci_inst->num_points);
+
 			mix_sort(
-					&(dci_inst->indices[idx * dci_inst->num_points
+					&(dci_inst->indices[idx * (dci_inst->num_points)
 							+ points_per_block * blockIdx.x]),
-					num_points_in_block);
+					min(num_points_in_block, num_elems_to_next_head));
+
+			//mix_sort(
+			//		&(dci_inst->indices[idx * dci_inst->num_points
+			//				+ points_per_block * blockIdx.x]),
+			//		num_points_in_block);
 		}
 	}
 }
@@ -138,15 +155,16 @@ __global__ void sort_indices(dci* const dci_inst, const int num_indices,
 __global__ void copy_to_indices(dci* const dci_inst, float* const data_proj,
 		const int num_indices, const int num_points) {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
-	int n = num_indices * num_points;
+	int n = num_indices * num_points * num_heads;
 	int chunk_size = (n + blockDim.x * gridDim.x - 1)
 			/ (blockDim.x * gridDim.x);
 	int idx;
 	for (int j = 0; j < chunk_size; j++) {
 		idx = i * chunk_size + j;
 		if (idx < n) {
+			int head = (int) (idx / (num_indices * num_points)); // start from head 0
 			dci_inst->indices[idx].key = data_proj[idx];
-			dci_inst->indices[idx].value = idx % num_points;
+			dci_inst->indices[idx].value = (idx % num_points) + (head * num_points);
 		}
 	}
 }
@@ -160,23 +178,46 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	float *data_proj;
 	cudaMallocManaged((void **) &data_proj,
-			sizeof(float) * num_points * num_indices);
+			sizeof(float) * num_points * num_indices * num_heads);
 
 	assert(dim == dci_inst->dim);
+	assert(num_heads == dci_inst->num_heads)
 	assert(dci_inst->num_points == 0);
 
 	cudaMallocManaged((void **) &dci_inst->data,
-			sizeof(float) * num_points * dim);
+			sizeof(float) * num_points * dim * num_heads);
 	dci_inst->data = data;
 	cudaMallocManaged((void **) &dci_inst->indices,
-			sizeof(idx_elem) * num_points * num_indices);
+			sizeof(idx_elem) * num_points * num_indices * num_heads);
 
 	dci_inst->num_points = num_points;
 
-	matmul_device(CUBLAS_OP_N, CUBLAS_OP_T, num_indices, num_points,
-			dci_inst->dim, dci_inst->proj_vec, dci_inst->data, data_proj,
-			dci_inst->devID);
+	//matmul_device(CUBLAS_OP_N, CUBLAS_OP_T, num_indices, num_points,
+	//		dci_inst->dim, dci_inst->proj_vec, dci_inst->data, data_proj,
+	//		dci_inst->devID);
+	//cudaDeviceSynchronize();
+
+	for (int i = 0; i < num_heads; i++) {
+		int proj_vec_id = i * dim * num_indices;
+		int data_id = i * num_points * dim;
+		int data_proj_id = i * num_points * num_indices;
+		matmul_device(
+			CUBLAS_OP_N, 
+			CUBLAS_OP_T, 
+			num_indices, 
+			num_points,
+			dci_inst->dim,
+			&(dci_inst->proj_vec[proj_vec_id]), 
+			&(dci_inst->data[data_id]), 
+			&(data_proj[data_proj_id]), 
+			dci_inst->devID
+		);
+	}
 	cudaDeviceSynchronize();
+
+	printf("proj_vec_id: %d\n", proj_vec_id);
+	printf("data_id: %d\n", data_id);
+	printf("data_proj_id: %d\n", data_proj_id);
 
 	/* Add to indices */
 	copy_to_indices	<<<block_size, thread_size>>>(dci_inst, data_proj, num_indices, num_points);
