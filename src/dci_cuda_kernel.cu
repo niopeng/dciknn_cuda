@@ -181,7 +181,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 			sizeof(float) * num_points * num_indices * num_heads);
 
 	assert(dim == dci_inst->dim);
-	assert(num_heads == dci_inst->num_heads)
+	assert(num_heads == dci_inst->num_heads);
 	assert(dci_inst->num_points == 0);
 
 	cudaMallocManaged((void **) &dci_inst->data,
@@ -227,7 +227,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 
 	int points_per_block = (dci_inst->num_points + block_size - 1) / block_size;
 	/* Sort the indices */
-	sort_indices<<<block_size, thread_size>>>(dci_inst, num_indices, num_points, num_heads
+	sort_indices<<<block_size, thread_size>>>(dci_inst, num_indices, num_points, num_heads,
 			points_per_block);
 
 	/* Synchronize the threads */
