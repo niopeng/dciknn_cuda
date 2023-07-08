@@ -51,7 +51,7 @@ static void py_tensor_free(PyObject *py_tensor_wrapper) {
     cudaFree(py_tensor);
 }
 
-py::handle py_dci_new(const int dim, const int num_comp_indices,
+py::handle py_dci_new(const int dim, const int num_heads, const int num_comp_indices,
     const int num_simp_indices, const int deviceId) {
 
     printf("py_dci_new in dci_cuda.cpp\n");
@@ -61,14 +61,14 @@ py::handle py_dci_new(const int dim, const int num_comp_indices,
     cudaMallocManaged((void **) &py_dci_inst, sizeof(py_dci));
 
     // initialize DCI instance
-    dci_init(&(py_dci_inst->dci_inst), dim, 1, num_comp_indices, num_simp_indices, deviceId);
+    dci_init(&(py_dci_inst->dci_inst), dim, num_heads, num_comp_indices, num_simp_indices, deviceId);
 
     // Returns new reference
     PyObject *py_dci_inst_wrapper = PyCapsule_New(py_dci_inst, "py_dci_inst", py_dci_free_wrap);
     return py_dci_inst_wrapper;
 }
 
-void py_dci_add(py::handle py_dci_inst_wrapper, const int dim, const int num_points,
+void py_dci_add(py::handle py_dci_inst_wrapper, const int dim, const int num_points, const int num_heads,
     torch::Tensor py_data, const int block_size, const int thread_size) {
 
     printf("py_dci_add in dci_cuda.cpp\n");
@@ -80,7 +80,7 @@ void py_dci_add(py::handle py_dci_inst_wrapper, const int dim, const int num_poi
     float* data = (float *)py_data.data_ptr();
 
     // add data to DCI instance
-    dci_add(&(py_dci_inst->dci_inst), dim, num_points, 1, data, block_size, thread_size);
+    dci_add(&(py_dci_inst->dci_inst), dim, num_points, num_heads, data, block_size, thread_size);
 
     PyObject *py_tensor_wrapper = PyCapsule_New(&py_data, "py_tensor", py_tensor_free);
     py_dci_inst->py_array = py_tensor_wrapper;
@@ -126,7 +126,7 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     return final_result;
 }
 
-std::vector<torch::Tensor> py_dci_multi_query(std::vector<py::handle> py_dci_inst_wrapper, const int dim, const int num_queries,
+std::vector<torch::Tensor> py_dci_multi_query(std::vector<py::handle> py_dci_inst_wrapper, const int dim, const int num_queries, 
     std::vector<torch::Tensor> py_query, const int num_neighbours, const bool blind, const int num_outer_iterations,
     const int max_num_candidates, const int block_size,
     const int thread_size) {

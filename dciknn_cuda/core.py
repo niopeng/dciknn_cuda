@@ -24,15 +24,16 @@ from math import sqrt
 
 class DCI(object):
     
-    def __init__(self, dim, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10, device=0):
+    def __init__(self, dim, num_heads, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10, device=0):
         
         if not torch.cuda.is_available():
             raise RuntimeError("DCI CUDA version requires GPU access, please check CUDA driver.")
 
         self._dim = dim
+        self._num_heads = num_heads
         self._num_comp_indices = num_comp_indices
         self._num_simp_indices = num_simp_indices
-        self._dci_inst = _dci_new(dim, num_comp_indices, num_simp_indices, device)
+        self._dci_inst = _dci_new(dim, num_heads, num_comp_indices, num_simp_indices, device)
         self._array = None
         self._block_size = bs
         self._thread_size = ts
@@ -42,6 +43,10 @@ class DCI(object):
     def dim(self):
         return self._dim
         
+    @property
+    def num_heads(self):
+        return self._num_heads
+
     @property
     def num_comp_indices(self):
         return self._num_comp_indices
@@ -70,10 +75,10 @@ class DCI(object):
         if self.num_points > 0:
             raise RuntimeError("DCI class does not support insertion of more than one tensor. Must combine all tensors into one tensor before inserting")
         self._check_data(data)
-        self.num_points = data.shape[0]
-        _dci_add(self._dci_inst, self._dim, self.num_points, data.flatten(), self._block_size, self._thread_size)
+        self.num_points = data.shape[0] // self._num_heads
+        _dci_add(self._dci_inst, self._dim, self.num_points, self._num_heads, data.flatten(), self._block_size, self._thread_size)
         self._array = data
-    
+
     # query is num_queries x dim, returns num_queries x num_neighbours
     def query(self, query, num_neighbours=-1, num_outer_iterations=5000, blind=False):
         if len(query.shape) < 2:
