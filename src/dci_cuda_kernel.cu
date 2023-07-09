@@ -72,8 +72,6 @@ __global__ void normalize_proj_vecs(float* const proj_vec, const int dim,
 			}
 		}
 	}
-
-	printf("normalize_proj_vecs i = %d\n", i);
 }
 
 /* Create matrix with proj_vec dim-dimensional normalized gaussian vectors.
@@ -109,6 +107,15 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 	cudaMallocManaged((void **) &dci_inst->proj_vec,
 			sizeof(float) * dim * num_indices * num_heads);
 	dci_gen_proj_vec(dci_inst->proj_vec, dim, num_indices, num_heads);
+
+	// check gen_proj_vec
+	for (int i = 0; i < num_heads; i++) {
+		printf("num_heads: %d\n", i);
+		for (int j = 0; j < dim * num_indices; j++) {
+			printf("%d ", j);
+		}
+		printf("\n");
+	}
 
 	/* Variables that initialize to default values */
 	dci_inst->num_points = 0;
