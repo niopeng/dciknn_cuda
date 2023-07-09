@@ -76,6 +76,9 @@ class DCI(object):
             raise RuntimeError("DCI class does not support insertion of more than one tensor. Must combine all tensors into one tensor before inserting")
         self._check_data(data)
         self.num_points = data.shape[0] // self._num_heads
+
+        print("core.py add function num_points: " + self.num_points)
+
         _dci_add(self._dci_inst, self._dim, self.num_points, self._num_heads, data.flatten(), self._block_size, self._thread_size)
         self._array = data
 
@@ -110,7 +113,6 @@ class DCI(object):
         _dci_free(self._dci_inst)
         self.num_points = 0
         self._array = None
-
 
 class MDCI(object):
     def __init__(self, dim, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10, devices=[0]):

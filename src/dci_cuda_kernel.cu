@@ -72,6 +72,8 @@ __global__ void normalize_proj_vecs(float* const proj_vec, const int dim,
 			}
 		}
 	}
+
+	printf("normalize_proj_vecs i = %d\n", i);
 }
 
 /* Create matrix with proj_vec dim-dimensional normalized gaussian vectors.
