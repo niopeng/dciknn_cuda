@@ -116,9 +116,11 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 	//	}
 	//	printf("\n");
 	//}
+	printf("\n");
+	int h = 0;
 	for (int j = 0; j < dim * num_indices; j++) {
-		int i = j + dim * num_indices;
-		printf("%f ", dci_inst->proj_vec[j]);
+		int i = j + dim * num_indices * h;
+		printf("%f ", dci_inst->proj_vec[i]);
 	}
 	printf("\n");
 
@@ -227,9 +229,9 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 			dci_inst->devID
 		);
 
-		printf("proj_vec_id: %d\n", proj_vec_id);
-		printf("data_id: %d\n", data_id);
-		printf("data_proj_id: %d\n", data_proj_id);
+		//printf("proj_vec_id: %d\n", proj_vec_id);
+		//printf("data_id: %d\n", data_id);
+		//printf("data_proj_id: %d\n", data_proj_id);
 	}
 	cudaDeviceSynchronize();
 
