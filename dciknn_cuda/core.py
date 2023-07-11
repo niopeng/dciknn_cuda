@@ -77,7 +77,7 @@ class DCI(object):
         self._check_data(data)
         self.num_points = data.shape[0] // self._num_heads
 
-        print("core.py add function num_points: " + self.num_points)
+        print("core.py add function num_points: " + str(self.num_points))
 
         _dci_add(self._dci_inst, self._dim, self.num_points, self._num_heads, data.flatten(), self._block_size, self._thread_size)
         self._array = data
