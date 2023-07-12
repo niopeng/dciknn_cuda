@@ -86,6 +86,7 @@ def main():
 
         data = data_and_queries[:(num_pts * num_heads), :].detach().clone().to(0)
         query = data_and_queries[(num_pts * num_heads):, :].detach().clone().to(0)
+
         a = datetime.datetime.now()
         dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
@@ -97,6 +98,9 @@ def main():
         dci_db.clear()
         b = datetime.datetime.now()
         print(b-a)
+
+        print(len(data))
+        print(len(query))
 
 if __name__ == '__main__':
     main()
