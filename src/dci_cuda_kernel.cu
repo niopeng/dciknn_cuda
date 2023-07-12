@@ -117,7 +117,7 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 	//	printf("\n");
 	//}
 	printf("\n");
-	int h = 0;
+	int h = 1;
 	for (int j = 0; j < dim * num_indices; j++) {
 		int i = j + dim * num_indices * h;
 		printf("%f ", dci_inst->proj_vec[i]);
