@@ -238,7 +238,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	cudaDeviceSynchronize();
 
 	printf("\n");
-	int h = 0;
+	int h = 1;
 	for (int j = 0; j < num_points * num_indices; j++) {
 		int i = j + num_points * num_indices * h;
 		printf("%f ", dci_inst->proj_vec[i]);
