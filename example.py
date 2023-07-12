@@ -19,8 +19,8 @@ import torch
 import random
 import datetime
 
-random.seed(10)
-torch.manual_seed(0)
+random_seed = 1
+torch.manual_seed(random_seed)
 
 def gen_data(ambient_dim, intrinsic_dim, num_points):
     latent_data = torch.randn((num_points, intrinsic_dim))
