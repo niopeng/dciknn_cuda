@@ -22,8 +22,8 @@ import datetime
 random_seed = 1
 torch.manual_seed(random_seed)
 
-def gen_data(ambient_dim, intrinsic_dim, num_points):
-    latent_data = torch.randn((num_points, intrinsic_dim))
+def gen_data(ambient_dim, intrinsic_dim, num_points, num_heads):
+    latent_data = torch.randn((num_points * num_heads, intrinsic_dim))
     transformation = torch.randn((intrinsic_dim, ambient_dim))
     data = torch.matmul(latent_data, transformation)
     return data     # num_points x ambient_dim
@@ -41,12 +41,13 @@ def main():
     dim = 100
     num_pts = 3000
     num_queries = 500
+    num_heads = 2
     # dim = 80
     # num_pts = 1000
     # num_queries = 100
 
     intrinsic_dim = 400
-    data_and_queries = gen_data(dim, intrinsic_dim, num_pts + num_queries)
+    data_and_queries = gen_data(dim, intrinsic_dim, num_pts + num_queries, num_heads)
 
     #data = data_and_queries[:num_pts, :].detach().clone().to(device)
     #query = data_and_queries[num_pts:, :].detach().clone().to(device)
@@ -68,7 +69,6 @@ def main():
     num_comp_indices = 2
     num_simp_indices = 10
     num_outer_iterations = 5000
-    num_heads = 2
 
     # initialize the DCI instance
     for i in range(2):
@@ -84,8 +84,8 @@ def main():
         #b = datetime.datetime.now()
         #print(b-a)
 
-        data = data_and_queries[:num_pts, :].detach().clone().to(0)
-        query = data_and_queries[num_pts:, :].detach().clone().to(0)
+        data = data_and_queries[:(num_pts * num_heads), :].detach().clone().to(0)
+        query = data_and_queries[(num_pts * num_heads):, :].detach().clone().to(0)
         a = datetime.datetime.now()
         dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
