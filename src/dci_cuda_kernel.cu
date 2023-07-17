@@ -289,10 +289,12 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	/* Synchronize the threads */
 	cudaDeviceSynchronize();
 
-	int points_per_block = (dci_inst->num_points + block_size - 1) / block_size;
+	//int points_per_block = (dci_inst->num_points + block_size - 1) / block_size;
+	int points_per_block = (dci_inst->num_points * num_heads + block_size - 1) / block_size;
 	/* Sort the indices */
 	sort_indices<<<block_size, thread_size>>>(dci_inst, num_indices, num_points, num_heads,
 			points_per_block);
+
 
 	int data_size = sizeof(idx_elem) * num_heads * num_points * num_indices;
 	idx_elem* h_data = (idx_elem *) malloc(data_size);
