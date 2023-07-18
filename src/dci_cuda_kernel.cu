@@ -209,8 +209,6 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 
 	dci_inst->num_points = num_points;
 
-	dim * num_indices * num_heads
-
     // project vector
 	int data_size = sizeof(float) * dim * num_indices * num_heads;
 	float* h_data = (float *) malloc(data_size);
