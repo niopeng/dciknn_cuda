@@ -218,7 +218,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 		printf("head: %d\n", h);
 		for (int i = 0; i < num_indices; i++) {
 			printf("index: %d\n", i);
-			for (int j = 0; j < num_points; j++) {
+			for (int j = 0; j < dim; j++) {
 				printf("%f ", h_data[j + i * num_points + h * num_points * num_indices]);
 			}
 			printf("\n");
