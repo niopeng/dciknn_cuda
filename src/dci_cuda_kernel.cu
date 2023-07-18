@@ -209,6 +209,26 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 
 	dci_inst->num_points = num_points;
 
+    // project vector
+	int data_size = sizeof(float) * dim * num_indices * num_heads;
+	float* h_data = (float *) malloc(data_size);
+	cudaMemcpy(h_data, dci_inst->proj_vec, data_size, cudaMemcpyDeviceToHost);
+
+	for (int h = 0; h < num_heads; h++) {
+		printf("head: %d\n", h);
+		for (int i = 0; i < num_indices; i++) {
+			printf("index: %d\n", i);
+			for (int j = 0; j < num_points; j++) {
+				printf("%f ", h_data[j + i * num_points + h * num_points * num_indices]);
+			}
+			printf("\n");
+		}
+		printf("head: %d\n", h);
+	}
+
+	cudaFree(h_data);
+	printf("\n");
+
 	//matmul_device(CUBLAS_OP_N, CUBLAS_OP_T, num_indices, num_points,
 	//		dci_inst->dim, dci_inst->proj_vec, dci_inst->data, data_proj,
 	//		dci_inst->devID);
