@@ -117,15 +117,15 @@ def main():
         #data = data_and_queries[:(num_pts), :].detach().clone().to(0)
         #query = data_and_queries[(num_pts):, :].detach().clone().to(0)
 
-        #a = datetime.datetime.now()
-        #dci_db = DCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+        a = datetime.datetime.now()
+        dci_db = DCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
-        #dci_db.add(data)
+        dci_db.add(data)
         #indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
 
-        #dci_db.clear()
-        #b = datetime.datetime.now()
-        #print(b-a)
+        dci_db.clear()
+        b = datetime.datetime.now()
+        print(b-a)
 
 if __name__ == '__main__':
     main()
