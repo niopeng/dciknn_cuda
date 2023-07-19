@@ -60,7 +60,7 @@ __global__ void normalize_proj_vecs(float* const proj_vec, const int dim,
 	int vec_index;
 	for (int j = 0; j < chunk_size; ++j) {
 		vec_index = i * chunk_size + j;
-		if (vec_index < num_indices) {
+		if (vec_index < total_indices) {
 			float sq_norm = 0.0;
 			for (int k = 0; k < dim; ++k) {
 				sq_norm += proj_vec[vec_index * dim + k]
