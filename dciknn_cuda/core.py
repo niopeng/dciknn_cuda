@@ -93,11 +93,15 @@ class DCI(object):
             num_neighbours = self.num_points
         self._ensure_positive_integer(num_neighbours)
         max_num_candidates = 10 * num_neighbours
-        # num_queries x num_neighbours
 
-        _query_result = _dci_query(self._dci_inst, self._dim, _query.shape[0], _query.flatten(), num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
-        half = _query_result.shape[0] // 2
-        return _query_result[:half].reshape(_query.shape[0], -1), _query_result[half:].reshape(_query.shape[0], -1)
+        num_queries = _query.shape[0] // self._num_heads
+
+        print(num_queries)
+
+        #_query_result = _dci_query(self._dci_inst, self._dim, num_queries, _query.flatten(), num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
+        
+        #half = _query_result.shape[0] // 2
+        #return _query_result[:half].reshape(_query.shape[0], -1), _query_result[half:].reshape(_query.shape[0], -1)
     
     def clear(self):
         _dci_clear(self._dci_inst)
