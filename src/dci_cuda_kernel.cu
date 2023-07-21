@@ -315,7 +315,6 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	sort_indices<<<block_size, thread_size>>>(dci_inst, num_indices, num_points, num_heads,
 			points_per_block);
 
-	/*
 	int data_size = sizeof(idx_elem) * num_heads * num_points * num_indices;
 	idx_elem* h_data = (idx_elem *) malloc(data_size);
 	cudaMemcpy(h_data, dci_inst->indices, data_size, cudaMemcpyDeviceToHost);
@@ -334,7 +333,6 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 
 	cudaFree(h_data);
 	printf("\n");
-	*/
 
 	/* Synchronize the threads */
 	cudaDeviceSynchronize();
@@ -955,10 +953,51 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	float* query_proj;
 
 	cudaMallocManaged((void **) (&query_proj),
-			sizeof(float) * num_indices * num_queries);
+			sizeof(float) * num_indices * num_queries * num_heads);
 
-	matmul_device(CUBLAS_OP_N, CUBLAS_OP_T, num_queries, num_indices,
-			dci_inst->dim, query, dci_inst->proj_vec, query_proj, devId);
+	//matmul_device(CUBLAS_OP_N, CUBLAS_OP_T, num_queries, num_indices,
+	//		dci_inst->dim, query, dci_inst->proj_vec, query_proj, devId);
+
+	for (int i = 0; i < num_heads; i++) {
+		int query_id = i * dci_inst->dim * num_queries;
+		int proj_vec_id = i * dci_inst->dim * num_indices;
+		int query_proj_id = i * num_indices * num_queries;
+
+		matmul_device(
+			CUBLAS_OP_N, 
+			CUBLAS_OP_T, 
+			num_queries, 
+			num_indices,
+			dci_inst->dim,
+			&(query[query_id]), 
+			&(dci_inst->proj_vec[proj_vec_id]), 
+			&(query_proj[query_proj_id]), 
+			devId
+		);
+	}
+
+	/*print result - testing*/
+	/*
+	int data_size = sizeof(float) * num_indices * num_queries * num_heads;
+	float* h_data = (float *) malloc(data_size);
+	cudaMemcpy(h_data, query_proj, data_size, cudaMemcpyDeviceToHost);
+
+	for (int h = 0; h < num_heads; h++) {
+		printf("head: %d\n", h);
+		for (int i = 0; i < num_queries; i++) {
+			printf("index: %d\n", i);
+			for (int j = 0; j < num_indices; j++) {
+				printf("%f ", h_data[j + i * num_points + h * num_points * num_indices]);
+			}
+			printf("\n");
+		}
+		printf("head: %d\n", h);
+	}
+
+	cudaFree(h_data);
+	printf("\n");
+	*/
+	/*testing*/
 
 	// copy query config to device pointer
 	dci_query_config* d_query_config;
@@ -1009,6 +1048,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		cudaDeviceSynchronize();
 
 		// get the final output
+		/*
 		if (!query_config.blind) {
 			get_top_candidates(&(nearest_neighbours[j * num_neighbours]),
 					&(nearest_neighbour_dists[j * num_neighbours]),
@@ -1020,6 +1060,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 					d_all_candidates, max_possible_num_candidates,
 					block_size * max_possible_num_candidates);
 		}
+		*/
 	}
 
 	// free the allocated memories
