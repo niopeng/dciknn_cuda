@@ -87,7 +87,12 @@ void py_dci_add(py::handle py_dci_inst_wrapper, const int dim, const int num_poi
     Py_INCREF(py_tensor_wrapper);
 }
 
-torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const int num_heads, const int num_queries,
+
+//torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const int num_heads, const int num_queries,
+//    torch::Tensor py_query, const int num_neighbours, const bool blind, const int num_outer_iterations,
+//    const int max_num_candidates, const int block_size,
+//    const int thread_size) {
+void py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const int num_heads, const int num_queries,
     torch::Tensor py_query, const int num_neighbours, const bool blind, const int num_outer_iterations,
     const int max_num_candidates, const int block_size,
     const int thread_size) {
