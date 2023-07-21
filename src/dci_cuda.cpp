@@ -87,7 +87,7 @@ void py_dci_add(py::handle py_dci_inst_wrapper, const int dim, const int num_poi
     Py_INCREF(py_tensor_wrapper);
 }
 
-torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const int num_queries,
+torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const int num_heads, const int num_queries,
     torch::Tensor py_query, const int num_neighbours, const bool blind, const int num_outer_iterations,
     const int max_num_candidates, const int block_size,
     const int thread_size) {
@@ -105,14 +105,15 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     dci_query_config query_config = {blind, num_outer_iterations, max_num_candidates};
     int*  final_outputs;
     float* final_distances;
-    const int output_size = num_neighbours * num_queries;
+    const int output_size = num_neighbours * num_queries * num_heads;
     cudaMalloc((void **) &(final_outputs), sizeof(int) * output_size);
     cudaMalloc((void **) &(final_distances), sizeof(float) * output_size);
 
     // query using DCI
-    dci_query(&(py_dci_inst->dci_inst), dim, 1, num_queries, query, num_neighbours,
+    dci_query(&(py_dci_inst->dci_inst), dim, num_heads, num_queries, query, num_neighbours,
       query_config, final_outputs, final_distances, block_size, thread_size);
 
+    /*
     auto options = torch::TensorOptions().device(torch::kCUDA);
     auto new_options = torch::TensorOptions().dtype(torch::kInt32).device(torch::kCUDA);
     torch::Tensor final_outputs_array = torch::from_blob(final_outputs, {output_size}, new_options);
@@ -124,6 +125,7 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     torch::Tensor final_result = torch::cat({ final, final_distances_array }, 0);
 
     return final_result;
+    */
 }
 
 std::vector<torch::Tensor> py_dci_multi_query(std::vector<py::handle> py_dci_inst_wrapper, const int dim, const int num_queries, 

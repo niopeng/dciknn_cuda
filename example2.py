@@ -111,8 +111,8 @@ def main():
         data = data1.detach().clone().to(0)
         query = query1.detach().clone().to(0)
 
-        print(len(data))
-        print(len(query))
+        #print(len(data))
+        #print(len(query))
 
         #data = data_and_queries[:(num_pts), :].detach().clone().to(0)
         #query = data_and_queries[(num_pts):, :].detach().clone().to(0)
