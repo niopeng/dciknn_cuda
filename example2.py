@@ -121,6 +121,7 @@ def main():
         dci_db = DCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
         dci_db.add(data)
+        dci_db.query(query, num_neighbours, num_outer_iterations)
         #indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
 
         dci_db.clear()
