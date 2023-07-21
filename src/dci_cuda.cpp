@@ -126,7 +126,7 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     torch::Tensor final_result = torch::cat({ final, final_distances_array }, 0);
     */
 
-    return NULL;
+    return py_query;
 }
 
 std::vector<torch::Tensor> py_dci_multi_query(std::vector<py::handle> py_dci_inst_wrapper, const int dim, const int num_queries, 
