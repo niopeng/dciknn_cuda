@@ -93,6 +93,7 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     const int max_num_candidates, const int block_size,
     const int thread_size) {
 
+
     printf("py_dci_query in dci_cuda.cpp\n");
 
     const at::cuda::OptionalCUDAGuard device_guard(device_of(py_query));
@@ -129,14 +130,14 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     return py_query;
 }
 
-std::vector<torch::Tensor> py_dci_multi_query(std::vector<py::handle> py_dci_inst_wrapper, const int dim, const int num_queries, 
-    std::vector<torch::Tensor> py_query, const int num_neighbours, const bool blind, const int num_outer_iterations,
-    const int max_num_candidates, const int block_size,
+std::vector<torch::Tensor> py_dci_multi_query(std::vector<py::handle> py_dci_inst_wrapper, const int dim, const int num_heads, 
+    const int num_queries, std::vector<torch::Tensor> py_query, const int num_neighbours, const bool blind, 
+    const int num_outer_iterations, const int max_num_candidates, const int block_size,
     const int thread_size) {
     std::vector<torch::Tensor> results;
     std::vector<std::future<torch::Tensor>> calcs;
     for (unsigned int i = 0; i < py_query.size(); i++) {
-        calcs.push_back(std::async(py_dci_query, py_dci_inst_wrapper[i], dim, num_queries,
+        calcs.push_back(std::async(py_dci_query, py_dci_inst_wrapper[i], dim, num_heads, num_queries,
             py_query[i], num_neighbours, blind, num_outer_iterations, max_num_candidates, block_size, thread_size));
     }
     for (unsigned int i = 0; i < py_query.size(); i++) {
