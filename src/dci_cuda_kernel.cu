@@ -979,26 +979,29 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	}
 
 	/*print result - testing*/
-	/*
-	int data_size = sizeof(float) * num_indices * num_queries * num_heads;
+	int data_total = num_indices * num_queries * num_heads;
+	int data_size = sizeof(float) * data_total;
 	float* h_data = (float *) malloc(data_size);
 	cudaMemcpy(h_data, query_proj, data_size, cudaMemcpyDeviceToHost);
 
-	for (int h = 0; h < num_heads; h++) {
-		printf("head: %d\n", h);
-		for (int i = 0; i < num_queries; i++) {
-			printf("index: %d\n", i);
-			for (int j = 0; j < num_indices; j++) {
-				printf("%f ", h_data[j + i * num_queries + h * num_queries * num_indices]);
-			}
-			printf("\n");
-		}
-		printf("head: %d\n", h);
+	for (int h = 0; h < data_total; h++) {
+		printf("%f ", h_data[h]);
 	}
+
+	//for (int h = 0; h < num_heads; h++) {
+	//	printf("head: %d\n", h);
+	//	for (int i = 0; i < num_queries; i++) {
+	//		printf("index: %d\n", i);
+	//		for (int j = 0; j < num_indices; j++) {
+	//			printf("%f ", h_data[j + i * num_queries + h * num_queries * num_indices]);
+	//		}
+	//		printf("\n");
+	//	}
+	//	printf("head: %d\n", h);
+	//}
 
 	cudaFree(h_data);
 	printf("\n");
-	*/
 	/*testing*/
 
 	// copy query config to device pointer
