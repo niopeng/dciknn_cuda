@@ -96,7 +96,7 @@ class DCI(object):
 
         num_queries = _query.shape[0] // self._num_heads
 
-        #print(num_queries)
+        print(num_queries)
 
         _dci_query(self._dci_inst, self._dim, self._num_heads, num_queries, _query.flatten(), num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
 

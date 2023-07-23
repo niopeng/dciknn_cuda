@@ -979,6 +979,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	}
 
 	/*print result - testing*/
+	/*
 	int data_size = sizeof(float) * num_indices * num_queries * num_heads;
 	float* h_data = (float *) malloc(data_size);
 	cudaMemcpy(h_data, query_proj, data_size, cudaMemcpyDeviceToHost);
@@ -997,6 +998,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 	cudaFree(h_data);
 	printf("\n");
+	*/
 	/*testing*/
 
 	// copy query config to device pointer
