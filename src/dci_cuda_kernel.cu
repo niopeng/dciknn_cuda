@@ -1109,7 +1109,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		dci_inst, num_heads, num_queries, num_neighbours, block_size, thread_size,
 		query, query_proj, query_config, d_top_candidates_dist, d_top_candidates_index,
 		all_candidates, counts, candidate_dists);
-
+	cudaDeviceSynchronize();
+			
 	/*
 	for (int j = 0; j < num_queries; j++) {
 		// need to refresh the result holder to avoid carry over results
