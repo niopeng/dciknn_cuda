@@ -952,6 +952,7 @@ __global__ void get_dci_query_result(const dci* const dci_inst, const int num_he
 	//&(query[query_id]), 
 
 	int j;
+	int idx;
 	// initialize the counters
 	for (j = 0; j < chunk_size; j++) {
 		idx = threadIdx.x * chunk_size + j;
@@ -968,12 +969,12 @@ __global__ void get_dci_query_result(const dci* const dci_inst, const int num_he
 
 			init_counts<<<block_size, thread_size>>>(
 				dci_inst, 
-				counts[dci_inst->num_comp_indices * dci_inst->num_points * head]
+				counts[(dci_inst->num_comp_indices) * (dci_inst->num_points) * head]
 			);
 
 			init_candidate_dists<<<block_size, thread_size>>>(
 				dci_inst,
-				candidate_dists[dci_inst->num_points * head]
+				candidate_dists[(dci_inst->num_points) * head]
 			);
 			
 			cudaDeviceSynchronize();
