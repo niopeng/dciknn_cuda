@@ -512,7 +512,8 @@ __device__ void init_index_priority(const dci* const dci_inst,
 
 __global__ void init_counts(const dci* const dci_inst, int* counts) {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
-	int total = dci_inst->num_comp_indices * dci_inst->num_points * dci_init->num_heads;
+	int total = dci_inst->num_comp_indices * dci_inst->num_points 
+	total = dci_inst->num_heads * total;
 	int chunk_size = (total + blockDim.x * gridDim.x - 1)
 			/ (blockDim.x * gridDim.x);
 	for (int j = 0; j < chunk_size; j++) {
@@ -526,7 +527,7 @@ __global__ void init_counts(const dci* const dci_inst, int* counts) {
 __global__ void init_candidate_dists(const dci* const dci_inst,
 		float* candidate_dists) {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
-	int total = dci_inst->num_points * dci_init->num_heads;
+	int total = dci_inst->num_points * dci_inst->num_heads;
 	int chunk_size = (total + blockDim.x * gridDim.x - 1)
 			/ (blockDim.x * gridDim.x);
 	for (int j = 0; j < chunk_size; j++) {
