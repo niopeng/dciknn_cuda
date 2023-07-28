@@ -929,7 +929,7 @@ void get_top_blind_candidates(int* const nearest_neighbours,
 }
 
 __global__ void get_dci_query_result(const dci* const dci_inst, const int num_heads, const int num_queries, 
-	const int num_neighbours, const int block_size, const int thread_size
+	const int num_neighbours, const int block_size, const int thread_size,
 	const float* const query, float* query_proj, const dci_query_config query_config,
 	float* const d_top_candidates_dist, int* const d_top_candidates_index,
 	int* const all_candidates, int* counts, float* candidate_dists) {
