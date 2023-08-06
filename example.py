@@ -50,11 +50,8 @@ def main():
     
     data_and_queries = gen_data(dim, intrinsic_dim, num_pts + num_queries, num_heads)
 
-    data = data_and_queries[:, :num_pts, :].detach().clone().to(device)
-    query = data_and_queries[:, num_pts:, :].detach().clone().to(device)
-
-    print(data.size())
-    print(query.size())
+    #data = data_and_queries[:, :num_pts, :].detach().clone().to(device)
+    #query = data_and_queries[:, num_pts:, :].detach().clone().to(device)
 
     #############################################################################################################################################
     #                                                                                                                                           #
@@ -75,7 +72,7 @@ def main():
     num_outer_iterations = 5000
 
     # initialize the DCI instance
-    #for i in range(2):
+    for i in range(2):
         #a = datetime.datetime.now()
         #dci_db = MDCI(dim, num_comp_indices, num_simp_indices, block_size, thread_size, devices=[0, 1])
 
@@ -88,8 +85,11 @@ def main():
         #b = datetime.datetime.now()
         #print(b-a)
 
-        #data = data_and_queries[:(num_pts * num_heads), :].detach().clone().to(0)
-        #query = data_and_queries[(num_pts * num_heads):, :].detach().clone().to(0)
+        data = data_and_queries[:(num_pts * num_heads), :].detach().clone().to(0)
+        query = data_and_queries[(num_pts * num_heads):, :].detach().clone().to(0)
+
+        print(data.size())
+        print(query.size())
 
         #a = datetime.datetime.now()
         #dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
