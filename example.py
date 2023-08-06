@@ -85,8 +85,8 @@ def main():
         #b = datetime.datetime.now()
         #print(b-a)
 
-        data = data_and_queries[:(num_pts * num_heads), :].detach().clone().to(0)
-        query = data_and_queries[(num_pts * num_heads):, :].detach().clone().to(0)
+        data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
+        query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
 
         print(data.size())
         print(query.size())
