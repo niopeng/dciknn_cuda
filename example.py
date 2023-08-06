@@ -23,8 +23,8 @@ random_seed = 1
 torch.manual_seed(random_seed)
 
 def gen_data(ambient_dim, intrinsic_dim, num_points, num_heads):
-    latent_data = torch.randn((num_points, intrinsic_dim))
-    transformation = torch.randn((intrinsic_dim, ambient_dim)) 
+    latent_data = torch.randn((num_heads, num_points, intrinsic_dim))
+    transformation = torch.randn((num_heads, intrinsic_dim, ambient_dim)) 
     data = torch.matmul(latent_data, transformation)
     return data     # num_points x ambient_dim
 
@@ -48,10 +48,8 @@ def main():
 
     intrinsic_dim = 400
     
-    value = torch.randn((num_pts + num_queries, intrinsic_dim, num_heads))
-    print(value.size())
-    
-    #data_and_queries = gen_data(dim, intrinsic_dim, num_pts + num_queries, num_heads)
+    data_and_queries = gen_data(dim, intrinsic_dim, num_pts + num_queries, num_heads)
+    print(data_and_queries.size())
 
     #data = data_and_queries[:num_pts, :].detach().clone().to(device)
     #query = data_and_queries[num_pts:, :].detach().clone().to(device)
