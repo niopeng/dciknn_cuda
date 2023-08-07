@@ -23,7 +23,7 @@ from math import sqrt
 
 
 class DCI(object):
-    
+
     def __init__(self, dim, num_heads, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10, device=0):
         
         if not torch.cuda.is_available():
@@ -91,11 +91,9 @@ class DCI(object):
         self._ensure_positive_integer(num_neighbours)
         max_num_candidates = 10 * num_neighbours
 
-        num_queries = _query.shape[0] // self._num_heads
+        num_queries = _query.shape[1]
 
-        print(num_queries)
-
-        _dci_query(self._dci_inst, self._dim, self._num_heads, num_queries, _query.flatten(), num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
+        #_dci_query(self._dci_inst, self._dim, self.num_heads, num_queries, _query.flatten(), num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
 
         #_query_result = _dci_query(self._dci_inst, self._dim, self._num_heads, num_queries, _query.flatten(), num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
         
