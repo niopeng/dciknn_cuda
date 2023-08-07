@@ -1014,6 +1014,7 @@ __global__ void get_dci_query_result(const dci* const dci_inst, const int num_he
 }
 */
 
+/*
 __global__ void get_dci_query_result(const dci* const dci_inst,
 		const int dim, const int num_indices, const int num_queries, 
 		const int num_heads, const int num_neighbours, const float* const query, 
@@ -1070,6 +1071,7 @@ __global__ void get_dci_query_result(const dci* const dci_inst,
 		}
 	}
 }
+*/
 
 // If blind querying is used, nearest_neighbours must be of size num_queries * max_possible_num_candidates; otherwise, it must be of size num_queries * num_neighbours
 // nearest_neighbour_dists can be NULL when blind querying is used
