@@ -557,6 +557,7 @@ __global__ void init_candidate_indices(const dci* const dci_inst,
 
 // Blind querying does not compute distances or look at the values of indexed vectors
 // For blind querying, top_candidates is not used; all_candidates is used to store candidates in the order of retrieval
+/*
 __global__
 static void dci_query_single_point_by_block(const dci* const dci_inst,
 		const int num_neighbours, const int curr_head, const float* const query,
@@ -604,18 +605,18 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		}
 		__syncthreads();
 
-		/* Search index */
+		//Search index
 		search_index(dci_inst, query_proj, num_indices, indices, left_pos, right_pos,
 				points_per_block);
 
-		/* Synchronize the threads */
+		//Synchronize the threads
 		__syncthreads();
 
-		/* Populate the closest indices */
+		//Populate the closest indices
 		init_index_priority(dci_inst, query_proj, num_indices, indices, left_pos, right_pos,
 				index_priority, cur_pos, points_per_block);
 
-		/* Synchronize the threads */
+		//Synchronize the threads
 		__syncthreads();
 
 		while (k < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
@@ -627,7 +628,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			while (m < dci_inst->num_comp_indices) {
 				// only one thread to get the top
 				if (threadIdx.x == 0) {
-					/* Get the top priority and data index in priority queue */
+					//Get the top priority and data index in priority queue
 					top_index_priority = DBL_MAX;
 					top_h = -1;
 					for (h = 0; h < dci_inst->num_simp_indices; h++) {
@@ -639,7 +640,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						}
 					}
 				}
-				/* Synchronize the threads */
+				//Synchronize the threads
 				__syncthreads();
 				if (top_h >= 0) {
 					if (threadIdx.x == 0) {
@@ -723,7 +724,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							}
 						}
 					}
-					/* Synchronize the threads */
+					//Synchronize the threads
 					__syncthreads();
 					// use the first thread to update
 					if (threadIdx.x == 0) {
@@ -770,7 +771,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				}
 				k++;
 			}
-			/* Synchronize the threads */
+			//Synchronize the threads
 			__syncthreads();
 			if (could_break) {
 			    break;
@@ -785,8 +786,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		}
 	}
 
-
 }
+*/
 
 __global__ void mix_sort_kernel(idx_elem* const d_top_candidates,
 		const int total) {
@@ -1200,6 +1201,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
+		/*
 		dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
 				num_neighbours, 
 				&(query_column[j * dim * num_heads]),
@@ -1212,6 +1214,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				candidate_dists);
 
 		cudaDeviceSynchronize();
+		*/
 
 		// get the final output
 		//if (!query_config.blind) {
