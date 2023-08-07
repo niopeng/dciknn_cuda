@@ -117,13 +117,13 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 	//	printf("\n");
 	//}
 
-	//printf("\n");
-	//int h = 1;
-	//for (int j = 0; j < dim * num_indices; j++) {
-	//	int i = j + dim * num_indices * h;
-	//	printf("%f ", dci_inst->proj_vec[i]);
-	//}
-	//printf("\n");
+	printf("\n");
+	int h = 1;
+	for (int j = 0; j < dim * num_indices; j++) {
+		int i = j + dim * num_indices * h;
+		printf("%f ", dci_inst->proj_vec[i]);
+	}
+	printf("\n");
 
 	/* Variables that initialize to default values */
 	dci_inst->num_points = 0;
@@ -1188,45 +1188,43 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 	//cudaDeviceSynchronize();
 
-	for (int h = 0; h < num_heads; h++) {
-		for (int j = 0; j < num_queries; j++) {
-			// need to refresh the result holder to avoid carry over results
-			init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
-					num_neighbours * block_size * thread_size, DBL_MAX);
+	for (int j = 0; j < num_queries; j++) {
+		// need to refresh the result holder to avoid carry over results
+		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
+				num_neighbours * block_size * thread_size, DBL_MAX);
 
-			cudaDeviceSynchronize();
-			init_counts<<<block_size, thread_size>>>(dci_inst, counts);
-			init_candidate_dists<<<block_size, thread_size>>>(dci_inst,
-					candidate_dists);
+		cudaDeviceSynchronize();
+		init_counts<<<block_size, thread_size>>>(dci_inst, counts);
+		init_candidate_dists<<<block_size, thread_size>>>(dci_inst,
+				candidate_dists);
 
-			cudaDeviceSynchronize();
+		cudaDeviceSynchronize();
 
-			dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
-					num_neighbours, 
-					&(query[j * dim]),
-					&(query_proj[j * num_indices]), 
-					*d_query_config,
-					d_top_candidates_dist, 
-					d_top_candidates_index, 
-					d_all_candidates,
-					counts, 
-					candidate_dists);
+		dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
+				num_neighbours, 
+				&(query_column[j * dim * num_heads]),
+				&(query_proj[j * num_indices]), 
+				*d_query_config,
+				d_top_candidates_dist, 
+				d_top_candidates_index, 
+				d_all_candidates,
+				counts, 
+				candidate_dists);
 
-			//cudaDeviceSynchronize();
+		cudaDeviceSynchronize();
 
-			// get the final output
-			//if (!query_config.blind) {
-			//	get_top_candidates(&(nearest_neighbours[j * num_neighbours]),
-			//			&(nearest_neighbour_dists[j * num_neighbours]),
-			//			d_top_candidates_dist, d_top_candidates_index,
-			//			num_neighbours, block_size * num_neighbours * thread_size);
-			//} else {
-			//	get_top_blind_candidates(
-			//			&(nearest_neighbours[j * max_possible_num_candidates]),
-			//			d_all_candidates, max_possible_num_candidates,
-			//			block_size * max_possible_num_candidates);
-			//}
-		}
+		// get the final output
+		//if (!query_config.blind) {
+		//	get_top_candidates(&(nearest_neighbours[j * num_neighbours]),
+		//			&(nearest_neighbour_dists[j * num_neighbours]),
+		//			d_top_candidates_dist, d_top_candidates_index,
+		//			num_neighbours, block_size * num_neighbours * thread_size);
+		//} else {
+		//	get_top_blind_candidates(
+		//			&(nearest_neighbours[j * max_possible_num_candidates]),
+		//			d_all_candidates, max_possible_num_candidates,
+		//			block_size * max_possible_num_candidates);
+		//}
 	}
 
 	// free the allocated memories

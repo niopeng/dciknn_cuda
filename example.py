@@ -41,7 +41,7 @@ def main():
     dim = 100
     num_pts = 3000
     num_queries = 500
-    num_heads = 2
+    num_heads = 1
     # dim = 80
     # num_pts = 1000
     # num_queries = 100
@@ -88,11 +88,8 @@ def main():
         data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
         query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
 
-        print(data.size())
-        print(query.size())
-
-        #a = datetime.datetime.now()
-        #dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+        a = datetime.datetime.now()
+        dci_db = DCI(dim, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
         #dci_db.add(data)
         # Query

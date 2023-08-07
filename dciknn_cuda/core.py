@@ -30,7 +30,6 @@ class DCI(object):
             raise RuntimeError("DCI CUDA version requires GPU access, please check CUDA driver.")
 
         self._dim = dim
-        self._num_heads = num_heads
         self._num_comp_indices = num_comp_indices
         self._num_simp_indices = num_simp_indices
         self._dci_inst = _dci_new(dim, num_heads, num_comp_indices, num_simp_indices, device)
@@ -38,14 +37,11 @@ class DCI(object):
         self._block_size = bs
         self._thread_size = ts
         self.num_points = 0
+        self.num_heads = 1
 
     @property
     def dim(self):
         return self._dim
-        
-    @property
-    def num_heads(self):
-        return self._num_heads
 
     @property
     def num_comp_indices(self):
@@ -75,11 +71,12 @@ class DCI(object):
         if self.num_points > 0:
             raise RuntimeError("DCI class does not support insertion of more than one tensor. Must combine all tensors into one tensor before inserting")
         self._check_data(data)
-        self.num_points = data.shape[0] // self._num_heads
+        self.num_heads = data.shape[0]
+        self.num_points = data.shape[1]
 
         #print("core.py add function num_points: " + str(self.num_points))
 
-        _dci_add(self._dci_inst, self._dim, self.num_points, self._num_heads, data.flatten(), self._block_size, self._thread_size)
+        _dci_add(self._dci_inst, self._dim, self.num_points, self.num_heads, data.flatten(), self._block_size, self._thread_size)
         self._array = data
 
     # query is num_queries x dim, returns num_queries x num_neighbours
