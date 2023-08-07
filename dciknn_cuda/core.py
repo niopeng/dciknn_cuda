@@ -16,8 +16,8 @@ Copyright (C) 2020    Ke Li, Shichong Peng, Mehran Aghabozorgi
 '''
 
 import torch
-from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _dci_free, _dci_multi_query
-# from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _dci_free
+#from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _dci_free, _dci_multi_query
+from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _dci_free
 
 from math import sqrt
 
@@ -151,20 +151,20 @@ class MDCI(object):
         max_num_candidates = 10 * num_neighbours
 
         queries = [_query.to(self.devices[dev_ind]).flatten() for dev_ind in self.devices]
-        res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, 1, _query.shape[0], queries, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
+        #res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, 1, _query.shape[0], queries, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
 
-        for ind, cur_res in enumerate(res):
-            half = cur_res.shape[0] // 2
-            cur_nns, cur_dist = cur_res[:half].reshape(_query.shape[0], -1), cur_res[half:].reshape(_query.shape[0], -1)
-            cur_nns = cur_nns + self.data_per_device * ind
-            dists.append(cur_dist.detach().clone().to(self.devices[0]))
-            nns.append(cur_nns.detach().clone().to(self.devices[0]))
+        #for ind, cur_res in enumerate(res):
+        #    half = cur_res.shape[0] // 2
+        #    cur_nns, cur_dist = cur_res[:half].reshape(_query.shape[0], -1), cur_res[half:].reshape(_query.shape[0], -1)
+        #    cur_nns = cur_nns + self.data_per_device * ind
+        #    dists.append(cur_dist.detach().clone().to(self.devices[0]))
+        #    nns.append(cur_nns.detach().clone().to(self.devices[0]))
 
-        merged_dists = torch.cat(dists, dim=1)
-        merged_nns = torch.cat(nns, dim=1)
-        _, sort_indices = torch.sort(merged_dists, dim=1)
-        sort_indices = sort_indices[:, :num_neighbours]
-        return torch.gather(merged_nns, 1, sort_indices), torch.gather(merged_dists, 1, sort_indices)
+        #merged_dists = torch.cat(dists, dim=1)
+        #merged_nns = torch.cat(nns, dim=1)
+        #_, sort_indices = torch.sort(merged_dists, dim=1)
+        #sort_indices = sort_indices[:, :num_neighbours]
+        #return torch.gather(merged_nns, 1, sort_indices), torch.gather(merged_dists, 1, sort_indices)
 
     def clear(self):
         for dci in self.dcis:
