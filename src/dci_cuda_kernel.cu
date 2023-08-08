@@ -318,6 +318,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	sort_indices<<<block_size, thread_size>>>(dci_inst, num_indices, num_points, num_heads,
 			points_per_block);
 
+	/*
 	int data_size = sizeof(idx_elem) * num_heads * num_points * num_indices;
 	idx_elem* h_data = (idx_elem *) malloc(data_size);
 	cudaMemcpy(h_data, dci_inst->indices, data_size, cudaMemcpyDeviceToHost);
@@ -336,6 +337,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 
 	cudaFree(h_data);
 	printf("\n");
+	*/
 
 	/* Synchronize the threads */
 	cudaDeviceSynchronize();
@@ -1124,7 +1126,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	}
 
 	/*print result - testing*/
-	/*
 	int data_total = num_indices * num_queries * num_heads;
 	int data_size = sizeof(float) * data_total;
 	float* h_data = (float *) malloc(data_size);
@@ -1144,7 +1145,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 	cudaFree(h_data);
 	printf("\n");
-	*/
 	/*testing*/
 
 	// copy query config to device pointer
@@ -1191,7 +1191,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 	//cudaDeviceSynchronize();
 
-	for (int j = 0; j < num_queries; j++) {
+	for (int j = 0; j < num_queries; j++) { 
 		// need to refresh the result holder to avoid carry over results
 		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
 				num_neighbours * block_size * thread_size, DBL_MAX);
