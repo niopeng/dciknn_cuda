@@ -109,16 +109,9 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     cudaMalloc((void **) &(final_outputs), sizeof(int) * output_size);
     cudaMalloc((void **) &(final_distances), sizeof(float) * output_size);
 
-    //void dci_query(dci* const dci_inst, const int dim, const int num_heads, const int num_queries,
-	//	const float* const query, const float* const query_column, const int num_neighbours,
-	//	const dci_query_config query_config, int* const nearest_neighbours,
-	//	float* const nearest_neighbour_dists, const int block_size,
-	//	const int thread_size)
-
     // query using DCI
-    dci_query(&(py_dci_inst->dci_inst), dim, num_heads, num_queries, query, 
-        num_neighbours, query_config, final_outputs, final_distances, block_size, 
-        thread_size);
+    dci_query(&(py_dci_inst->dci_inst), dim, num_heads, num_queries, query, num_neighbours, query_config, 
+        final_outputs, final_distances, block_size, thread_size);
 
     /*
     auto options = torch::TensorOptions().device(torch::kCUDA);

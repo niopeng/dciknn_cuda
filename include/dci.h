@@ -70,9 +70,8 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 		float* const data, const int block_size, const int thread_size);
 
 void dci_query(dci* const dci_inst, const int dim, const int num_heads, const int num_queries,
-		const float* const query, const float* const query_column, const int num_neighbours,
-		const dci_query_config query_config, int* const nearest_neighbours,
-		float* const nearest_neighbour_dists, const int block_size,
+		const float* const query, const int num_neighbours, const dci_query_config query_config, 
+		int* const nearest_neighbours, float* const nearest_neighbour_dists, const int block_size,
 		const int thread_size);
 
 void dci_clear(dci* const dci_inst);
