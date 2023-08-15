@@ -568,6 +568,7 @@ __global__ void init_candidate_indices(const dci* const dci_inst,
 //		int* const all_candidates, int* counts, float* candidate_dists) {
 
 // query_proj: assume 
+/*
 __global__
 static void dci_query_single_point_by_block(const dci* const dci_inst,
 		const int num_neighbours, const int num_queries, const int curr_index, 
@@ -619,7 +620,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		}
 		__syncthreads();
 
-		/* Search index */
 		search_index(
 				dci_inst, 
 				query_proj, 
@@ -629,7 +629,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				points_per_block
 			);
 
-		/* Synchronize the threads */
 		__syncthreads();
 
 		//const dci* const dci_inst,
@@ -642,7 +641,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		//int* const cur_pos,
 		//const int points_per_block
 
-		/* Populate the closest indices */
 		init_index_priority(
 				dci_inst, 
 				query_proj, 
@@ -654,7 +652,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				points_per_block
 			);
 
-		/* Synchronize the threads */
+
 		__syncthreads();
 
 		// --------------------------------------------------------- //
@@ -681,7 +679,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				// index priority, that is cloest to the query point (projection on projection 
 				// vector), this simple index will be top_h
 				if (threadIdx.x == 0) {
-					/* Get the top priority and data index in priority queue */
+					// Get the top priority and data index in priority queue
 					top_index_priority = DBL_MAX;
 					top_h = -1;
 					for (h = 0; h < dci_inst->num_simp_indices; h++) {
@@ -693,7 +691,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						}
 					}
 				}
-				/* Synchronize the threads */
 				__syncthreads();
 				if (top_h >= 0) {
 					// first thread only
@@ -782,7 +779,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							}
 						}
 					}
-					/* Synchronize the threads */
 					__syncthreads();
 					// use the first thread to update
 					if (threadIdx.x == 0) {
@@ -829,7 +825,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				}
 				k++;
 			}
-			/* Synchronize the threads */
 			__syncthreads();
 			if (could_break) {
 			    break;
@@ -849,6 +844,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	}
 
 }
+*/
 
 
 __global__ void mix_sort_kernel(idx_elem* const d_top_candidates,
