@@ -89,7 +89,7 @@ void py_dci_add(py::handle py_dci_inst_wrapper, const int dim, const int num_poi
 
 
 torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const int num_heads, const int num_queries,
-    torch::Tensor py_query, torch::Tensor py_query_column, const int num_neighbours, const bool blind, 
+    torch::Tensor py_query, const int num_neighbours, const bool blind, 
     const int num_outer_iterations, const int max_num_candidates, const int block_size, const int thread_size) {
 
     printf("py_dci_query in dci_cuda.cpp\n");
@@ -117,7 +117,7 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
 	//	const int thread_size)
 
     // query using DCI
-    dci_query(&(py_dci_inst->dci_inst), dim, num_heads, num_queries, query, query_column, 
+    dci_query(&(py_dci_inst->dci_inst), dim, num_heads, num_queries, query, 
         num_neighbours, query_config, final_outputs, final_distances, block_size, 
         thread_size);
 

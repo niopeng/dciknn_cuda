@@ -1015,7 +1015,7 @@ void dci_query_proj_3d_permute(float* const query_proj, float* const query_proj_
 // If blind querying is used, nearest_neighbours must be of size num_queries * max_possible_num_candidates; otherwise, it must be of size num_queries * num_neighbours
 // nearest_neighbour_dists can be NULL when blind querying is used
 void dci_query(dci* const dci_inst, const int dim, const int num_heads, const int num_queries,
-		const float* const query, const float* const query_column, const int num_neighbours,
+		const float* const query, const int num_neighbours,
 		const dci_query_config query_config, int* const nearest_neighbours,
 		float* const nearest_neighbour_dists, const int block_size,
 		const int thread_size) {
@@ -1069,15 +1069,14 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	dci_query_proj_3d_permute(query_proj, query_proj_column, num_heads, num_queries, num_indices);
 
 	/*print result - testing*/
-	/*
 	int data_total = num_indices * num_queries * num_heads;
 	int data_size = sizeof(float) * data_total;
 	float* h_data = (float *) malloc(data_size);
-	cudaMemcpy(h_data, query_proj, data_size, cudaMemcpyDeviceToHost);
+	cudaMemcpy(h_data, query_proj_column, data_size, cudaMemcpyDeviceToHost);
 
-	for (int h = 0; h < num_heads; h++) {
+	for (int h = 0; h < num_queries; h++) {
 		printf("head: %d\n", h);
-		for (int i = 0; i < num_queries; i++) {
+		for (int i = 0; i < num_heads; i++) {
 			printf("index: %d\n", i);
 			for (int j = 0; j < num_indices; j++) {
 				printf("%f ", h_data[j + i * num_indices + h * num_queries * num_indices]);
@@ -1089,7 +1088,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 	cudaFree(h_data);
 	printf("\n");
-	*/
 	/*testing*/
 
 	// copy query config to device pointer
@@ -1139,8 +1137,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				num_queries,
 				j,
 				//thread_per_head,
-				&(query_column[j * dim * num_heads]),
-				&(query_proj[j * num_indices]), 
+				&(query_proj_column[j * num_indices * num_heads]), 
 				*d_query_config,
 				d_top_candidates_dist, 
 				d_top_candidates_index, 
