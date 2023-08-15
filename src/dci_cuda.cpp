@@ -101,7 +101,6 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
 
     // Assuming row-major layout, py_query->data is N x D, where N is the number of queries and D is the dimensionality
     float* query = (float *)py_query.data_ptr();
-    float* query_column = (float *)py_query_column.data_ptr();
 
     dci_query_config query_config = {blind, num_outer_iterations, max_num_candidates};
     int*  final_outputs;
