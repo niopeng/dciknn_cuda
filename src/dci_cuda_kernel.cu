@@ -1075,7 +1075,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		for (int i = 0; i < num_heads; i++) {
 			printf("index: %d\n", i);
 			for (int j = 0; j < num_indices; j++) {
-				printf("%f ", h_data[j + i * num_indices + h * num_queries * num_indices]);
+				printf("%f ", h_data[j + i * num_indices + h * num_heads * num_indices]);
 			}
 			printf("\n");
 		}
