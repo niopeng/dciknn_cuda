@@ -181,7 +181,7 @@ __global__ void copy_to_indices(dci* const dci_inst, float* const data_proj,
 	for (int j = 0; j < chunk_size; j++) {
 		idx = i * chunk_size + j;
 		if (idx < n) {
-			int head = (int) (idx / (num_indices * num_points)); // start from head 0
+			//int head = (int) (idx / (num_indices * num_points)); // start from head 0
 			dci_inst->indices[idx].key = data_proj[idx];
 			//dci_inst->indices[idx].value = (idx % num_points) + (head * num_points);
 			dci_inst->indices[idx].value = (idx % num_points); // only consider the position in the current head
@@ -759,10 +759,10 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								} else {
 									// Compute distance
 									cur_dist = compute_dist_device(
-											&(dci_inst->data[cur_point * dci_inst->dim
-												+ dci_init->num_points * num_indices * num_heads]), 
-											query,
-											dci_inst->dim);
+											&(dci_inst->data[cur_point
+													* dci_inst->dim
+													+dci_init->num_points * num_indices * num_heads]), 
+											query, dci_inst->dim);
 									candidate_dists[cur_point + dci_inst->num_points * head] = cur_dist;
 									if (num_candidates < num_neighbours) {
 										d_top_candidates_dist[blockIdx.x * num_neighbours
@@ -1039,7 +1039,7 @@ __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const 
 	int total = num_heads * num_queries;
 	int chunk_size = (total + blockDim.x * gridDim.x - 1) / (blockDim.x * gridDim.x);
 
-	int j;
+	int j, idx, head, query;
 	for (j = 0; j < chunk_size; j++) {
 		idx = i * chunk_size + j;
 		head = (int) (idx / num_queries);
