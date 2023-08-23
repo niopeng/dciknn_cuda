@@ -584,7 +584,7 @@ __global__ void init_candidate_indices(const dci* const dci_inst,
 // &(query_proj_column[j * num_indices * num_heads]), j <- current query id
 __global__
 static void dci_query_single_point_by_block(const dci* const dci_inst,
-		const int num_neighbours, const int curr_index, const int thread_per_head, 
+		const int num_neighbours, const int num_queries, const int thread_per_head, 
 		const float* const query, const float* const query_proj_column,  
 		const dci_query_config query_config, float* const d_top_candidates_dist, 
 		int* const d_top_candidates_index, int* const all_candidates, 
@@ -762,7 +762,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 											&(dci_inst->data[cur_point
 													* dci_inst->dim
 													+ dci_inst->num_points * num_indices * num_heads]), 
-											query, dci_inst->dim);
+											&(query[dci_inst->dim * num_queries * head]), dci_inst->dim);
 									candidate_dists[cur_point + dci_inst->num_points * head] = cur_dist;
 									if (num_candidates < num_neighbours) {
 										d_top_candidates_dist[blockIdx.x * num_neighbours
@@ -1170,23 +1170,23 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
-		//int thread_per_head = (int) (block_size * thread_size / num_heads);
-		/*
+		int thread_per_head = (int) (block_size * thread_size / num_heads);
 		dci_query_single_point_by_block<<<block_size, thread_size>>>(
 				dci_inst,
 				num_neighbours, 
 				num_queries,
-				j,
-				//thread_per_head,
+				thread_per_head,
+				&(query[j * dim]), // need work on
 				&(query_proj_column[j * num_indices * num_heads]), 
 				*d_query_config,
 				d_top_candidates_dist, 
 				d_top_candidates_index, 
 				d_all_candidates,
 				counts, 
-				candidate_dists
+				candidate_dists,
+				block_size,
+				thread_size
 			);
-			*/
 
 		//dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
 		//		num_neighbours, &(query[j * dim]),
