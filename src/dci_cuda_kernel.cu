@@ -843,9 +843,9 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						}
 						if (position[head] >= 0 && position[head] < num_points_in_block) {
 							index_priority[i[head]] = abs_d(
-									dci_inst->indices[(int) (position
+									dci_inst->indices[position
 											+ i[head] * (dci_inst->num_points)
-											+ blockIdx.x * points_per_block)].key
+											+ blockIdx.x * points_per_block].key
 											- query_proj_column[i[head]]);
 						} else {
 							index_priority[i[head]] = DBL_MAX;
