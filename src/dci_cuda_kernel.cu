@@ -614,11 +614,9 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 	int head = (int) (threadIdx.x / thread_per_head);
 	int curr_start = head * thread_per_head;
-	if (gridDim.x == 0) {
-		if (blockIdx.x == 0) {
-			if (threadIdx.x == 0) {
-				printf("thread_per_head: %d/n", thread_per_head);
-			}
+	if (blockIdx.x == 0) {
+		if (threadIdx.x == 0) {
+			printf("thread_per_head: %d/n", thread_per_head);
 		}
 	}
 
