@@ -616,11 +616,13 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	int curr_start = head * thread_per_head;
 
 	// test
+	/*
 	if ((threadIdx.x % thread_per_head) == 0) {
 		printf("h = %d | ", head);
 		printf("s = %d | ", curr_start);
 		printf("b = %d\n", blockIdx.x);
 	}
+	*/
 	// test
 
 	int points_per_block = (dci_inst->num_points + gridDim.x - 1) / gridDim.x;
@@ -1197,9 +1199,9 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			);
 
 		int data_total = num_neighbours * block_size * thread_size * num_heads;
-		int data_size = sizeof(float) * data_total;
-		float* h_data = (float *) malloc(data_size);
-		cudaMemcpy(h_data, d_top_candidates_dist, data_size, cudaMemcpyDeviceToHost);
+		int data_size = sizeof(int) * data_total;
+		int* h_data = (int *) malloc(data_size);
+		cudaMemcpy(h_data, d_top_candidates_index, data_size, cudaMemcpyDeviceToHost);
 
 		for (int h = 0; h < num_heads; h++) {
 			printf("head: %d\n", h);
