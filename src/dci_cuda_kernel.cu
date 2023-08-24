@@ -584,7 +584,7 @@ __global__ void init_candidate_indices(const dci* const dci_inst,
 // &(query_proj_column[j * num_indices * num_heads]), j <- current query id
 __global__
 static void dci_query_single_point_by_block(const dci* const dci_inst,
-		const int num_neighbours, const int num_queries, const int thread_per_head, 
+		const int num_neighbours, const int num_queries,
 		const float* const query, const float* const query_proj_column,  
 		const dci_query_config query_config, float* const d_top_candidates_dist, 
 		int* const d_top_candidates_index, int* const all_candidates, 
@@ -594,6 +594,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	float cur_dist;
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	int num_heads = dci_inst->num_heads;
+	int thread_per_head = (int) (thread_size / num_heads);
+
 	__shared__ float *top_index_priority;
 	__shared__ int *k;
 	__shared__ int *top_h;
@@ -614,7 +616,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	int curr_start = head * thread_per_head;
 
 	// test
-	if (threadIdx.x == 1) {
+	if ((threadIdx.x % thread_per_head) == 0) {
 		printf("h = %d | ", head);
 		printf("s = %d | ", curr_start);
 		printf("b = %d\n", blockIdx.x);
@@ -1178,12 +1180,10 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
-		int thread_per_head = (int) (block_size * thread_size / num_heads);
 		dci_query_single_point_by_block<<<block_size, thread_size>>>(
 				dci_inst,
 				num_neighbours, 
 				num_queries,
-				thread_per_head,
 				&(query[j * dim]), // need work on
 				&(query_proj_column[j * num_indices * num_heads]), 
 				*d_query_config,
@@ -1196,7 +1196,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				thread_size
 			);
 
-		/*
 		int data_total = num_neighbours * block_size * thread_size * num_heads;
 		int data_size = sizeof(float) * data_total;
 		float* h_data = (float *) malloc(data_size);
@@ -1212,7 +1211,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		cudaFree(h_data);
 		printf("\n");
 		break;
-		*/
 
 		//dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
 		//		num_neighbours, &(query[j * dim]),
