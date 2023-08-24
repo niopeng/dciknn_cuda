@@ -610,28 +610,19 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			query_config.max_num_candidates,
 			query_config.num_outer_iterations);
 
-	//int head = (int) (threadIdx.x / thread_per_head);
-
-	int head = (int) (threadIdx.x / thread_per_head);
+	int curr_head = (int) (threadIdx.x / thread_per_head);
 	int curr_start = head * thread_per_head;
+
+	/*
 	if (blockIdx.x == 0) {
 		if (threadIdx.x == 0) {
-			printf("thread_per_head: %d/n", thread_per_head);
+			printf("thread_per_head: %d\n", thread_per_head);
 		}
 	}
+	*/
 
-	// test
-	//if (blockIdx.x == 0) {
-	//	if (threadIdx.x == 0) {
-	//		printf("head = %d | ", head);
-	//		printf("s = %d | ", curr_start);
-	//		printf("b = %d\n", blockIdx.x);
-	//		printf("tid = %d | ", threadIdx.x);
-	//	}
-	//}
-	// test
-
-	int points_per_block = (dci_inst->num_points + gridDim.x - 1) / gridDim.x;
+	// int points_per_block = (dci_inst->num_points * num_heads + gridDim.x - 1) / gridDim.x;
+	int points_per_block = (dci_inst->num_points + gridDim.x - 1) / gridDim.x; // for a head
 	int num_points_in_block = min(
 			(int) (dci_inst->num_points - blockIdx.x * points_per_block),
 			points_per_block);
@@ -663,13 +654,27 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			dci_inst, 
 			query_proj_column, 
 			num_indices, 
-			head,
+			curr_head,
 			curr_start,
 			&(left_pos[num_indices * head]), 
 			&(right_pos[num_indices * head]),
 			points_per_block
 		);
 
+		if (blockIdx.x == 0) {
+			if (threadIdx.x == 0) {
+				
+				for (int a = 0; int a < num_heads; a++) {
+					printf("head: %d\n", a);
+					for (int b = 0; int b < num_indices) {
+						printf("%d ", left_pos[b]);
+					}
+					printf("\n");
+				}
+			}
+		}
+
+		/*
 		__syncthreads();
 
 		init_index_priority(
@@ -898,6 +903,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		// ------------------------------------------------------- //
 		// ---------------- End of major loop (k) ---------------- //
 		// ------------------------------------------------------- //
+		*/
 
 		__syncthreads();
 		// free variables
@@ -1197,6 +1203,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				block_size,
 				thread_size
 			);
+		
+		break;
 
 		/*
 		int data_total = dci_inst->num_points * num_heads;
