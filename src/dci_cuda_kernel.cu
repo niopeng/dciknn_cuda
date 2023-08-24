@@ -771,8 +771,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								} else {
 									// Compute distance
 									cur_dist = compute_dist_device(
-											&(dci_inst->data[cur_point
-													* dci_inst->dim
+											&(dci_inst->data[cur_point * dci_inst->dim
 													+ dci_inst->num_points * num_indices * num_heads]), 
 											&(query[dci_inst->dim * num_queries * head]), dci_inst->dim);
 									candidate_dists[cur_point + dci_inst->num_points * head] = cur_dist;
@@ -781,8 +780,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 												+ threadIdx.x * num_neighbours
 												+ num_candidates
 												+ num_neighbours * block_size * thread_size * head] = cur_dist;
-										d_top_candidates_index[blockIdx.x
-												* num_neighbours
+										d_top_candidates_index[blockIdx.x * num_neighbours
 												+ threadIdx.x * num_neighbours
 												+ num_candidates
 												+ num_neighbours * block_size * thread_size * head] = cur_point;
@@ -791,13 +789,11 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 											last_top_candidate = num_candidates;
 										}
 									} else if (cur_dist < last_top_candidate_dist) {
-										d_top_candidates_dist[blockIdx.x
-												* num_neighbours
+										d_top_candidates_dist[blockIdx.x * num_neighbours
 												+ threadIdx.x * num_neighbours
 												+ last_top_candidate
 												+ num_neighbours * block_size * thread_size * head] = cur_dist;
-										d_top_candidates_index[blockIdx.x
-												* num_neighbours
+										d_top_candidates_index[blockIdx.x * num_neighbours
 												+ threadIdx.x * num_neighbours
 												+ last_top_candidate
 												+ num_neighbours * block_size * thread_size * head] = cur_point;
@@ -805,15 +801,13 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 										// Assuming num_neighbours less than the min(blockDim) = 32
 										// no need to run on gpu
 										for (j = 0; j < num_neighbours; j++) {
-											if (d_top_candidates_dist[blockIdx.x
-													* num_neighbours
+											if (d_top_candidates_dist[blockIdx.x * num_neighbours
 													+ threadIdx.x * num_neighbours
 													+ j
 													+ num_neighbours * block_size * thread_size * head]
 													> last_top_candidate_dist) {
 												last_top_candidate_dist =
-														d_top_candidates_dist[blockIdx.x
-																* num_neighbours
+														d_top_candidates_dist[blockIdx.x * num_neighbours
 																+ threadIdx.x * num_neighbours
 																+ j
 																+ num_neighbours * block_size * thread_size * head];
@@ -1198,15 +1192,15 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				thread_size
 			);
 
-		int data_total = num_neighbours * block_size * thread_size * num_heads;
-		int data_size = sizeof(int) * data_total;
-		int* h_data = (int *) malloc(data_size);
-		cudaMemcpy(h_data, d_top_candidates_index, data_size, cudaMemcpyDeviceToHost);
+		int data_total = dci_inst->num_points * num_heads;
+		int data_size = sizeof(float) * data_total;
+		float* h_data = (float *) malloc(data_size);
+		cudaMemcpy(h_data, candidate_dists, data_size, cudaMemcpyDeviceToHost);
 
 		for (int h = 0; h < num_heads; h++) {
 			printf("head: %d\n", h);
-			for (int i = 0; i < num_neighbours * block_size * thread_size; i++) {
-				printf("%d ", h_data[i + h * num_neighbours * block_size * thread_size]);
+			for (int i = 0; i < dci_inst->num_points; i++) {
+				printf("%d ", h_data[i + dci_inst->num_points * h]);
 			}
 		}
 
