@@ -656,8 +656,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			num_indices, 
 			curr_head,
 			curr_start,
-			&(left_pos[num_indices * head]), 
-			&(right_pos[num_indices * head]),
+			&(left_pos[num_indices * curr_head]), 
+			&(right_pos[num_indices * curr_head]),
 			points_per_block
 		);
 
