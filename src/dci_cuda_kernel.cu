@@ -615,8 +615,9 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 	// test
 	if (threadIdx.x == 1) {
-		printf("head: %d/n", head);
-		printf("curr_start: %d/n", curr_start);
+		printf("%d ", head);
+		printf("%d ", curr_start);
+		printf("%d\n", blockIdx.x);
 	}
 	// test
 
