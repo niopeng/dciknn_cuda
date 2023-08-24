@@ -616,13 +616,13 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	int curr_start = head * thread_per_head;
 
 	// test
-	/*
-	if ((threadIdx.x % thread_per_head) == 0) {
-		printf("h = %d | ", head);
-		printf("s = %d | ", curr_start);
-		printf("b = %d\n", blockIdx.x);
+	if (blockIdx.x == 0) {
+		if (threadIdx.x == 0) {
+			printf("h = %d | ", head);
+			printf("s = %d | ", curr_start);
+			printf("b = %d\n", blockIdx.x);
+		}
 	}
-	*/
 	// test
 
 	int points_per_block = (dci_inst->num_points + gridDim.x - 1) / gridDim.x;
@@ -1192,6 +1192,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				thread_size
 			);
 
+		/*
 		int data_total = dci_inst->num_points * num_heads;
 		int data_size = sizeof(float) * data_total;
 		float* h_data = (float *) malloc(data_size);
@@ -1207,6 +1208,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		cudaFree(h_data);
 		printf("\n");
 		break;
+		*/
 
 		//dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
 		//		num_neighbours, &(query[j * dim]),
