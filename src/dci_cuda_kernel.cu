@@ -574,14 +574,6 @@ __global__ void init_candidate_indices(const dci* const dci_inst,
 // Blind querying does not compute distances or look at the values of indexed vectors
 // For blind querying, top_candidates is not used; all_candidates is used to store candidates in the order of retrieval
 //__global__
-//		const dci* const dci_inst,
-//		const int num_neighbours, const float* const query,
-//		const float* const query_proj, const dci_query_config query_config,
-//		float* const d_top_candidates_dist, int* const d_top_candidates_index,
-//		int* const all_candidates, int* counts, float* candidate_dists) {
-
-// query_proj_column: start from the query position
-// &(query_proj_column[j * num_indices * num_heads]), j <- current query id
 __global__
 static void dci_query_single_point_by_block(const dci* const dci_inst,
 		const int num_neighbours, const int num_queries,
@@ -596,6 +588,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	int num_heads = dci_inst->num_heads;
 	int thread_per_head = (int) (thread_size / num_heads);
 
+	// shared value is an array, each value in the array is correspond to a head
+	// the array size is num_heads
 	__shared__ float *top_index_priority;
 	__shared__ int *k;
 	__shared__ int *top_h;
@@ -679,6 +673,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
+		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				for (int head_loop = 0; head_loop < num_heads; head_loop++) {
@@ -711,18 +706,21 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				}
 			}
 		}
+		*/
 
 		// --------------------------------------------------------- //
 		// ---------------- start of major loop (k) ---------------- //
 		// --------------------------------------------------------- //
 
-		/*
 		// init variables
 		if ((threadIdx.x % thread_per_head) == 0) {
 			k[head] = 0;
 			could_break[head] = false;
+
+			printf("threadIdx.x : %d\n", threadIdx.x);
 		}
 
+		/*
 		while (k[head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
 
 			if ((threadIdx.x % thread_per_head) == 0) {
