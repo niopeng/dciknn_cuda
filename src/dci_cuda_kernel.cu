@@ -714,8 +714,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		// init variables
 		if ((threadIdx.x % thread_per_head) == 0) {
-			k[head] = 0;
-			could_break[head] = false;
+			k[curr_head] = 0;
+			could_break[curr_head] = false;
 
 			printf("threadIdx.x : %d\n", threadIdx.x);
 		}
