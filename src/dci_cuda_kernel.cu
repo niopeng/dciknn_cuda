@@ -736,14 +736,15 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					for (h = 0; h < dci_inst->num_simp_indices; h++) {
 						if (index_priority[h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices]
 								< top_index_priority[curr_head]) {
-							top_index_priority[curr_head] = index_priority[h
-									+ m[curr_head] * dci_inst->num_simp_indices
-									+ curr_head * num_indices];
+							top_index_priority[curr_head] = index_priority[h 
+								+ m[curr_head] * dci_inst->num_simp_indices 
+								+ curr_head * num_indices];
 							top_h[curr_head] = h;
 
 							if (blockIdx.x == 0) {
 								if (threadIdx.x == 0) {
-									printf("%f\n", index_priority[h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices]);
+									//printf("%f\n", index_priority[h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices]);
+									printf("%d\n", top_h[curr_head])
 								}
 							}
 						}
