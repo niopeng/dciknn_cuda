@@ -673,36 +673,34 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
-		if (blockIdx.x == 1) {
-			printf("blockIdx.x: %d\n", blockIdx.x);
-			if (threadIdx.x == 0) {
-				for (int head_loop = 0; head_loop < num_heads; head_loop++) {
-					for (int index_loop = 0; index_loop < num_indices; index_loop++) {
-						printf("%d ", left_pos[index_loop]);
-					}
-					printf("\n");
+		if (threadIdx.x == 0) {
+			for (int head_loop = 0; head_loop < num_heads; head_loop++) {
+				printf("blockIdx.x %d\n", blockIdx.x);
+				for (int index_loop = 0; index_loop < num_indices; index_loop++) {
+					printf("%d ", left_pos[index_loop]);
 				}
+				printf("\n");
+			}
 				
-				for (int head_loop = 0; head_loop < num_heads; head_loop++) {
-					for (int index_loop = 0; index_loop < num_indices; index_loop++) {
-						printf("%d ", right_pos[index_loop]);
-					}
-					printf("\n");
+			for (int head_loop = 0; head_loop < num_heads; head_loop++) {
+				for (int index_loop = 0; index_loop < num_indices; index_loop++) {
+					printf("%d ", right_pos[index_loop]);
 				}
+				printf("\n");
+			}
 
-				for (int head_loop = 0; head_loop < num_heads; head_loop++) {
-					for (int index_loop = 0; index_loop < num_indices; index_loop++) {
-						printf("%f ", index_priority[index_loop]);
-					}
-					printf("\n");
+			for (int head_loop = 0; head_loop < num_heads; head_loop++) {
+				for (int index_loop = 0; index_loop < num_indices; index_loop++) {
+					printf("%f ", index_priority[index_loop]);
 				}
+				printf("\n");
+			}
 
-				for (int head_loop = 0; head_loop < num_heads; head_loop++) {
-					for (int index_loop = 0; index_loop < num_indices; index_loop++) {
-						printf("%d ", cur_pos[index_loop]);
-					}
-					printf("\n");
+			for (int head_loop = 0; head_loop < num_heads; head_loop++) {
+				for (int index_loop = 0; index_loop < num_indices; index_loop++) {
+					printf("%d ", cur_pos[index_loop]);
 				}
+				printf("\n");
 			}
 		}
 
