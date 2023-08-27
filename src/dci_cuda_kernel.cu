@@ -657,19 +657,31 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
-		init_index_priority(
-				dci_inst, 
-				query_proj_column, 
-				num_indices, 
-				curr_head,
-				curr_start,
-				&(left_pos[num_indices * curr_head]), 
-				&(right_pos[num_indices * curr_head]),
-				&(index_priority[num_indices * curr_head]), 
-				&(cur_pos[num_indices * curr_head]), 
-				points_per_block
-			);
+		for (int b = 0; b < block_size; b++) {
+			printf("block: %d\n", b);
+			if (threadIdx.x == 0) {
+				for (int ch = 0; ch < curr_head; ch++) {
+					printf("head: %d\n", ch);
+					for (int ni = 0; ni < num_indices; ni++) {
+						printf("%d ", left_pos[ch * num_indices + ni]);
+					}
+					printf("\n");
+				}
+			}
+		}
 
+		init_index_priority(
+			dci_inst, 
+			query_proj_column, 
+			num_indices, 
+			curr_head,
+			curr_start,
+			&(left_pos[num_indices * curr_head]), 
+			&(right_pos[num_indices * curr_head]),
+			&(index_priority[num_indices * curr_head]), 
+			&(cur_pos[num_indices * curr_head]), 
+			points_per_block
+		);
 
 		__syncthreads();
 
@@ -711,7 +723,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		// --------------------------------------------------------- //
 		// ---------------- start of major loop (k) ---------------- //
 		// --------------------------------------------------------- //
-
+		/*
 		// init variables
 		if ((threadIdx.x % thread_per_head) == 0) {
 			k[curr_head] = 0;
@@ -751,12 +763,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							//	}
 							//}
 
-						}
-
-						if (blockIdx.x == 0) {
-							if (threadIdx.x == 0) {
-								printf("%f\n", index_priority[h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices]);
-							}
 						}
 					}
 				}
@@ -938,6 +944,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			    break;
 			}
 		}
+		*/
 		// ------------------------------------------------------- //
 		// ---------------- End of major loop (k) ---------------- //
 		// ------------------------------------------------------- //
