@@ -657,21 +657,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
-		//for (int b = 0; b < block_size; b++) {
-		if (blockIdx.x == 0) {
-			if (threadIdx.x == 0) {
-				//for (int b = 0; b < block_size; b++) {
-				//printf("block: %d\n", b);
-				for (int ch = 0; ch < num_heads; ch++) {
-					//printf("head: %d\n", ch);
-					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%d ", right_pos[ch * num_indices + ni]);
-					}
-					printf("\n");
-				}
-				//}
-			}
-		}
 
 		init_index_priority(
 			dci_inst, 
@@ -688,7 +673,20 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
-		//printf("%d\n", (threadIdx.x % thread_per_head));
+		if (blockIdx.x == 0) {
+			if (threadIdx.x == 0) {
+				//for (int b = 0; b < block_size; b++) {
+				//printf("block: %d\n", b);
+				for (int ch = 0; ch < num_heads; ch++) {
+					//printf("head: %d\n", ch);
+					for (int ni = 0; ni < num_indices; ni++) {
+						printf("%d ", left_pos[ch * num_indices + ni]);
+					}
+					printf("\n");
+				}
+				//}
+			}
+		}
 
 		/*
 		if (threadIdx.x == 0) {
