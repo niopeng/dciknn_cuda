@@ -868,7 +868,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						cur_pos[i[curr_head]] = dci_next_closest_proj(
 								&(dci_inst->indices[i[curr_head] * (dci_inst->num_points)
 										+ blockIdx.x * points_per_block]),
-								&(left_pos[i[head]]), &(right_pos[i[curr_head]]), query_proj_column[i[curr_head]], // need reconsider
+								&(left_pos[i[curr_head]]), &(right_pos[i[curr_head]]), query_proj_column[i[curr_head]], // need reconsider
 								num_points_in_block);
 						if ((cur_pos[i[curr_head]] < 0) && (cur_pos[i[curr_head]] > -blockDim.x)) {
 							position[curr_head] = 0;
