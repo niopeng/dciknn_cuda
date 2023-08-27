@@ -716,8 +716,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		if ((threadIdx.x % thread_per_head) == 0) {
 			k[curr_head] = 0;
 			could_break[curr_head] = false;
-
-			printf("threadIdx.x: %d\n", threadIdx.x);
 		}
 
 		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
@@ -753,7 +751,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							//	}
 							//}
 
-							//printf("threadIdx.x: %d\n", threadIdx.x);
+							printf("threadIdx.x: %d\n", threadIdx.x);
 						}
 					}
 				}
@@ -761,7 +759,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				//if (blockIdx.x == 0) {
 				//	if (threadIdx.x == 0) {
 				//		printf("start\n");
-				//		printf("top_index_priority: %f\n", top_index_priority[curr_head]);
+				//		printf("%f\n", top_index_priority[curr_head]);
 				//		printf("top_h: %d\n", top_h[curr_head]);
 				//	}
 				//}
