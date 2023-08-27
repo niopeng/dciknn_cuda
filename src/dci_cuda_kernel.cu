@@ -673,7 +673,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
-		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				for (int head_loop = 0; head_loop < num_heads; head_loop++) {
@@ -706,7 +705,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				}
 			}
 		}
-		*/
 
 		// --------------------------------------------------------- //
 		// ---------------- start of major loop (k) ---------------- //
@@ -716,8 +714,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		if ((threadIdx.x % thread_per_head) == 0) {
 			k[curr_head] = 0;
 			could_break[curr_head] = false;
-
-			printf("threadIdx.x : %d\n", threadIdx.x);
 		}
 
 		/*
