@@ -650,8 +650,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			num_indices, 
 			curr_head,
 			curr_start,
-			left_pos[num_indices * curr_head], 
-			right_pos[num_indices * curr_head],
+			left_pos, 
+			right_pos,
 			points_per_block
 		);
 
@@ -681,6 +681,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			}
 		}
 
+		/*
 		init_index_priority(
 			dci_inst, 
 			query_proj_column, 
@@ -736,6 +737,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
+		*/
 
 		/*
 		if (threadIdx.x == 0) {
