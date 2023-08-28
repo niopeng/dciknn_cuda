@@ -689,6 +689,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					printf("\n");
 					for (int ni = 0; ni < num_indices; ni++) {
 						printf("%d ", cur_pos[ch * num_indices + ni]);
+					}
 					printf("\n");
 					for (int ni = 0; ni < num_indices; ni++) {
 						printf("%f ", index_priority[ch * num_indices + ni]);
