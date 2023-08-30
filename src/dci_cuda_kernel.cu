@@ -609,7 +609,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	int curr_start = curr_head * thread_per_head;
 
 	if (blockIdx.x == 0) {
-		if (threadIdx.x == 0) {
+		if ((threadIdx.x % thread_per_head) == 0) {
 			printf("curr_head: %d\n", curr_head);
 			printf("curr_start: %d\n", curr_start);
 		}
@@ -650,8 +650,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			num_indices, 
 			curr_head,
 			curr_start,
-			left_pos, 
-			right_pos,
+			&(left_pos[num_indices * curr_head]), 
+			&(right_pos[num_indices * curr_head]),
 			points_per_block
 		);
 
@@ -668,6 +668,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					for (int ni = 0; ni < num_indices; ni++) {
 						printf("%d ", left_pos[ch * num_indices + ni]);
 					}
+					printf("\n");
 				}
 				printf("\n");
 				printf("search_index right_pos\n");
@@ -676,6 +677,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					for (int ni = 0; ni < num_indices; ni++) {
 						printf("%d ", right_pos[ch * num_indices + ni]);
 					}
+					printf("\n");
 				}
 				printf("\n");
 			}
@@ -1222,7 +1224,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
 
 	/*print result - testing*/
-	/*
 	int data_total = num_indices * num_queries * num_heads;
 	int data_size = sizeof(float) * data_total;
 	float* h_data = (float *) malloc(data_size);
@@ -1242,7 +1243,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 	cudaFree(h_data);
 	printf("\n");
-	*/
 	/*testing*/
 
 	// copy query config to device pointer
@@ -1284,6 +1284,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
+		/*
 		dci_query_single_point_by_block<<<block_size, thread_size>>>(
 				dci_inst,
 				num_neighbours, 
@@ -1301,6 +1302,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			);
 		
 		break;
+		*/
 
 		/*
 		int data_total = dci_inst->num_points * num_heads;
