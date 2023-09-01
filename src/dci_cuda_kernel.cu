@@ -456,11 +456,13 @@ static inline int dci_search_index(const idx_elem* const idx, const float key,
 }
 
 /* Search indices */
-// result: 	left_pos - left index position, &(left_pos[num_indices * head])
-// 			right_pos - right index position, &(right_pos[num_indices * head])
+// result: 	left_pos - left index position, &(left_pos[num_indices * curr_head])
+// 			right_pos - right index position, &(right_pos[num_indices * curr_head])
+/*
 __device__ void search_index(const dci* const dci_inst, const float* const query_proj_column, 
 		const int num_indices, const int curr_head, const int curr_start,
-		int* const left_pos, int* const right_pos, const int points_per_block) {
+		const int* const left_pos, const int* const right_pos, const int points_per_block) {
+
 	int total = num_indices;
 	int chunk_size = (total + blockDim.x - 1) / blockDim.x;
 	int prev_chunk = curr_start * chunk_size;
@@ -480,6 +482,41 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 			right_pos[idx + prev_chunk] = left_pos[idx + prev_chunk] + blockDim.x;
 		}
 	}
+}
+*/
+
+// left_pos: num_indices * num_heads
+// right_pos: num_indices * num_heads
+__device__ void search_index(const dci* const dci_inst, const float* const query_proj_column, 
+		const int num_indices, const int num_heads, 
+		int* const left_pos, int* const right_pos, const int points_per_block) {
+
+	int total = num_indices * num_heads;
+	int chunk_size = (total + blockDim.x - 1) / blockDim.x;
+	
+	int idx;
+	for (int j = 0; j < chunk_size; j++) {
+		idx = threadIdx.x * chunk_size + j;
+	}
+
+	/*
+	int idx;
+	for (int j = 0; j < chunk_size; j++) {
+		idx = threadIdx.x * chunk_size + j;
+		//curr_idx = idx % num_indices; // index within each head
+		//curr_head = (int) (idx / num_indices);
+
+		if (idx < total) {
+			left_pos[idx] = dci_search_index(
+					&(dci_inst->indices[idx * (dci_inst->num_points)
+							+ blockIdx.x * points_per_block]),
+					query_proj[idx],
+					min(dci_inst->num_points * num_heads - blockIdx.x * points_per_block,
+							points_per_block)) - blockDim.x + 1;
+			right_pos[idx] = left_pos[idx] + blockDim.x;
+		}
+	}
+	*/
 }
 
 // &(left_pos[num_indices * head])
@@ -608,18 +645,20 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	int curr_head = (int) (threadIdx.x / thread_per_head);
 	int curr_start = curr_head * thread_per_head;
 
+	int points_per_block = (dci_inst->num_points * num_heads + gridDim.x - 1) / gridDim.x; // default number of data processed by a block
+	int num_points_in_block = min(
+			(int) (dci_inst->num_points * num_heads - blockIdx.x * points_per_block), // should not process data beyond the current block
+			points_per_block);
+
+
 	if (blockIdx.x == 0) {
 		if ((threadIdx.x % thread_per_head) == 0) {
 			printf("curr_head: %d\n", curr_head);
 			printf("curr_start: %d\n", curr_start);
+			printf("points_per_block: %d\n", points_per_block);
+			printf("num_points_in_block: %d\n", num_points_in_block);
 		}
 	}
-
-	// int points_per_block = (dci_inst->num_points * num_heads + gridDim.x - 1) / gridDim.x;
-	int points_per_block = (dci_inst->num_points + gridDim.x - 1) / gridDim.x; // for a head
-	int num_points_in_block = min(
-			(int) (dci_inst->num_points - blockIdx.x * points_per_block),
-			points_per_block);
 
 	if (num_points_in_block > 0) {
 		__shared__ int* left_pos;
@@ -650,13 +689,14 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			num_indices, 
 			curr_head,
 			curr_start,
-			&(left_pos[num_indices * curr_head]), 
-			&(right_pos[num_indices * curr_head]),
+			left_pos,
+			right_pos,
 			points_per_block
 		);
 
 		__syncthreads();
 
+		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				//for (int b = 0; b < block_size; b++) {
@@ -682,6 +722,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
+		*/
 
 		/*
 		init_index_priority(
@@ -1224,11 +1265,11 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
 
 	/*print result - testing*/
+	/*
 	int data_total = num_indices * num_queries * num_heads;
 	int data_size = sizeof(float) * data_total;
 	float* h_data = (float *) malloc(data_size);
 	cudaMemcpy(h_data, query_proj_column, data_size, cudaMemcpyDeviceToHost);
-
 	for (int h = 0; h < num_queries; h++) {
 		printf("head: %d\n", h);
 		for (int i = 0; i < num_heads; i++) {
@@ -1240,9 +1281,9 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		}
 		printf("head: %d\n", h);
 	}
-
 	cudaFree(h_data);
 	printf("\n");
+	*/
 	/*testing*/
 
 	// copy query config to device pointer
