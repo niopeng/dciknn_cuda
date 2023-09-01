@@ -1328,7 +1328,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
-		/*
 		dci_query_single_point_by_block<<<block_size, thread_size>>>(
 				dci_inst,
 				num_neighbours, 
@@ -1346,7 +1345,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			);
 		
 		break;
-		*/
 
 		/*
 		int data_total = dci_inst->num_points * num_heads;
