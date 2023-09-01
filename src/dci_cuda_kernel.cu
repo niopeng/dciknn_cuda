@@ -682,13 +682,16 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		}
 		__syncthreads();
 
+		//const dci* const dci_inst, const float* const query_proj_column, 
+		//const int num_indices, const int num_heads, 
+		//int* const left_pos, int* const right_pos, const int points_per_block
+
 		// left_pos and right_pos already account for multi-head
 		search_index(
 			dci_inst, 
 			query_proj_column, 
 			num_indices, 
-			curr_head,
-			curr_start,
+			num_heads,
 			left_pos,
 			right_pos,
 			points_per_block
