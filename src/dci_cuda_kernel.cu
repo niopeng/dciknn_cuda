@@ -497,6 +497,19 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 	int idx;
 	for (int j = 0; j < chunk_size; j++) {
 		idx = threadIdx.x * chunk_size + j;
+		curr_idx = idx % num_indices;			// index within each head
+		curr_head = (int) (idx / num_indices);	// current head assign to the thread
+
+		if (idx < total) {
+			left_pos[idx] = dci_search_index(
+				&(dci_inst->indices[curr_idx * (dci_inst->num_points)	// position of index (single head)
+						+ blockIdx.x * points_per_block] // position within each index
+						+ dci_inst->num_points * curr_head * num_indices),
+				query_proj_column[curr_idx + curr_head * num_indices],
+				min(dci_inst->num_points - blockIdx.x * points_per_block,
+							points_per_block)) - blockDim.x + 1;
+			right_pos[idx + prev_chunk] = left_pos[idx + prev_chunk] + blockDim.x;
+		}
 	}
 
 	/*
@@ -645,9 +658,9 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	int curr_head = (int) (threadIdx.x / thread_per_head);
 	int curr_start = curr_head * thread_per_head;
 
-	int points_per_block = (dci_inst->num_points * num_heads + gridDim.x - 1) / gridDim.x; // default number of data processed by a block
+	int points_per_block = (dci_inst->num_points + gridDim.x - 1) / gridDim.x; // default number of data processed by a block
 	int num_points_in_block = min(
-			(int) (dci_inst->num_points * num_heads - blockIdx.x * points_per_block), // should not process data beyond the current block
+			(int) (dci_inst->num_points - blockIdx.x * points_per_block), // should not process data beyond the current block
 			points_per_block);
 
 
@@ -699,7 +712,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
-		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				//for (int b = 0; b < block_size; b++) {
@@ -725,7 +737,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
-		*/
 
 		/*
 		init_index_priority(
