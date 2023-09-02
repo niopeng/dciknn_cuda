@@ -503,8 +503,8 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 		if (idx < total) {
 			left_pos[idx] = dci_search_index(
 				&(dci_inst->indices[curr_idx * (dci_inst->num_points)	// position of index (single head)
-						+ blockIdx.x * points_per_block] // position within each index
-						+ dci_inst->num_points * curr_head * num_indices),
+						+ blockIdx.x * points_per_block // position within each index
+						+ dci_inst->num_points * curr_head * num_indices]),
 				query_proj_column[curr_idx + curr_head * num_indices],
 				min(dci_inst->num_points - blockIdx.x * points_per_block,
 							points_per_block)) - blockDim.x + 1;
