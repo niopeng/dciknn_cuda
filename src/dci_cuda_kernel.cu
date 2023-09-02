@@ -494,7 +494,7 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 	int total = num_indices * num_heads;
 	int chunk_size = (total + blockDim.x - 1) / blockDim.x;
 	
-	int idx;
+	int idx, curr_idx, curr_head;
 	for (int j = 0; j < chunk_size; j++) {
 		idx = threadIdx.x * chunk_size + j;
 		curr_idx = idx % num_indices;			// index within each head
@@ -508,7 +508,7 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 				query_proj_column[curr_idx + curr_head * num_indices],
 				min(dci_inst->num_points - blockIdx.x * points_per_block,
 							points_per_block)) - blockDim.x + 1;
-			right_pos[idx + prev_chunk] = left_pos[idx + prev_chunk] + blockDim.x;
+			right_pos[idx] = left_pos[idx] + blockDim.x;
 		}
 	}
 
