@@ -858,7 +858,11 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 						if (blockIdx.x == 0) {
 							if (threadIdx.x == 0) {
-								//printf("%f | %f\n", index_priority[h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices], top_index_priority[curr_head]);
+								printf("%f | %f\n", index_priority[h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices], top_index_priority[curr_head]);
+							}
+						}
+						if (blockIdx.x == 0) {
+							if (threadIdx.x == 0) {
 								printf("%d | %d\n", h, top_h[curr_head]);
 							}
 						}
