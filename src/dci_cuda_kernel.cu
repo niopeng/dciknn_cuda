@@ -858,7 +858,17 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					}
 				}
 
+				if (blockIdx.x == 0) {
+					if (threadIdx.x == 0) {
+						printf("Test for top_h\n");
+						printf("top_h: %d\n", top_h[curr_head]);
+						printf("top_index_priority: %d\n", top_index_priority[curr_head]);
+					}
+				}
+
 				__syncthreads();
+
+				/*
 				if (top_h[curr_head] >= 0) {
 					// first thread only
 					// find the actual index position (complex indices and simple indices) for top_h
@@ -995,7 +1005,9 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				}
 				__syncthreads();
 			}
+			*/
 
+			/*
 			if ((threadIdx.x % thread_per_head) == 0) {
 				if (num_candidates >= num_neighbours) {
 					if (k[curr_head] + 1
@@ -1012,6 +1024,10 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			if (could_break[curr_head]) {
 			    break;
 			}
+			*/
+
+			//test 
+			break;
 		}
 
 		// ------------------------------------------------------- //
@@ -1315,6 +1331,9 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				thread_size
 			);
 
+		break;
+
+		/*
 		int data_total = num_neighbours * block_size * thread_size * num_heads;
 		int data_size = sizeof(float) * data_total;
 		float* h_data = (float *) malloc(data_size);
@@ -1332,6 +1351,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		cudaFree(h_data);
 		printf("\n");
 		break;
+		*/
 
 		//dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
 		//		num_neighbours, &(query[j * dim]),
