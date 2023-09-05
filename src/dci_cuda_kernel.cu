@@ -689,7 +689,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			points_per_block);
 
 	if (blockIdx.x == 0) {
-		if ((threadIdx.x % thread_per_head) == 0) {
+		if (threadIdx.x == 0) {
 			printf("num_indices: %d\n", num_indices);
 			printf("num_heads: %d\n", num_heads);
 			printf("curr_head: %d\n", curr_head);
@@ -866,6 +866,16 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						//		printf("%d | %d\n", h, top_h[curr_head]);
 						//	}
 						//}
+
+						if (blockIdx.x == 0) {
+							if (threadIdx.x == 0) {
+								printf("m: %d\n", m[curr_head]);
+								printf("h: %d | top_h: %d\n", h, top_h[curr_head]);
+								printf("index_priority key %d\n", (h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices));
+								printf("index_priority %f\n", index_priority[h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices]);
+								printf("top_index_priority %f\n," top_index_priority[curr_head]);
+							}
+						}
 					}
 				}
 
@@ -900,7 +910,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					if (blockIdx.x == 0) {
 						if (threadIdx.x == 0) {
 							printf("cur_index: %d\n", cur_index);
-							printf("cur_index: %d\n", num_points_in_block);
+							printf("num_points_in_block: %d\n", num_points_in_block);
 						}
 					}
 
@@ -911,6 +921,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]++;
 
+						/*
 						if (blockIdx.x == 0) {
 							if (threadIdx.x == 0) {
 								printf("curr_head: %d\n", curr_head);
@@ -924,6 +935,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("counts key: %d\n", (cur_point + dci_inst->num_points * m[curr_head] + dci_inst->num_comp_indices * dci_inst->num_points * curr_head));
 							}
 						}
+						*/
 
 						if (counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]
