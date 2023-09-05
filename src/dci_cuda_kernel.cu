@@ -1004,8 +1004,9 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					m[curr_head] = m[curr_head] + 1;
 				}
 				__syncthreads();
+				*/
 			}
-			*/
+			
 
 			/*
 			if ((threadIdx.x % thread_per_head) == 0) {
