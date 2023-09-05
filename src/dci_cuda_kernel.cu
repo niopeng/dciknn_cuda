@@ -897,11 +897,12 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					// this also mean it now process less number of index but work on multiple head
 					int cur_index = position[curr_head] + head_threadIdx;
 	
-					//if (blockIdx.x == 0) {
-					//	if (threadIdx.x == 0) {
-					//		printf("cur_index: %d\n", cur_index);
-					//	}
-					//}
+					if (blockIdx.x == 0) {
+						if (threadIdx.x == 0) {
+							printf("cur_index: %d\n", cur_index);
+							printf("cur_index: %d\n", num_points_in_block);
+						}
+					}
 
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
 						int cur_point = dci_inst->indices[cur_index
@@ -910,14 +911,15 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]++;
 
-						if (blockIdx.x == 0) {
-							if (threadIdx.x == 0) {
-								printf("cur_point: %d\n", cur_point);
-								printf("index key: %f\n", dci_inst->indices[cur_index + dci_inst->num_points * i[curr_head] + blockIdx.x * points_per_block].key);
-								printf("index value: %d\n", dci_inst->indices[cur_index + dci_inst->num_points * i[curr_head] + blockIdx.x * points_per_block].value);
-								printf("count: %d\n", counts[cur_point + dci_inst->num_points * m[curr_head] + dci_inst->num_comp_indices * dci_inst->num_points * curr_head]);
-							}
-						}
+						//if (blockIdx.x == 0) {
+						//	if (threadIdx.x == 0) {
+						//		printf("cur_point: %d\n", cur_point);
+						//		printf("index key: %f\n", dci_inst->indices[cur_index + dci_inst->num_points * i[curr_head] + blockIdx.x * points_per_block].key);
+						//		printf("index value: %d\n", dci_inst->indices[cur_index + dci_inst->num_points * i[curr_head] + blockIdx.x * points_per_block].value);
+						//		printf("count: %d\n", counts[cur_point + dci_inst->num_points * m[curr_head] + dci_inst->num_comp_indices * dci_inst->num_points * curr_head]);
+						//	}
+						//	break;
+						//}
 
 						if (counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]
@@ -1034,8 +1036,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				// -----------------------------------------------------------------------------------------------
 				// End working
 				// -----------------------------------------------------------------------------------------------
-
-				break;
 			}
 			
 
