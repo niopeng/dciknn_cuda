@@ -854,37 +854,27 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								+ m[curr_head] * dci_inst->num_simp_indices 
 								+ curr_head * num_indices];
 							top_h[curr_head] = h;
-						}
 
-						//if (blockIdx.x == 0) {
-						//	if (threadIdx.x == 0) {
-						//		printf("%f | %f\n", index_priority[h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices], top_index_priority[curr_head]);
-						//	}
-						//}
-						//if (blockIdx.x == 0) {
-						//	if (threadIdx.x == 0) {
-						//		printf("%d | %d\n", h, top_h[curr_head]);
-						//	}
-						//}
+							if (blockIdx.x == 0) {
+								if (threadIdx.x == 0) {
+									printf("m: %d\n", m[curr_head]);
+									printf("h %d | top_h %d\n", h, top_h[curr_head]);
+									printf("index_priority key: %d\n", h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices);
+									printf("index_priority: %f\n", index_priority[h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices]);
+									printf("top_index_priority: %f\n", top_index_priority[curr_head]);
+								}
+							}
+						}
 
 						//if (blockIdx.x == 0) {
 						//	if (threadIdx.x == 0) {
 						//		printf("m: %d\n", m[curr_head]);
-						//		printf("h: %d | top_h: %d\n", h, top_h[curr_head]);
-						//		printf("index_priority key: %d\n", (h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices));
-						//		printf("index_priority %f\n", index_priority[h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices]);
-						//		printf("top_index_priority %f\n," top_index_priority[curr_head]);
+						//		printf("h %d | top_h %d\n", h, top_h[curr_head]);
+						//		printf("index_priority key: %d\n", h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices);
+						//		printf("index_priority: %f\n", index_priority[h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices]);
+						//		printf("top_index_priority: %f\n", top_index_priority[curr_head]);
 						//	}
 						//}
-
-						if (blockIdx.x == 0) {
-							if (threadIdx.x == 0) {
-								printf("m: %d\n", m[curr_head]);
-								printf("h %d | top_h %d\n", h, top_h[curr_head]);
-								printf("index_priority key: %d\n", h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices);
-								printf("index_priority: %f\n", index_priority[h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices]);
-							}
-						}
 					}
 				}
 
@@ -903,11 +893,15 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						position[curr_head] = cur_pos[i[curr_head]]; // position already adjust on current head
 					}
 
-					//if (blockIdx.x == 0) {
-					//	if (threadIdx.x == 0) {
-					//		printf("i: %d | position: %d\n", i[curr_head], position[curr_head]);
-					//	}
-					//}
+					if (blockIdx.x == 0) {
+						if (threadIdx.x == 0) {
+							printf("second checkpoint\n");
+							printf("i: %d\n", i[curr_head]);
+							printf("top_h: %d\n", top_h[curr_head]);
+							printf("m: %d\n", m[curr_head]);
+							printf("position: %d\n", position[curr_head]);
+						}
+					}
 
 					__syncthreads();
 					//int cur_index = position[curr_head] + threadIdx.x;
