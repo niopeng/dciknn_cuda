@@ -688,7 +688,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			(int) (dci_inst->num_points - blockIdx.x * points_per_block), // should not process data beyond the current block
 			points_per_block);
 
-
+	/*
 	if (blockIdx.x == 0) {
 		if ((threadIdx.x % thread_per_head) == 0) {
 			printf("curr_head: %d\n", curr_head);
@@ -697,6 +697,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			printf("num_points_in_block: %d\n", num_points_in_block);
 		}
 	}
+	*/
 
 	if (num_points_in_block > 0) {
 		__shared__ int* left_pos;
@@ -1316,23 +1317,23 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		
 		break;
 
-		/*
-		int data_total = dci_inst->num_points * num_heads;
+		int data_total = num_neighbours * block_size * thread_size * num_heads;
 		int data_size = sizeof(float) * data_total;
 		float* h_data = (float *) malloc(data_size);
-		cudaMemcpy(h_data, candidate_dists, data_size, cudaMemcpyDeviceToHost);
+		cudaMemcpy(h_data, d_top_candidates_dist, data_size, cudaMemcpyDeviceToHost);
 
 		for (int h = 0; h < num_heads; h++) {
-			printf("head: %d\n", h);
-			for (int i = 0; i < dci_inst->num_points; i++) {
-				printf("%d ", h_data[i + dci_inst->num_points * h]);
+			printf("\n");
+			printf("d_top_candidates_dist head %d\n", h);
+			for (int i = 0; i < (num_neighbours * block_size * thread_size); i++) {
+				printf("%f ", h_data[i + num_neighbours * block_size * thread_size * h]);
 			}
+			printf("\n");
 		}
 
 		cudaFree(h_data);
 		printf("\n");
 		break;
-		*/
 
 		//dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
 		//		num_neighbours, &(query[j * dim]),
