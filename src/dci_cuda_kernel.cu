@@ -480,7 +480,7 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 							points_per_block)) - blockDim.x + 1;
 
 			if (blockIdx.x == 0) {
-				if (threadIdx.x == 0) {
+				if (threadIdx.x == 1) {
 					printf("\n");
 					printf("idx: %d\n", idx);
 					printf("curr_idx: %d\n", curr_idx);
