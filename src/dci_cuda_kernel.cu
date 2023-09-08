@@ -778,7 +778,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			if (threadIdx.x == 0) {
 				//for (int b = 0; b < block_size; b++) {
 				//printf("block: %d\n", b);
-				printf("search_index left_pos\n");
+				printf("search_index_original left_pos\n");
 				for (int ch = 0; ch < num_heads; ch++) {
 					//printf("head: %d\n", ch);
 					printf("head: %d\n", ch);
@@ -788,7 +788,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					printf("\n");
 				}
 				printf("\n");
-				printf("search_index right_pos\n");
+				printf("search_index_original right_pos\n");
 				for (int ch = 0; ch < num_heads; ch++) {
 					printf("head: %d\n", ch);
 					for (int ni = 0; ni < num_indices; ni++) {
