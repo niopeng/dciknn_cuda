@@ -615,6 +615,43 @@ __device__ void init_index_priority(const dci* const dci_inst,
 	}
 }
 
+__device__ void init_index_priority_original(const dci* const dci_inst,
+		const float* const query_proj, const int num_indices,
+		int* const left_pos, int* const right_pos, float* const index_priority,
+		int* const cur_pos, const int points_per_block) {
+	int total = num_indices;
+	int chunk_size = (total + blockDim.x - 1) / blockDim.x;
+	int idx;
+	int num_points_in_block = min(
+			(int) (dci_inst->num_points - blockIdx.x * points_per_block),
+			points_per_block);
+	for (int j = 0; j < chunk_size; j++) {
+		idx = threadIdx.x * chunk_size + j;
+		if (idx < total && num_points_in_block > 0) {
+			cur_pos[idx] = dci_next_closest_proj(
+					&(dci_inst->indices[idx * (dci_inst->num_points)
+							+ blockIdx.x * points_per_block]),
+					&(left_pos[idx]), &(right_pos[idx]), query_proj[idx],
+					num_points_in_block);
+			int position;
+			if ((cur_pos[idx] < 0) && (cur_pos[idx] > -blockDim.x)) {
+				position = 0;
+			} else if ((cur_pos[idx] < (num_points_in_block + blockDim.x - 1))
+					&& (cur_pos[idx] >= num_points_in_block)) {
+				position = num_points_in_block - 1;
+			} else {
+				position = cur_pos[idx];
+			}
+			assert(position >= 0); // There should be at least one point in the index
+			assert(position < num_points_in_block);
+			index_priority[idx] = abs_d(
+					dci_inst->indices[position + idx * (dci_inst->num_points)
+							+ blockIdx.x * points_per_block].key
+							- query_proj[idx]);
+		}
+	}
+}
+
 __global__ void init_counts(const dci* const dci_inst, int* counts) {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
 	int total = dci_inst->num_comp_indices * dci_inst->num_points;
@@ -813,6 +850,51 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		);
 
 		__syncthreads();
+
+		if (blockIdx.x == 0) {
+			if (threadIdx.x == 0) {
+				printf("init_index_priority left_pos\n");
+				for (int ch = 0; ch < num_heads; ch++) {
+					//printf("head: %d\n", ch);
+					printf("head: %d\n", ch);
+					for (int ni = 0; ni < num_indices; ni++) {
+						printf("%d ", left_pos[ch * num_indices + ni]);
+					}
+					printf("\n");
+				}
+				printf("\n");
+				printf("init_index_priority right_pos\n");
+				for (int ch = 0; ch < num_heads; ch++) {
+					printf("head: %d\n", ch);
+					for (int ni = 0; ni < num_indices; ni++) {
+						printf("%d ", right_pos[ch * num_indices + ni]);
+					}
+					printf("\n");
+				}
+				printf("\n");
+				printf("init_index_priority cur_pos\n");
+				for (int ch = 0; ch < num_heads; ch++) {
+					printf("head: %d\n", ch);
+					for (int ni = 0; ni < num_indices; ni++) {
+						printf("%d ", cur_pos[ch * num_indices + ni]);
+					}
+					printf("\n");
+				}
+				printf("\n");
+				printf("init_index_priority cur_pos\n");
+				for (int ch = 0; ch < num_heads; ch++) {
+					printf("head: %d\n", ch);
+					for (int ni = 0; ni < num_indices; ni++) {
+						printf("%f ", index_priority[ch * num_indices + ni]);
+					}
+					printf("\n");
+				}
+				printf("\n");
+			}
+		}
+
+		init_index_priority_original(dci_inst, query_proj, num_indices, left_pos, right_pos,
+				index_priority, cur_pos, points_per_block);
 
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
