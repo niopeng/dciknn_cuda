@@ -530,6 +530,16 @@ __device__ void init_index_priority(const dci* const dci_inst,
 					&(left_pos[idx]), &(right_pos[idx]), query_proj_column[curr_idx + curr_head * num_indices],
 					num_points_in_block);
 
+			if (blockIdx.x == 0) {
+				if (threadIdx.x == 0) {
+					printf("\n");
+					printf("init_index_priority idx: %d\n", idx);
+					printf("curr_idx: %d\n", curr_idx);
+					printf("curr_head: %d\n", curr_head);
+					printf("cur_pos: %d\n", cur_pos[idx]);
+				}
+			}
+
 			int position;
 			if ((cur_pos[idx] < 0) && (cur_pos[idx] > -blockDim.x)) {
 				position = 0;
@@ -571,6 +581,15 @@ __device__ void init_index_priority_original(const dci* const dci_inst,
 							+ blockIdx.x * points_per_block]),
 					&(left_pos[idx]), &(right_pos[idx]), query_proj[idx],
 					num_points_in_block);
+
+			if (blockIdx.x == 0) {
+				if (threadIdx.x == 0) {
+					printf("\n");
+					printf("init_index_priority_original idx: %d\n", idx);
+					printf("cur_pos: %d\n", cur_pos[idx]);
+				}
+			}
+
 			int position;
 			if ((cur_pos[idx] < 0) && (cur_pos[idx] > -blockDim.x)) {
 				position = 0;
