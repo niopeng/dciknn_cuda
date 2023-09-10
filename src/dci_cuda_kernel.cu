@@ -799,6 +799,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		}
 		*/
 
+		/*
 		init_index_priority(
 			dci_inst, 
 			query_proj_column, 
@@ -854,6 +855,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
+		*/
 
 		init_index_priority_original(dci_inst, query_proj, num_indices, left_pos, right_pos,
 				index_priority, cur_pos, points_per_block);
