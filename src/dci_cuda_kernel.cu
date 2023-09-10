@@ -484,6 +484,7 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 	}
 }
 
+/*
 __device__ void search_index_original(const dci* const dci_inst,
 		const float* const query_proj, const int num_indices,
 		int* const left_pos, int* const right_pos, const int points_per_block) {
@@ -503,6 +504,7 @@ __device__ void search_index_original(const dci* const dci_inst,
 		}
 	}
 }
+*/
 
 __device__ void init_index_priority(const dci* const dci_inst,
 		const float* const query_proj_column, 
