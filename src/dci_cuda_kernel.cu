@@ -951,6 +951,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							//}
 						}
 
+						/*
 						if (blockIdx.x == 0) {
 							if (threadIdx.x == 0) {
 								printf("\n");
@@ -961,10 +962,23 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("top_index_priority: %f\n", top_index_priority[curr_head]);
 							}
 						}
+						*/
 					}
 				}
 
 				__syncthreads();
+
+				if (blockIdx.x == 0) {
+					if (threadIdx.x == 0) {
+						
+						for (int tmp = 0; tmp < num_heads; tmp++) {
+							printf("\n");
+							printf("head: %d\n", tmp);
+							printf("top_h: %d\n", top_h[tmp]);
+							printf("top_h: %f\n", top_index_priority[tmp]);
+						}
+					}
+				}
 
 				// -----------------------------------------------------------------------------------------------
 				// Start working
