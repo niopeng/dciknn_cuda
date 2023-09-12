@@ -1022,6 +1022,16 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							printf("cur_index: %d\n", cur_index);
 						}
 
+						if (threadIdx.x == 1) {
+							printf("\n");
+							printf("cur_index: %d\n", cur_index);
+						}
+
+						if (threadIdx.x == 4) {
+							printf("\n");
+							printf("cur_index: %d\n", cur_index);
+						}
+
 						//if (threadIdx.x == 1) {
 						//	printf("head_threadIdx: %d\n", head_threadIdx);
 						//	printf("cur_index: %d\n", cur_index);
