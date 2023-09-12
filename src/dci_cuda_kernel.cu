@@ -1005,7 +1005,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("top_h: %d\n", top_h[tmp]);
 								printf("m: %d\n", m[tmp]);
 								printf("position: %d\n", position[tmp]);
-								printf("\n");
 							}
 						}
 					}
@@ -1017,21 +1016,18 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					// this also mean it now process less number of index but work on multiple head
 					int cur_index = position[curr_head] + head_threadIdx;
 	
-					/*
 					if (blockIdx.x == 0) {
 						if (threadIdx.x == 0) {
-							printf("head_threadIdx: %d\n", head_threadIdx);
-							printf("cur_index: %d\n", cur_index);
 							printf("\n");
+							printf("cur_index: %d\n", cur_index);
 						}
 
-						if (threadIdx.x == 1) {
-							printf("head_threadIdx: %d\n", head_threadIdx);
-							printf("cur_index: %d\n", cur_index);
-							printf("\n");
-						}
+						//if (threadIdx.x == 1) {
+						//	printf("head_threadIdx: %d\n", head_threadIdx);
+						//	printf("cur_index: %d\n", cur_index);
+						//	printf("\n");
+						//}
 					}
-					*/
 
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
 						int cur_point = dci_inst->indices[cur_index
