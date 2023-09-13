@@ -1050,6 +1050,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]++;
 
+						/*
 						if (blockIdx.x == 0) {
 							if (threadIdx.x == 0) {
 								printf("\n");
@@ -1064,6 +1065,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("count: %d\n", counts[cur_point + dci_inst->num_points * m[curr_head] + dci_inst->num_comp_indices * dci_inst->num_points * curr_head]);
 							}
 						}
+						*/
 
 						if (counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]
@@ -1140,6 +1142,26 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					if ((threadIdx.x % thread_per_head) == 0) {
 						// i[head] = top_h[head] + m[head] * dci_inst->num_simp_indices + head * num_indices;
 						// i[head] has account for multi-head (right?)
+
+						//cur_pos[idx] = dci_next_closest_proj(
+						//		&(dci_inst->indices[curr_idx * (dci_inst->num_points)	// position of index (single head)
+						//			+ blockIdx.x * points_per_block // position within each index
+						//			+ dci_inst->num_points * num_indices * curr_head]),
+						//		&(left_pos[idx]), &(right_pos[idx]), query_proj_column[curr_idx + curr_head * num_indices],
+						//		num_points_in_block);
+
+						//index_priority[idx] = abs_d(
+						//		dci_inst->indices[position + curr_idx * (dci_inst->num_points)	// position of index (single head)
+						//			+ blockIdx.x * points_per_block // position within each index
+						//			+ dci_inst->num_points * num_indices * curr_head].key
+						//				- query_proj_column[curr_idx + curr_head * num_indices]);
+
+						printf("\n");
+						printf("curr_head: %d\n", curr_head);
+						printf("i[curr_head]: %d\n", i[curr_head]);
+						printf("1st indices key: %d\n", i[curr_head] * (dci_inst->num_points) + blockIdx.x * points_per_block);
+						printf("2nd indices key: %d\n", position[curr_head] + i[curr_head] * (dci_inst->num_points) + blockIdx.x * points_per_block);
+
 						cur_pos[i[curr_head]] = dci_next_closest_proj(
 								&(dci_inst->indices[i[curr_head] * (dci_inst->num_points)
 										+ blockIdx.x * points_per_block]),
