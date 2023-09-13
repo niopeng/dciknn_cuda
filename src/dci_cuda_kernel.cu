@@ -1050,7 +1050,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]++;
 
-						/*
 						if (blockIdx.x == 0) {
 							if (threadIdx.x == 0) {
 								printf("\n");
@@ -1065,7 +1064,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("count: %d\n", counts[cur_point + dci_inst->num_points * m[curr_head] + dci_inst->num_comp_indices * dci_inst->num_points * curr_head]);
 							}
 						}
-						*/
 
 						if (counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]
@@ -1080,6 +1078,14 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 											+ max_possible_num_candidates * block_size * curr_head] =
 											cur_point;
 									num_candidates++;
+
+									if (blockIdx.x == 0) {
+										if (threadIdx.x == 0) {			
+											printf("\n");
+											printf("all_candidates index: %d\n", num_candidates + blockIdx.x * max_possible_num_candidates + max_possible_num_candidates * block_size * curr_head);
+											printf("all_candidates: %d\n", all_candidates[num_candidates + blockIdx.x * max_possible_num_candidates + max_possible_num_candidates * block_size * curr_head]);
+										}
+									}			
 								} else {
 									// Compute distance
 									cur_dist = compute_dist_device(
