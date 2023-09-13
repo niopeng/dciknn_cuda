@@ -940,17 +940,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								+ m[curr_head] * dci_inst->num_simp_indices 
 								+ curr_head * num_indices];
 							top_h[curr_head] = h;
-
-							//if (blockIdx.x == 0) {
-							//	if (threadIdx.x == 0) {
-							//		printf("m: %d\n", m[curr_head]);
-							//		printf("h %d | top_h %d\n", h, top_h[curr_head]);
-							//		printf("index_priority key: %d\n", h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices);
-							//		printf("index_priority: %f\n", index_priority[h + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices]);
-							//		printf("top_index_priority: %f\n", top_index_priority[curr_head]);
-							//		printf("\n");
-							//	}
-							//}
 						}
 
 						/*
@@ -1050,6 +1039,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]++;
 
+						/*
 						if (blockIdx.x == 0) {
 							if (threadIdx.x == 0) {
 								printf("\n");
@@ -1064,6 +1054,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("count: %d\n", counts[cur_point + dci_inst->num_points * m[curr_head] + dci_inst->num_comp_indices * dci_inst->num_points * curr_head]);
 							}
 						}
+						*/
 
 						if (counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]
@@ -1079,13 +1070,13 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 											cur_point;
 									num_candidates++;
 
-									if (blockIdx.x == 0) {
-										if (threadIdx.x == 0) {			
-											printf("\n");
-											printf("all_candidates index: %d\n", num_candidates + blockIdx.x * max_possible_num_candidates + max_possible_num_candidates * block_size * curr_head);
-											printf("all_candidates: %d\n", all_candidates[num_candidates + blockIdx.x * max_possible_num_candidates + max_possible_num_candidates * block_size * curr_head]);
-										}
-									}			
+									//if (blockIdx.x == 0) {
+									//	if (threadIdx.x == 0) {			
+									//		printf("\n");
+									//		printf("all_candidates index: %d\n", num_candidates + blockIdx.x * max_possible_num_candidates + max_possible_num_candidates * block_size * curr_head);
+									//		printf("all_candidates: %d\n", all_candidates[num_candidates + blockIdx.x * max_possible_num_candidates + max_possible_num_candidates * block_size * curr_head]);
+									//	}
+									//}			
 								} else {
 									// Compute distance
 									cur_dist = compute_dist_device(
@@ -1541,16 +1532,16 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				thread_size
 			);
 
-		int data_total = num_neighbours * block_size * thread_size * num_heads;
+		int data_total = dci_inst->num_points * num_heads;
 		int data_size = sizeof(float) * data_total;
 		float* h_data = (float *) malloc(data_size);
-		cudaMemcpy(h_data, d_top_candidates_dist, data_size, cudaMemcpyDeviceToHost);
+		cudaMemcpy(h_data, candidate_dists, data_size, cudaMemcpyDeviceToHost);
 
 		for (int h = 0; h < num_heads; h++) {
 			printf("\n");
-			printf("d_top_candidates_dist head %d\n", h);
-			for (int i = 0; i < (num_neighbours * block_size * thread_size); i++) {
-				printf("%f ", h_data[i + num_neighbours * block_size * thread_size * h]);
+			printf("candidate_dists head %d\n", h);
+			for (int i = 0; i < (dci_inst->num_points); i++) {
+				printf("%f ", h_data[i + dci_inst->num_points * h]);
 			}
 			printf("\n");
 		}
