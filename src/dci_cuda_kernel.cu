@@ -1190,12 +1190,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					}
 				}
 
-					// index_priority[idx] = abs_d(
-					//		dci_inst->indices[position + curr_head * num_indices * (dci_inst->num_points)
-					//		+ idx * (dci_inst->num_points)
-					//		+ blockIdx.x * points_per_block].key
-					//		- query_proj_column[idx + curr_head * num_indices]);
-
 				if ((threadIdx.x % thread_per_head) == 0) {
 					m[curr_head] = m[curr_head] + 1;
 				}
@@ -1204,6 +1198,16 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				// End working
 				// -----------------------------------------------------------------------------------------------
 
+			}
+
+			if (blockIdx.x == 0) {
+				if (threadIdx.x == 0) {
+					printf("\n");
+					for (int y = 0; y < (num_neighbours * block_size * thread_size); y++) {
+						printf("%f ", d_top_candidates_dist[y]);
+					}
+					printf("\n");
+				}
 			}			
 
 			if ((threadIdx.x % thread_per_head) == 0) {
@@ -1223,25 +1227,14 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			    break;
 			}
 
-			if (blockIdx.x == 0) {
-				if (threadIdx.x == 0) {
-					printf("\n");
-					for (int y = 0; y < (num_neighbours * block_size * thread_size); y++) {
-						printf("%f ", d_top_candidates_dist[y]);
-					}
-					printf("\n");
-				}
-			}
-
-
-		//for (int h = 0; h < num_heads; h++) {
-		//	printf("\n");
-		//	printf("candidate_dists head %d\n", h);
-		//	for (int i = 0; i < (dci_inst->num_points); i++) {
-		//		printf("%f ", h_data[i + dci_inst->num_points * h]);
-		//	}
-		//	printf("\n");
-		//}
+			//for (int h = 0; h < num_heads; h++) {
+			//	printf("\n");
+			//	printf("candidate_dists head %d\n", h);
+			//	for (int i = 0; i < (dci_inst->num_points); i++) {
+			//		printf("%f ", h_data[i + dci_inst->num_points * h]);
+			//	}
+			//	printf("\n");
+			//}
 
 		}
 
