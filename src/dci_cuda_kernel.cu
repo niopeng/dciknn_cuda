@@ -1156,15 +1156,15 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						//			+ dci_inst->num_points * num_indices * curr_head].key
 						//				- query_proj_column[curr_idx + curr_head * num_indices]);
 
-						if (blockIdx.x == 0) {
-							if (threadIdx.x == 0) {
-								printf("\n");
-								printf("curr_head: %d\n", curr_head);
-								printf("i[curr_head]: %d\n", i[curr_head]);
-								printf("1st indices key: %d\n", i[curr_head] * (dci_inst->num_points) + blockIdx.x * points_per_block);
-								printf("2nd indices key: %d\n", position[curr_head] + i[curr_head] * (dci_inst->num_points) + blockIdx.x * points_per_block);
-							}
-						}
+						//if (blockIdx.x == 0) {
+						//	if (threadIdx.x == 0) {
+						//		printf("\n");
+						//		printf("curr_head: %d\n", curr_head);
+						//		printf("i[curr_head]: %d\n", i[curr_head]);
+						//		printf("1st indices key: %d\n", i[curr_head] * (dci_inst->num_points) + blockIdx.x * points_per_block);
+						//		printf("2nd indices key: %d\n", position[curr_head] + i[curr_head] * (dci_inst->num_points) + blockIdx.x * points_per_block);
+						//	}
+						//}
 
 						cur_pos[i[curr_head]] = dci_next_closest_proj(
 								&(dci_inst->indices[i[curr_head] * (dci_inst->num_points)
@@ -1227,7 +1227,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			}
 
 			// test 
-			break;
+			//break;
 			// test
 		}
 
@@ -1537,7 +1537,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		break;
 
-		/*
 		int data_total = num_neighbours * block_size * thread_size * num_heads;
 		int data_size = sizeof(float) * data_total;
 		float* h_data = (float *) malloc(data_size);
@@ -1555,7 +1554,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		cudaFree(h_data);
 		printf("\n");
 		break;
-		*/
 
 		//dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
 		//		num_neighbours, &(query[j * dim]),
