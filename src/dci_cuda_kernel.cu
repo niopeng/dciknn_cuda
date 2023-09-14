@@ -1555,7 +1555,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		cudaMemcpy(h_data, candidate_dists, data_size, cudaMemcpyDeviceToHost);
 
 		printf("\n");
-		printf("candidate_dists head %d\n", h);
 		for (int i = 0; i < (dci_inst->num_points); i++) {
 			printf("%f ", h_data[i]);
 		}
