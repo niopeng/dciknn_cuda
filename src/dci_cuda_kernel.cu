@@ -1200,6 +1200,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 			}
 
+			/*
 			if (blockIdx.x == 0) {
 				if (threadIdx.x == 0) {
 					printf("\n");
@@ -1208,7 +1209,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					}
 					printf("\n");
 				}
-			}			
+			}
+			*/
 
 			if ((threadIdx.x % thread_per_head) == 0) {
 				if (num_candidates >= num_neighbours) {
