@@ -1770,7 +1770,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			);
 		*/
 
-		dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
+		dci_query_single_point_by_block_original<<<block_size, thread_size>>>(dci_inst,
 				num_neighbours, &(query[j * dim]),
 				&(query_proj[j * num_indices]), *d_query_config,
 				d_top_candidates_dist, d_top_candidates_index, d_all_candidates,
