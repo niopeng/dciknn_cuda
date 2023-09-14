@@ -65,7 +65,7 @@ def main():
     # DCI Hyperparameters                                                                                                                       #
     #                                                                                                                                           #
     #############################################################################################################################################
-    block_size = 10
+    block_size = 2
     thread_size = 10
     num_comp_indices = 2
     num_simp_indices = 10

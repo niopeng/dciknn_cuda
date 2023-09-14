@@ -1542,6 +1542,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				thread_size
 			);
 
+		break;
+
 		/*
 		int data_total = dci_inst->num_points * num_heads;
 		int data_size = sizeof(float) * data_total;
