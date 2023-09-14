@@ -484,7 +484,6 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 	}
 }
 
-/*
 __device__ void search_index_original(const dci* const dci_inst,
 		const float* const query_proj, const int num_indices,
 		int* const left_pos, int* const right_pos, const int points_per_block) {
@@ -504,7 +503,6 @@ __device__ void search_index_original(const dci* const dci_inst,
 		}
 	}
 }
-*/
 
 __device__ void init_index_priority(const dci* const dci_inst,
 		const float* const query_proj_column, 
@@ -563,7 +561,6 @@ __device__ void init_index_priority(const dci* const dci_inst,
 	}
 }
 
-/*
 __device__ void init_index_priority_original(const dci* const dci_inst,
 		const float* const query_proj, const int num_indices,
 		int* const left_pos, int* const right_pos, float* const index_priority,
@@ -612,7 +609,6 @@ __device__ void init_index_priority_original(const dci* const dci_inst,
 		}
 	}
 }
-*/
 
 __global__ void init_counts(const dci* const dci_inst, int* counts) {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
@@ -1265,6 +1261,233 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 }
 
+__global__
+static void dci_query_single_point_by_block_original(const dci* const dci_inst,
+		const int num_neighbours, const float* const query,
+		const float* const query_proj, const dci_query_config query_config,
+		float* const d_top_candidates_dist, int* const d_top_candidates_index,
+		int* const all_candidates, int* counts, float* candidate_dists) {
+	int j, h;
+	float cur_dist;
+	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
+	__shared__ float top_index_priority;
+	__shared__ int k, top_h, position, m, i;
+	__shared__ bool could_break; // Bug fix: resolve infinite loop if thread 0 exits first
+	float last_top_candidate_dist = -1.0; // The distance of the k^th closest candidate found so far
+	int num_candidates = 0, last_top_candidate = -1;
+
+	// init variables
+	if (threadIdx.x == 0) {
+		k = 0;
+		could_break = false;
+	}
+
+	int max_possible_num_candidates = min(query_config.max_num_candidates,
+			query_config.num_outer_iterations);
+
+	int points_per_block = (dci_inst->num_points + gridDim.x - 1) / gridDim.x;
+	int num_points_in_block = min(
+			(int) (dci_inst->num_points - blockIdx.x * points_per_block),
+			points_per_block);
+
+	if (num_points_in_block > 0) {
+
+		__shared__ int* left_pos;
+		__shared__ int* right_pos;
+		__shared__ int* cur_pos;
+		__shared__ float* index_priority;
+		// init variables
+		if (threadIdx.x == 0) {
+			left_pos = new int[num_indices];
+			right_pos = new int[num_indices];
+			cur_pos = new int[num_indices];
+			index_priority = new float[num_indices];
+		}
+		__syncthreads();
+
+		/* Search index */
+		search_index_original(dci_inst, query_proj, num_indices, left_pos, right_pos,
+				points_per_block);
+
+		/* Synchronize the threads */
+		__syncthreads();
+
+		/* Populate the closest indices */
+		init_index_priority_original(dci_inst, query_proj, num_indices, left_pos, right_pos,
+				index_priority, cur_pos, points_per_block);
+
+		/* Synchronize the threads */
+		__syncthreads();
+
+		while (k < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
+
+			if (threadIdx.x == 0) {
+				m = 0;
+			}
+			__syncthreads();
+			while (m < dci_inst->num_comp_indices) {
+				// only one thread to get the top
+				if (threadIdx.x == 0) {
+					/* Get the top priority and data index in priority queue */
+					top_index_priority = DBL_MAX;
+					top_h = -1;
+					for (h = 0; h < dci_inst->num_simp_indices; h++) {
+						if (index_priority[h + m * dci_inst->num_simp_indices]
+								< top_index_priority) {
+							top_index_priority = index_priority[h
+									+ m * dci_inst->num_simp_indices];
+							top_h = h;
+						}
+					}
+				}
+				/* Synchronize the threads */
+				__syncthreads();
+				if (top_h >= 0) {
+					if (threadIdx.x == 0) {
+						i = top_h + m * dci_inst->num_simp_indices;
+						position = cur_pos[i];
+					}
+					__syncthreads();
+					int cur_index = position + threadIdx.x;
+					// check whether the current thread pointing index is within range
+					if (cur_index >= 0 && cur_index < num_points_in_block) {
+						int cur_point = dci_inst->indices[cur_index
+								+ i * (dci_inst->num_points)
+								+ blockIdx.x * points_per_block].value;
+						counts[cur_point + m * (dci_inst->num_points)]++;
+						if (counts[cur_point + m * (dci_inst->num_points)]
+								== dci_inst->num_simp_indices) {
+							// add offset to candidate_dists
+							if (candidate_dists[cur_point] == -2.0) {
+								if (query_config.blind) {
+									candidate_dists[cur_point] = -1.0;
+									// lock
+									all_candidates[num_candidates
+											+ blockIdx.x
+													* max_possible_num_candidates] =
+											cur_point;
+									num_candidates++;
+								} else {
+									// Compute distance
+									cur_dist = compute_dist_device(
+											&(dci_inst->data[cur_point
+													* dci_inst->dim]), query,
+											dci_inst->dim);
+									candidate_dists[cur_point] = cur_dist;
+									if (num_candidates < num_neighbours) {
+										d_top_candidates_dist[blockIdx.x
+												* num_neighbours
+												+ threadIdx.x * num_neighbours
+												+ num_candidates] = cur_dist;
+										d_top_candidates_index[blockIdx.x
+												* num_neighbours
+												+ threadIdx.x * num_neighbours
+												+ num_candidates] = cur_point;
+										if (cur_dist > last_top_candidate_dist) {
+											last_top_candidate_dist = cur_dist;
+											last_top_candidate = num_candidates;
+										}
+									} else if (cur_dist < last_top_candidate_dist) {
+										d_top_candidates_dist[blockIdx.x
+												* num_neighbours
+												+ threadIdx.x * num_neighbours
+												+ last_top_candidate] = cur_dist;
+										d_top_candidates_index[blockIdx.x
+												* num_neighbours
+												+ threadIdx.x * num_neighbours
+												+ last_top_candidate] = cur_point;
+										last_top_candidate_dist = -1.0;
+										// Assuming num_neighbours less than the min(blockDim) = 32
+										// no need to run on gpu
+										for (j = 0; j < num_neighbours; j++) {
+											if (d_top_candidates_dist[blockIdx.x
+													* num_neighbours
+													+ threadIdx.x * num_neighbours
+													+ j]
+													> last_top_candidate_dist) {
+												last_top_candidate_dist =
+														d_top_candidates_dist[blockIdx.x
+																* num_neighbours
+																+ threadIdx.x
+																		* num_neighbours
+																+ j];
+												last_top_candidate = j;
+											}
+										}
+									}
+									num_candidates++;
+								}
+							} else {
+								if (!query_config.blind) {
+									cur_dist = candidate_dists[cur_point];
+								}
+							}
+						}
+					}
+					/* Synchronize the threads */
+					__syncthreads();
+					// use the first thread to update
+					if (threadIdx.x == 0) {
+						cur_pos[i] = dci_next_closest_proj(
+								&(dci_inst->indices[i * (dci_inst->num_points)
+										+ blockIdx.x * points_per_block]),
+								&(left_pos[i]), &(right_pos[i]), query_proj[i],
+								num_points_in_block);
+						if ((cur_pos[i] < 0) && (cur_pos[i] > -blockDim.x)) {
+							position = 0;
+						} else if ((cur_pos[i]
+								< (num_points_in_block + blockDim.x - 1))
+								&& (cur_pos[i] >= num_points_in_block)) {
+							position = num_points_in_block - 1;
+						} else {
+							position = cur_pos[i];
+						}
+						if (position >= 0 && position < num_points_in_block) {
+							index_priority[i] = abs_d(
+									dci_inst->indices[position
+											+ i * (dci_inst->num_points)
+											+ blockIdx.x * points_per_block].key
+											- query_proj[i]);
+						} else {
+							index_priority[i] = DBL_MAX;
+							cur_pos[i] = -blockDim.x;
+						}
+					}
+				}
+				if (threadIdx.x == 0) {
+					m++;
+				}
+				__syncthreads();
+			}
+			if (threadIdx.x == 0) {
+				if (num_candidates >= num_neighbours) {
+					if (k + 1
+							>= query_config.num_outer_iterations
+									* dci_inst->num_simp_indices
+							|| num_candidates >= query_config.max_num_candidates) {
+						could_break = true;
+						break;
+					}
+				}
+				k++;
+			}
+			/* Synchronize the threads */
+			__syncthreads();
+			if (could_break) {
+			    break;
+			}
+		}
+		// free variables
+		if (threadIdx.x == 0) {
+			free(left_pos);
+			free(right_pos);
+			free(cur_pos);
+			free(index_priority);
+		}
+	}
+
+
+}
 
 __global__ void mix_sort_kernel(idx_elem* const d_top_candidates,
 		const int total) {
@@ -1528,6 +1751,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
+		/*
 		dci_query_single_point_by_block<<<block_size, thread_size>>>(
 				dci_inst,
 				num_neighbours, 
@@ -1544,6 +1768,14 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				block_size,
 				thread_size
 			);
+		*/
+
+		dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
+				num_neighbours, &(query[j * dim]),
+				&(query_proj[j * num_indices]), *d_query_config,
+				d_top_candidates_dist, d_top_candidates_index, d_all_candidates,
+				counts, candidate_dists);
+
 
 		printf("\n");
 		printf("num_heads: %d\n", num_heads);
