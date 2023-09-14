@@ -1222,6 +1222,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				}
 				k[curr_head] = k[curr_head] + 1;
 			}
+
 			__syncthreads();
 			if (could_break[curr_head]) {
 			    break;
@@ -1541,6 +1542,11 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				block_size,
 				thread_size
 			);
+
+		printf("\n");
+		printf("num_heads: %d\n", num_heads);
+		printf("d_top_candidates_dist size: %d\n", num_neighbours * block_size * thread_size);
+		printf("\n");
 
 		break;
 
