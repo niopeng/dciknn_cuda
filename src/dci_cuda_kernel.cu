@@ -1816,6 +1816,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		printf("\n");
 		cudaFree(h_data);
 
+		break;
+
 		//printf("\n");
 		//printf("num_heads: %d\n", num_heads);
 		//printf("d_top_candidates_dist size: %d\n", num_neighbours * block_size * thread_size);
