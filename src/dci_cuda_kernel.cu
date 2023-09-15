@@ -1751,7 +1751,9 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
-		/*
+		int data_total, data_size;
+		float* h_data;
+
 		dci_query_single_point_by_block<<<block_size, thread_size>>>(
 				dci_inst,
 				num_neighbours, 
@@ -1768,7 +1770,33 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				block_size,
 				thread_size
 			);
-		*/
+
+		data_total = num_neighbours * block_size * thread_size;
+		data_size = sizeof(float) * data_total;
+		h_data = (float *) malloc(data_size);
+		cudaMemcpy(h_data, d_top_candidates_dist, data_size, cudaMemcpyDeviceToHost);
+
+		printf("\n");
+		for (int i = 0; i < (num_neighbours * block_size * thread_size); i++) {
+			printf("%f ", h_data[i]);
+		}
+		printf("\n");
+		cudaFree(h_data);
+
+		cudaDeviceSynchronize();
+
+		// -------- original result --------
+
+		// need to refresh the result holder to avoid carry over results
+		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
+				num_neighbours * block_size * thread_size * num_heads, DBL_MAX);
+
+		cudaDeviceSynchronize();
+		init_counts<<<block_size, thread_size>>>(dci_inst, counts);
+		init_candidate_dists<<<block_size, thread_size>>>(dci_inst,
+				candidate_dists);
+
+		cudaDeviceSynchronize();
 
 		dci_query_single_point_by_block_original<<<block_size, thread_size>>>(dci_inst,
 				num_neighbours, &(query[j * dim]),
@@ -1776,6 +1804,17 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				d_top_candidates_dist, d_top_candidates_index, d_all_candidates,
 				counts, candidate_dists);
 
+		data_total = num_neighbours * block_size * thread_size;
+		data_size = sizeof(float) * data_total;
+		h_data = (float *) malloc(data_size);
+		cudaMemcpy(h_data, d_top_candidates_dist, data_size, cudaMemcpyDeviceToHost);
+
+		printf("\n");
+		for (int i = 0; i < (num_neighbours * block_size * thread_size); i++) {
+			printf("%f ", h_data[i]);
+		}
+		printf("\n");
+		cudaFree(h_data);
 
 		//printf("\n");
 		//printf("num_heads: %d\n", num_heads);
@@ -1832,18 +1871,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		//			block_size * max_possible_num_candidates);
 		//}
 	}
-
-	int data_total = num_neighbours * block_size * thread_size;
-	int data_size = sizeof(float) * data_total;
-	float* h_data = (float *) malloc(data_size);
-	cudaMemcpy(h_data, d_top_candidates_dist, data_size, cudaMemcpyDeviceToHost);
-
-	printf("\n");
-	for (int i = 0; i < (num_neighbours * block_size * thread_size); i++) {
-		printf("%f ", h_data[i]);
-	}
-	printf("\n");
-	cudaFree(h_data);
 
 	// free the allocated memories
 	cudaFree(query_proj);
