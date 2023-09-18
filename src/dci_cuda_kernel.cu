@@ -1831,6 +1831,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		printf("\n");
 		cudaFree(i_data);
 
+		break;
+
 		// -------- original result --------
 
 		// need to refresh the result holder to avoid carry over results
