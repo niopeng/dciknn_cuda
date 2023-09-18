@@ -1753,6 +1753,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		int data_total, data_size;
 		float* h_data;
+		int * i_data;
 
 		dci_query_single_point_by_block<<<block_size, thread_size>>>(
 				dci_inst,
@@ -1796,39 +1797,39 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		data_total = num_neighbours * block_size * thread_size * num_heads;
 		data_size = sizeof(int) * data_total;
-		h_data = (int *) malloc(data_size);
-		cudaMemcpy(h_data, d_top_candidates_index, data_size, cudaMemcpyDeviceToHost);
+		i_data = (int *) malloc(data_size);
+		cudaMemcpy(i_data, d_top_candidates_index, data_size, cudaMemcpyDeviceToHost);
 
 		printf("\n");
 		printf("d_top_candidates_index\n");
 		for (int j = 0; j < num_heads; j ++) {
 			printf("head %d\n", j);
 			for (int i = 0; i < (num_neighbours * block_size * thread_size); i++) {
-				printf("%d ", h_data[i]);
+				printf("%d ", i_data[i]);
 			}
 			printf("\n");
 		}
 		printf("\n");
-		cudaFree(h_data);
+		cudaFree(i_data);
 
 		// d_all_candidates
 
 		data_total = max_possible_num_candidates * block_size * num_heads;
 		data_size = sizeof(int) * data_total;
-		h_data = (int *) malloc(data_size);
-		cudaMemcpy(h_data, d_all_candidates, data_size, cudaMemcpyDeviceToHost);
+		i_data = (int *) malloc(data_size);
+		cudaMemcpy(i_data, d_all_candidates, data_size, cudaMemcpyDeviceToHost);
 
 		printf("\n");
 		printf("d_all_candidates\n");
 		for (int j = 0; j < num_heads; j ++) {
 			printf("head %d\n", j);
 			for (int i = 0; i < (max_possible_num_candidates * block_size); i++) {
-				printf("%d ", h_data[i]);
+				printf("%d ", i_data[i]);
 			}
 			printf("\n");
 		}
 		printf("\n");
-		cudaFree(h_data);
+		cudaFree(i_data);
 
 		// -------- original result --------
 
@@ -1908,6 +1909,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		//		counts, candidate_dists);
 
 		// get the final output
+		/*
 		if (!query_config.blind) {
 			get_top_candidates(&(nearest_neighbours[j * num_neighbours]),
 					&(nearest_neighbour_dists[j * num_neighbours]),
@@ -1919,6 +1921,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 					d_all_candidates, max_possible_num_candidates,
 					block_size * max_possible_num_candidates);
 		}
+		*/
 	}
 
 	// free the allocated memories
