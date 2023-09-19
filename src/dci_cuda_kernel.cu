@@ -1918,7 +1918,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		cudaMemcpy(i_data, counts, data_size, cudaMemcpyDeviceToHost);
 
 		printf("\n");
-		printf("d_all_candidates\n");
+		printf("counts\n");
 		for (int j = 0; j < num_heads; j ++) {
 			printf("head %d\n", j);
 			for (int i = 0; i < (dci_inst->num_points * dci_inst->num_comp_indices); i++) {
