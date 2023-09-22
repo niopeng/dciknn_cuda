@@ -38,13 +38,13 @@ def main():
     # Data Generation Hyperparameters                                                                                                           #
     #                                                                                                                                           #
     #############################################################################################################################################
-    dim = 10
-    num_pts = 300
-    num_queries = 50
+    #dim = 10
+    #num_pts = 300
+    #num_queries = 50
     num_heads = 1
-    #dim = 100
-    #num_pts = 3000
-    #num_queries = 500
+    dim = 100
+    num_pts = 3000
+    num_queries = 500
     #num_heads = 2
     # dim = 100
     # num_pts = 3000
