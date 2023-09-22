@@ -50,7 +50,7 @@ def main():
     # num_pts = 3000
     # num_queries = 500
 
-    intrinsic_dim = 40
+    intrinsic_dim = 400
     
     data_and_queries = gen_data(dim, intrinsic_dim, num_pts + num_queries, num_heads)
 
