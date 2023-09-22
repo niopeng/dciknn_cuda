@@ -113,7 +113,6 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     dci_query(&(py_dci_inst->dci_inst), dim, num_heads, num_queries, query, num_neighbours, query_config, 
         final_outputs, final_distances, block_size, thread_size);
 
-    /*
     auto options = torch::TensorOptions().device(torch::kCUDA);
     auto new_options = torch::TensorOptions().dtype(torch::kInt32).device(torch::kCUDA);
     torch::Tensor final_outputs_array = torch::from_blob(final_outputs, {output_size}, new_options);
@@ -123,7 +122,6 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     torch::Tensor final_distances_array = torch::from_blob(final_distances, {output_size}, options);
 
     torch::Tensor final_result = torch::cat({ final, final_distances_array }, 0);
-    */
 
     return py_query;
 }

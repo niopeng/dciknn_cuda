@@ -1612,6 +1612,30 @@ __global__ void get_blind_candidate_count(idx_elem* const candidate_map,
 	}
 }
 
+/*
+ * Update the top nearest neighbors from the partial results
+ */
+void get_top_blind_candidates(int* const nearest_neighbours,
+		int* const d_all_candidates, const int max_possible_num_candidates,
+		const int total) {
+	int i;
+	idx_elem* candidate_map;
+	cudaMallocManaged((void **) (&candidate_map),
+			sizeof(idx_elem) * total);
+	int block_size = 1024;
+	int thread_size = 32;
+	init_candidates<<<block_size, thread_size>>>(candidate_map, total, 0);
+	// synch all blocks
+	cudaDeviceSynchronize();
+	get_blind_candidate_count<<<block_size, thread_size>>>(candidate_map, d_all_candidates, total);
+	// synch all blocks
+	cudaDeviceSynchronize();
+	mix_sort_kernel<<<1, 1>>>(candidate_map, total);
+	for (i = 0; i < max_possible_num_candidates; i++) {
+		nearest_neighbours[i] = candidate_map[i].value;
+	}
+}
+
 // change the dimension of query project from (head, query, indices) to (query, head, indices)
 __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const query_proj_column, 
 		const int num_heads, const int num_queries, const int num_indices) {
@@ -1776,6 +1800,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		// candidate_dists
 
+		/*
 		data_total = dci_inst->num_points * num_heads;
 		data_size = sizeof(float) * data_total;
 		h_data = (float *) malloc(data_size);
@@ -1868,10 +1893,12 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		}
 		printf("\n");
 		cudaFree(i_data);
+		*/
 
 
 		// -------- original result --------
-
+		
+		/*
 		// need to refresh the result holder to avoid carry over results
 		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
 				num_neighbours * block_size * thread_size * num_heads, DBL_MAX);
@@ -1985,44 +2012,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		}
 		printf("\n");
 		cudaFree(i_data);
-
-		break;
-
-		//printf("\n");
-		//printf("num_heads: %d\n", num_heads);
-		//printf("d_top_candidates_dist size: %d\n", num_neighbours * block_size * thread_size);
-		//printf("\n");
-
-		/*
-		int data_total = dci_inst->num_points * num_heads;
-		int data_size = sizeof(float) * data_total;
-		float* h_data = (float *) malloc(data_size);
-		cudaMemcpy(h_data, candidate_dists, data_size, cudaMemcpyDeviceToHost);
-
-		printf("\n");
-		for (int i = 0; i < (dci_inst->num_points); i++) {
-			printf("%f ", h_data[i]);
-		}
-		printf("\n");
-
-		cudaFree(h_data);
 		*/
-
-		/*
-		int data_total = num_neighbours * block_size * thread_size;
-		int data_size = sizeof(float) * data_total;
-		float* h_data = (float *) malloc(data_size);
-		cudaMemcpy(h_data, d_top_candidates_dist, data_size, cudaMemcpyDeviceToHost);
-
-		printf("\n");
-		for (int i = 0; i < (num_neighbours * block_size * thread_size); i++) {
-			printf("%f ", h_data[i]);
-		}
-		printf("\n");
-		cudaFree(h_data);
-		*/
-
-		//break;
 
 		//dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
 		//		num_neighbours, &(query[j * dim]),
@@ -2031,7 +2021,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		//		counts, candidate_dists);
 
 		// get the final output
-		/*
 		if (!query_config.blind) {
 			get_top_candidates(&(nearest_neighbours[j * num_neighbours]),
 					&(nearest_neighbour_dists[j * num_neighbours]),
@@ -2043,7 +2032,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 					d_all_candidates, max_possible_num_candidates,
 					block_size * max_possible_num_candidates);
 		}
-		*/
 	}
 
 	// free the allocated memories
