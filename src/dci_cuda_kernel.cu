@@ -1596,18 +1596,21 @@ __global__ void init_candidates(idx_elem* const candidate_map, const int total,
 }
 
 __global__ void get_blind_candidate_count(idx_elem* const candidate_map,
-		int* const d_all_candidates, const int total) {
+		int* const d_all_candidates, const int total, 
+		const int num_points, const int num_indices, const int num_heads) {
 	int idx, i = blockDim.x * blockIdx.x + threadIdx.x;
-	int chunk_size = (total + blockDim.x * gridDim.x - 1)
+	int chunk_size = (total * num_heads + blockDim.x * gridDim.x - 1)
 			/ (blockDim.x * gridDim.x);
 	int j;
 	// maintain counts as negative numbers for candidate_map.key in order to reuse mix_sort (ascending)
 	for (j = 0; j < chunk_size; j++) {
 		idx = i * chunk_size + j;
+		curr_head = (int) (idx / total);	// which head the given index belong to
+
 		if (idx < total) {
 			candidate_map[d_all_candidates[idx]].key--;
 			candidate_map[d_all_candidates[idx]].value =
-					d_all_candidates[idx];
+					d_all_candidates[idx] + num_points * num_indices * curr_head;
 		}
 	}
 }
@@ -1617,22 +1620,30 @@ __global__ void get_blind_candidate_count(idx_elem* const candidate_map,
  */
 void get_top_blind_candidates(int* const nearest_neighbours,
 		int* const d_all_candidates, const int max_possible_num_candidates,
+		const int num_points, const int num_indices, const int num_heads,
 		const int total) {
-	int i;
+	int i, j;
 	idx_elem* candidate_map;
 	cudaMallocManaged((void **) (&candidate_map),
-			sizeof(idx_elem) * total);
+			sizeof(idx_elem) * total * num_heads);
 	int block_size = 1024;
 	int thread_size = 32;
-	init_candidates<<<block_size, thread_size>>>(candidate_map, total, 0);
+	init_candidates<<<block_size, thread_size>>>(candidate_map, total * num_heads, 0);
 	// synch all blocks
 	cudaDeviceSynchronize();
-	get_blind_candidate_count<<<block_size, thread_size>>>(candidate_map, d_all_candidates, total);
+	get_blind_candidate_count<<<block_size, thread_size>>>(
+		candidate_map, d_all_candidates, total, num_points, num_indices num_heads);
 	// synch all blocks
 	cudaDeviceSynchronize();
-	mix_sort_kernel<<<1, 1>>>(candidate_map, total);
-	for (i = 0; i < max_possible_num_candidates; i++) {
-		nearest_neighbours[i] = candidate_map[i].value;
+
+	&(dci_inst->proj_vec[proj_vec_id])
+	for (j = 0; j < num_heads; j++) {
+		mix_sort_kernel<<<1, 1>>>(&(candidate_map[max_possible_num_candidates * block_size * j]), total);
+		
+		for (i = 0; i < max_possible_num_candidates; i++) {
+			nearest_neighbours[i + num_neighbours * num_queries * j] = 
+				candidate_map[i + num_neighbours * num_queries * j].value;
+		}
 	}
 }
 
@@ -2022,15 +2033,26 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		// get the final output
 		if (!query_config.blind) {
-			get_top_candidates(&(nearest_neighbours[j * num_neighbours]),
-					&(nearest_neighbour_dists[j * num_neighbours]),
-					d_top_candidates_dist, d_top_candidates_index,
-					num_neighbours, block_size * num_neighbours * thread_size);
+			for (int h = 0; h < num_heads; h++) {
+				get_top_candidates(
+						&(nearest_neighbours[j * num_neighbours + num_neighbours * num_queries * h]),
+						&(nearest_neighbour_dists[j * num_neighbours + num_neighbours * num_queries * h]),
+						&(d_top_candidates_dist[num_neighbours * block_size * thread_size * h]), 
+						&(d_top_candidates_index[num_neighbours * block_size * thread_size * h]),
+						num_neighbours, 
+						block_size * num_neighbours * thread_size
+					);
+			}
 		} else {
 			get_top_blind_candidates(
 					&(nearest_neighbours[j * max_possible_num_candidates]),
-					d_all_candidates, max_possible_num_candidates,
-					block_size * max_possible_num_candidates);
+					d_all_candidates, 
+					max_possible_num_candidates,
+					num_neighbours,
+					num_queries,
+					num_heads,
+					block_size * max_possible_num_candidates
+				);
 		}
 	}
 
