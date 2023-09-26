@@ -1598,6 +1598,7 @@ __global__ void init_candidates(idx_elem* const candidate_map, const int total,
 __global__ void get_blind_candidate_count(idx_elem* const candidate_map,
 		int* const d_all_candidates, const int total, 
 		const int num_points, const int num_indices, const int num_heads) {
+	int curr_head;
 	int idx, i = blockDim.x * blockIdx.x + threadIdx.x;
 	int chunk_size = (total * num_heads + blockDim.x * gridDim.x - 1)
 			/ (blockDim.x * gridDim.x);
@@ -1631,12 +1632,10 @@ void get_top_blind_candidates(int* const nearest_neighbours,
 	init_candidates<<<block_size, thread_size>>>(candidate_map, total * num_heads, 0);
 	// synch all blocks
 	cudaDeviceSynchronize();
-	get_blind_candidate_count<<<block_size, thread_size>>>(
-		candidate_map, d_all_candidates, total, num_points, num_indices num_heads);
+	get_blind_candidate_count<<<block_size, thread_size>>>(candidate_map, d_all_candidates, total, num_points, num_indices num_heads);
 	// synch all blocks
 	cudaDeviceSynchronize();
 
-	&(dci_inst->proj_vec[proj_vec_id])
 	for (j = 0; j < num_heads; j++) {
 		mix_sort_kernel<<<1, 1>>>(&(candidate_map[max_possible_num_candidates * block_size * j]), total);
 		
