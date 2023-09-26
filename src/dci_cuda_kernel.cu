@@ -1621,6 +1621,7 @@ __global__ void get_blind_candidate_count(idx_elem* const candidate_map,
  */
 void get_top_blind_candidates(int* const nearest_neighbours,
 		int* const d_all_candidates, const int max_possible_num_candidates,
+		const int num_points, const int num_indices,
 		const int num_neighbours, const int num_queries, const int num_heads,
 		const int total) {
 	int i, j;
@@ -2047,6 +2048,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 					&(nearest_neighbours[j * max_possible_num_candidates]),
 					d_all_candidates, 
 					max_possible_num_candidates,
+					dci_inst->num_points,
+					num_indices,
 					num_neighbours,
 					num_queries,
 					num_heads,
