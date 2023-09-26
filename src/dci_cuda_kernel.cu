@@ -1621,7 +1621,7 @@ __global__ void get_blind_candidate_count(idx_elem* const candidate_map,
  */
 void get_top_blind_candidates(int* const nearest_neighbours,
 		int* const d_all_candidates, const int max_possible_num_candidates,
-		const int num_points, const int num_indices, const int num_heads,
+		const int num_neighbours, const int num_queries, const int num_heads,
 		const int total) {
 	int i, j;
 	idx_elem* candidate_map;
@@ -1632,7 +1632,7 @@ void get_top_blind_candidates(int* const nearest_neighbours,
 	init_candidates<<<block_size, thread_size>>>(candidate_map, total * num_heads, 0);
 	// synch all blocks
 	cudaDeviceSynchronize();
-	get_blind_candidate_count<<<block_size, thread_size>>>(candidate_map, d_all_candidates, total, num_points, num_indices num_heads);
+	get_blind_candidate_count<<<block_size, thread_size>>>(candidate_map, d_all_candidates, total, num_points, num_indices, num_heads);
 	// synch all blocks
 	cudaDeviceSynchronize();
 
