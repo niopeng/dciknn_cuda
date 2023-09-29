@@ -94,8 +94,14 @@ def main():
         #b = datetime.datetime.now()
         #print(b-a)
 
-        data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
-        query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
+        data_arr = data_and_queries[:, :num_pts, :]
+        query_arr = data_and_queries[:, num_pts:, :]
+
+        data1 = torch.cat((data_arr, data_arr), 1)
+        query1 = torch.cat((query_arr, query_arr), 1)
+
+        data = data1.detach().clone().to(0)
+        query = query1.detach().clone().to(0)
 
         print(data.shape)
         print(query.shape)
