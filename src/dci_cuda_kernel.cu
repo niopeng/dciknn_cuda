@@ -1776,6 +1776,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 	for (int j = 0; j < num_queries; j++) { 
 		// need to refresh the result holder to avoid carry over results
+
+		/*
 		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
 				num_neighbours * block_size * thread_size * num_heads, DBL_MAX);
 
@@ -1903,10 +1905,10 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			printf("\n");
 			cudaFree(i_data);
 		}
+		*/
 
 		// -------- original result --------
 		
-		/*
 		// need to refresh the result holder to avoid carry over results
 		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
 				num_neighbours * block_size * thread_size * num_heads, DBL_MAX);
@@ -2026,7 +2028,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		//		&(query_proj[j * num_indices]), *d_query_config,
 		//		d_top_candidates_dist, d_top_candidates_index, d_all_candidates,
 		//		counts, candidate_dists);
-		*/
 
 		// get the final output
 		if (!query_config.blind) {
