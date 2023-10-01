@@ -111,7 +111,7 @@ def main():
         a = datetime.datetime.now()
         dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
-        #dci_db.add(data)
+        dci_db.add(data)
         ## Query
         ##dci_db.query(query, num_neighbours, num_outer_iterations)
         indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
