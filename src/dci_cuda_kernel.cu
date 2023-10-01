@@ -2086,20 +2086,20 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 	data_total = num_neighbours * num_queries * num_heads;
 	data_size = sizeof(float) * data_total;
-	i_data = (float *) malloc(data_size);
-	cudaMemcpy(i_data, nearest_neighbour_dists, data_size, cudaMemcpyDeviceToHost);
+	h_data = (float *) malloc(data_size);
+	cudaMemcpy(h_data, nearest_neighbour_dists, data_size, cudaMemcpyDeviceToHost);
 
 	printf("\n");
 	printf("nearest_neighbour_dists\n");
 	for (int j = 0; j < num_heads; j ++) {
 		printf("head %d\n", j);
 		for (int i = 0; i < (num_neighbours * num_queries); i++) {
-			printf("%f ", i_data[i + num_neighbours * num_queries * j]);
+			printf("%f ", h_data[i + num_neighbours * num_queries * j]);
 		}
 		printf("\n");
 	}
 	printf("\n");
-	cudaFree(i_data);
+	cudaFree(h_data);
 
 	// free the allocated memories
 	cudaFree(query_proj);
