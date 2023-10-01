@@ -120,8 +120,8 @@ def main():
         b = datetime.datetime.now()
         print(b-a)
 
-        #print(len(data))
-        #print(len(query))
+        print(indices.shape)
+        print(dists.shape)
 
 if __name__ == '__main__':
     main()
