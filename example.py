@@ -94,14 +94,16 @@ def main():
         #b = datetime.datetime.now()
         #print(b-a)
 
-        data_arr = data_and_queries[:, :num_pts, :]
-        query_arr = data_and_queries[:, num_pts:, :]
+        #data_arr = data_and_queries[:, :num_pts, :]
+        #query_arr = data_and_queries[:, num_pts:, :]
+        #data1 = torch.cat((data_arr, data_arr), 0)
+        #query1 = torch.cat((query_arr, query_arr), 0)
 
-        data1 = torch.cat((data_arr, data_arr), 0)
-        query1 = torch.cat((query_arr, query_arr), 0)
+        #data = data1.detach().clone().to(0)
+        #query = query1.detach().clone().to(0)
 
-        data = data1.detach().clone().to(0)
-        query = query1.detach().clone().to(0)
+        data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
+        query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
 
         print(data.shape)
         print(query.shape)
@@ -109,19 +111,19 @@ def main():
         a = datetime.datetime.now()
         dci_db = DCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
-        dci_db.add(data)
+        #dci_db.add(data)
         ## Query
         ##dci_db.query(query, num_neighbours, num_outer_iterations)
         indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
-        torch.set_printoptions(threshold=10000)
-        print("Nearest Indices:", indices)
-        print("Indices Distances:", dists)
-        dci_db.clear()
-        b = datetime.datetime.now()
-        print(b-a)
+        #torch.set_printoptions(threshold=10000)
+        #print("Nearest Indices:", indices)
+        #print("Indices Distances:", dists)
+        #dci_db.clear()
+        #b = datetime.datetime.now()
+        #print(b-a)
 
-        print(indices.shape)
-        print(dists.shape)
+        #print(indices.shape)
+        #print(dists.shape)
 
 if __name__ == '__main__':
     main()
