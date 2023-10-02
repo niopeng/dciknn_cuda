@@ -2063,6 +2063,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		}
 	}
 
+	/*
 	int data_total, data_size;
 	float* h_data;
 	int * i_data;
@@ -2100,6 +2101,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	}
 	printf("\n");
 	cudaFree(h_data);
+	*/
 
 	// free the allocated memories
 	cudaFree(query_proj);
