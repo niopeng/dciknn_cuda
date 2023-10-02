@@ -38,13 +38,13 @@ def main():
     # Data Generation Hyperparameters                                                                                                           #
     #                                                                                                                                           #
     #############################################################################################################################################
-    dim = 10
-    num_pts = 300
-    num_queries = 50
-    num_heads = 1
-    #dim = 100
-    #num_pts = 3000
-    #num_queries = 500
+    #dim = 10
+    #num_pts = 300
+    #num_queries = 50
+    num_heads = 2
+    dim = 100
+    num_pts = 3000
+    num_queries = 500
     #num_heads = 2
     # dim = 100
     # num_pts = 3000
@@ -94,22 +94,23 @@ def main():
         #b = datetime.datetime.now()
         #print(b-a)
 
-        #data_arr = data_and_queries[:, :num_pts, :]
-        #query_arr = data_and_queries[:, num_pts:, :]
-        #data1 = torch.cat((data_arr, data_arr), 0)
-        #query1 = torch.cat((query_arr, query_arr), 0)
+        data_arr = data_and_queries[:, :num_pts, :]
+        query_arr = data_and_queries[:, num_pts:, :]
+        data1 = torch.cat((data_arr, data_arr), 0)
+        query1 = torch.cat((query_arr, query_arr), 0)
 
-        #data = data1.detach().clone().to(0)
-        #query = query1.detach().clone().to(0)
+        data = data1.detach().clone().to(0)
+        query = query1.detach().clone().to(0)
 
-        data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
-        query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
+        #data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
+        #query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
 
-        print(data.shape)
-        print(query.shape)
+        #print(data.shape)
+        #print(query.shape)
 
-        a = datetime.datetime.now()
-        dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+        #a = datetime.datetime.now()
+        #dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+        dci_db = DCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
         dci_db.add(data)
         ## Query
