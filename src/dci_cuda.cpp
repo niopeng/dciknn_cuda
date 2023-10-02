@@ -109,7 +109,7 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     cudaMalloc((void **) &(final_outputs), sizeof(int) * output_size);
     cudaMalloc((void **) &(final_distances), sizeof(float) * output_size);
 
-    printf("output size: %d\n", output_size);
+    //printf("output size: %d\n", output_size);
 
     // query using DCI
     dci_query(&(py_dci_inst->dci_inst), dim, num_heads, num_queries, query, num_neighbours, query_config, 
@@ -125,7 +125,7 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
 
     torch::Tensor final_result = torch::cat({ final, final_distances_array }, 0);
 
-    return py_query;
+    return final_result;
 }
 
 std::vector<torch::Tensor> py_dci_multi_query(std::vector<py::handle> py_dci_inst_wrapper, const int dim, const int num_heads, 
