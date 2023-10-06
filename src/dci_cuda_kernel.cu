@@ -1726,7 +1726,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
 
 	/*print result - testing*/
-	/*
 	int data_total = num_indices * num_queries * num_heads;
 	int data_size = sizeof(float) * data_total;
 	float* h_data = (float *) malloc(data_size);
@@ -1744,7 +1743,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	}
 	cudaFree(h_data);
 	printf("\n");
-	*/
 	/*testing*/
 
 	// copy query config to device pointer
