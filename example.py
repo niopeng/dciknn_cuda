@@ -105,20 +105,20 @@ def main():
         #data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
         #query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
 
-        torch.set_printoptions(threshold=10000)
-        print("Data 1:", data[0, :, :])
-        print("Data 2:", data[1, :, :])
-        print("Query 1:", query[0, :, :])
-        print("Query 2:", query[1, :, :])
+        #torch.set_printoptions(threshold=10000)
+        #print("Data 1:", data[0, :, :])
+        #print("Data 2:", data[1, :, :])
+        #print("Query 1:", query[0, :, :])
+        #print("Query 2:", query[1, :, :])
 
-        print(data.shape)
-        print(query.shape)
+        #print(data.shape)
+        #print(query.shape)
 
-        #a = datetime.datetime.now()
+        a = datetime.datetime.now()
         #dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
-        #dci_db = DCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+        dci_db = DCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
-        #dci_db.add(data)
+        dci_db.add(data)
         ## Query
         ##dci_db.query(query, num_neighbours, num_outer_iterations)
         #indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
