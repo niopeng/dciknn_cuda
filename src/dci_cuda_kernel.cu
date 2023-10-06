@@ -1777,9 +1777,9 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	for (int j = 0; j < num_queries; j++) { 
 		// need to refresh the result holder to avoid carry over results
 
-		//int data_total, data_size;
-		//float* h_data;
-		//int * i_data;
+		int data_total, data_size;
+		float* h_data;
+		int * i_data;
 
 		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
 				num_neighbours * block_size * thread_size * num_heads, DBL_MAX);
