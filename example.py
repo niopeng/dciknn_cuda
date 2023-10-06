@@ -102,12 +102,14 @@ def main():
         data = data1.detach().clone().to(0)
         query = query1.detach().clone().to(0)
 
-        data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
-        query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
+        #data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
+        #query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
 
         torch.set_printoptions(threshold=10000)
-        print("Data:", data)
-        print("Query:", query)
+        print("Data 1:", data[0, :, :])
+        print("Data 2:", data[1, :, :])
+        print("Query 1:", query[0, :, :])
+        print("Query 2:", query[1, :, :])
 
         print(data.shape)
         print(query.shape)
