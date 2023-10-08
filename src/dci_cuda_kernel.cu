@@ -1821,7 +1821,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		h_data = (float *) malloc(data_size);
 		cudaMemcpy(h_data, candidate_dists, data_size, cudaMemcpyDeviceToHost);
 
-		if (j == (num_queries - 1)) {
+		if (j == 0) {
 			data_total = dci_inst->num_points * num_heads;
 			data_size = sizeof(float) * data_total;
 			h_data = (float *) malloc(data_size);
