@@ -694,16 +694,16 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			(int) (dci_inst->num_points - blockIdx.x * points_per_block), // should not process data beyond the current block
 			points_per_block);
 
-	//if (blockIdx.x == 0) {
-	//	if (threadIdx.x == 0) {
-	//		printf("num_indices: %d\n", num_indices);
-	//		printf("num_heads: %d\n", num_heads);
-	//		printf("curr_head: %d\n", curr_head);
-	//		printf("curr_start: %d\n", curr_start);
-	//		printf("points_per_block: %d\n", points_per_block);
-	//		printf("num_points_in_block: %d\n", num_points_in_block);
-	//	}
-	//}
+	if (blockIdx.x == 0) {
+		if (threadIdx.x == 0) {
+			printf("num_indices: %d\n", num_indices);
+			printf("num_heads: %d\n", num_heads);
+			printf("curr_head: %d\n", curr_head);
+			printf("curr_start: %d\n", curr_start);
+			printf("points_per_block: %d\n", points_per_block);
+			printf("num_points_in_block: %d\n", num_points_in_block);
+		}
+	}
 
 	if (num_points_in_block > 0) {
 		__shared__ int* left_pos;
@@ -1816,6 +1816,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		// candidate_dists
 
+		/*
 		data_total = dci_inst->num_points * num_heads;
 		data_size = sizeof(float) * data_total;
 		h_data = (float *) malloc(data_size);
@@ -1913,6 +1914,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			printf("\n");
 			cudaFree(i_data);
 		}
+		*/
 
 		// -------- original result --------
 		
