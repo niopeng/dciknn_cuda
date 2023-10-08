@@ -1725,10 +1725,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
 
-	printf("num_heads: %d\n", num_heads);
-	printf("num_queries: %d\n", num_queries);
-	printf("num_indices: %d\n", num_indices);
-
 	/*print result - testing*/
 	/*
 	int data_total = num_indices * num_queries * num_heads;
