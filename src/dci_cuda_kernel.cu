@@ -742,6 +742,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
+		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				//for (int b = 0; b < block_size; b++) {
@@ -767,6 +768,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
+		*/
 
 		/*
 		search_index_original(dci_inst, query_proj, num_indices, left_pos, right_pos,
@@ -813,7 +815,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
-		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				printf("init_index_priority left_pos\n");
@@ -856,6 +857,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			}
 		}
 
+		/*
 		init_index_priority_original(dci_inst, query_proj, num_indices, left_pos, right_pos,
 				index_priority, cur_pos, points_per_block);
 
