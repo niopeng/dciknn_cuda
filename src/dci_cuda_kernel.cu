@@ -942,8 +942,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							top_h[curr_head] = h;
 						}
 
+						/*
 						if (blockIdx.x == 0) {
-							/*
 							if (threadIdx.x == 0) {
 								printf("\n");
 								printf("m: %d\n", m[curr_head]);
@@ -953,7 +953,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("top_index_priority: %f\n", top_index_priority[curr_head]);
 								printf("\n");
 							}
-							*/
 
 							if (h == (dci_inst->num_simp_indices - 1)) {
 								printf("\n");
@@ -966,22 +965,23 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("\n");
 							}
 						}
+						*/
 					}
 				}
 
 				__syncthreads();
 
-				//if (blockIdx.x == 0) {
-				//	if (threadIdx.x == 0) {
-				//		
-				//		for (int tmp = 0; tmp < num_heads; tmp++) {
-				//			printf("\n");
-				//			printf("head: %d\n", tmp);
-				//			printf("top_h: %d\n", top_h[tmp]);
-				//			printf("top_index_priority: %f\n", top_index_priority[tmp]);
-				//		}
-				//	}
-				//}
+				if (blockIdx.x == 0) {
+					if (threadIdx.x == 0) {
+						
+						for (int tmp = 0; tmp < num_heads; tmp++) {
+							printf("\n");
+							printf("head: %d\n", tmp);
+							printf("top_h: %d\n", top_h[tmp]);
+							printf("top_index_priority: %f\n", top_index_priority[tmp]);
+						}
+					}
+				}
 
 				// -----------------------------------------------------------------------------------------------
 				// Start working
