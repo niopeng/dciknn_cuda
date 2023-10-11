@@ -998,6 +998,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						position[curr_head] = cur_pos[i[curr_head]]; // position already adjust on current head
 					}
 
+					/*
 					if (blockIdx.x == 0) {
 						if (threadIdx.x == 0) {
 
@@ -1011,6 +1012,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							}
 						}
 					}
+					*/
 
 					__syncthreads();
 					//int cur_index = position[curr_head] + threadIdx.x;
@@ -1019,6 +1021,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					// this also mean it now process less number of index but work on multiple head
 					int cur_index = position[curr_head] + head_threadIdx;
 	
+					/*
 					if (blockIdx.x == 0) {
 						if (threadIdx.x == 0) {
 							printf("\n");
@@ -1041,6 +1044,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						//	printf("\n");
 						//}
 					}
+					*/
 
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
 						int cur_point = dci_inst->indices[cur_index
@@ -1049,7 +1053,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]++;
 
-						/*
 						if (blockIdx.x == 0) {
 							if (threadIdx.x == 0) {
 								printf("\n");
@@ -1064,7 +1067,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("count: %d\n", counts[cur_point + dci_inst->num_points * m[curr_head] + dci_inst->num_comp_indices * dci_inst->num_points * curr_head]);
 							}
 						}
-						*/
 
 						if (counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]
