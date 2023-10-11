@@ -1214,7 +1214,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 			}
 
-			break;
+			//break;
 
 			/*
 			if (blockIdx.x == 0) {
