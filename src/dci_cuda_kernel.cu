@@ -997,11 +997,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						position[curr_head] = cur_pos[i[curr_head]]; // position already adjust on current head
 					}
 
-					if (threadIdx.x == 0) {
-						i = top_h + m * dci_inst->num_simp_indices;
-						position = cur_pos[i];
-					}
-
 					__syncthreads();
 					//int cur_index = position[curr_head] + threadIdx.x;
 					
