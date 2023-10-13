@@ -1046,6 +1046,18 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					}
 					*/
 
+					if (blockIdx.x == 0) {
+						if (curr_head == 1) {
+							printf("\n");
+							printf("curr_head: %d\n", curr_head);
+							printf("cur_index: %d\n", cur_index);
+							printf("i: %d\n", i[curr_head]);
+							printf("m: %d\n", m[curr_head]);
+							printf("indices key: %f\n", cur_index + dci_inst->num_points * i[curr_head] + blockIdx.x * points_per_block);
+							printf("indices value: %d\n", dci_inst->indices[cur_index + dci_inst->num_points * i[curr_head] + blockIdx.x * points_per_block].value);
+						}
+					}
+
 					// possible issue 1
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
 						int cur_point = dci_inst->indices[cur_index
@@ -1057,6 +1069,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						if (blockIdx.x == 0) {
 							//if (threadIdx.x == 0) {
 							//if ((threadIdx.x % thread_per_head) == 0) {
+							/*
 							if (curr_head == 1) {
 								printf("\n");
 								printf("curr_head: %d\n", curr_head);
@@ -1069,6 +1082,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("counts key: %d\n", (cur_point + dci_inst->num_points * m[curr_head] + dci_inst->num_comp_indices * dci_inst->num_points * curr_head));
 								printf("count: %d\n", counts[cur_point + dci_inst->num_points * m[curr_head] + dci_inst->num_comp_indices * dci_inst->num_points * curr_head]);
 							}
+							*/
 						}
 
 						// possible issue 2
