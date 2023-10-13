@@ -817,6 +817,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
+				printf("data size: %d\n", (num_indices * num_heads));
 				printf("init_index_priority left_pos\n");
 				for (int ch = 0; ch < num_heads; ch++) {
 					//printf("head: %d\n", ch);
@@ -994,6 +995,11 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						// find the actual index position (complex indices + simple indices), adjust based on current head
 						i[curr_head] = top_h[curr_head] + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices;
 						position[curr_head] = cur_pos[i[curr_head]]; // position already adjust on current head
+					}
+
+					if (threadIdx.x == 0) {
+						i = top_h + m * dci_inst->num_simp_indices;
+						position = cur_pos[i];
 					}
 
 					__syncthreads();
