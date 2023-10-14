@@ -1242,16 +1242,20 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								&(left_pos[i[curr_head]]), &(right_pos[i[curr_head]]), query_proj_column[i[curr_head]], // need reconsider
 								num_points_in_block);
 						
-						printf("\n");
-						printf("init_index_priority_original cur_pos\n");
-						for (int ch = 0; ch < num_heads; ch++) {
-							printf("head: %d\n", ch);
-							for (int ni = 0; ni < num_indices; ni++) {
-								printf("%d ", cur_pos[ch * num_indices + ni]);
+						if (blockIdx.x == 0) {
+							if (threadIdx.x == 0) {
+								printf("\n");
+								printf("init_index_priority_original cur_pos\n");
+								for (int ch = 0; ch < num_heads; ch++) {
+									printf("head: %d\n", ch);
+									for (int ni = 0; ni < num_indices; ni++) {
+										printf("%d ", cur_pos[ch * num_indices + ni]);
+									}
+									printf("\n");
+								}
+								printf("\n");
 							}
-							printf("\n");
 						}
-						printf("\n");
 						
 						if ((cur_pos[i[curr_head]] < 0) && (cur_pos[i[curr_head]] > -blockDim.x)) {
 							position[curr_head] = 0;
