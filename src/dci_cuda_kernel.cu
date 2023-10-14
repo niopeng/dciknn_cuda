@@ -1004,6 +1004,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					// this also mean it now process less number of index but work on multiple head
 					int cur_index = position[curr_head] + head_threadIdx;
 	
+					/*
 					if (blockIdx.x == 0) {
 						if (curr_head == 0) {
 							printf("\n");
@@ -1014,7 +1015,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							printf("cur_index: %d\n", cur_index);
 							printf("\n");
 						}
-						/*
 						if (threadIdx.x == 0) {
 							for (int tmp = 0; tmp < num_heads; tmp++) {
 								printf("\n");
@@ -1027,8 +1027,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							}
 							
 						}
-						*/
 					}
+					*/
 
 					/*
 					if (blockIdx.x == 0) {
@@ -1068,6 +1068,21 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						}
 					}
 					*/
+
+					if (blockIdx.x == 0) {
+						if (threadIdx.x == 0) {
+							printf("\n");
+							printf("init_index_priority cur_pos\n");
+							for (int ch = 0; ch < num_heads; ch++) {
+								printf("head: %d\n", ch);
+								for (int ni = 0; ni < num_indices; ni++) {
+									printf("%f ", index_priority[ch * num_indices + ni]);
+								}
+								printf("\n");
+							}
+							printf("\n");
+						}
+					}
 
 					// possible issue 1
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
