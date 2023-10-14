@@ -1236,6 +1236,13 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						// i[head] = top_h[head] + m[head] * dci_inst->num_simp_indices + head * num_indices;
 						// i[head] has account for multi-head (right?)
 
+						//cur_pos[idx] = dci_next_closest_proj(
+						//		&(dci_inst->indices[curr_idx * (dci_inst->num_points)	// position of index (single head)
+						//			+ blockIdx.x * points_per_block // position within each index
+						//			+ dci_inst->num_points * num_indices * curr_head]),
+						//		&(left_pos[idx]), &(right_pos[idx]), query_proj_column[curr_idx + curr_head * num_indices],
+						//		num_points_in_block);
+
 						cur_pos[i[curr_head]] = dci_next_closest_proj(
 								&(dci_inst->indices[i[curr_head] * (dci_inst->num_points)
 										+ blockIdx.x * points_per_block]),
@@ -1245,6 +1252,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						if (blockIdx.x == 0) {
 							if (threadIdx.x == 0) {
 								printf("\n");
+								printf("i: %d\n", i[curr_head]);
 								printf("init_index_priority_original cur_pos\n");
 								for (int ch = 0; ch < num_heads; ch++) {
 									printf("head: %d\n", ch);
