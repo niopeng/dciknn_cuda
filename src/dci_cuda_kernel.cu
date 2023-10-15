@@ -1315,6 +1315,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							cur_pos[i[curr_head]] = -blockDim.x;
 						}
 
+						/*
 						if (blockIdx.x == 0) {
 							if (threadIdx.x == 0) {
 								printf("\n");
@@ -1338,6 +1339,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("\n");
 							}
 						}
+						*/
 					}
 				}
 
