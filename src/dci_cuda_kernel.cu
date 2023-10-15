@@ -1069,11 +1069,20 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					}
 					*/
 
-					/*
 					if (blockIdx.x == 0) {
 						if (threadIdx.x == 0) {
 							printf("\n");
-							printf("init_index_priority cur_pos\n");
+							printf("i: %d\n", i[curr_head]);
+							printf("update start cur_pos\n");
+							for (int ch = 0; ch < num_heads; ch++) {
+								printf("head: %d\n", ch);
+								for (int ni = 0; ni < num_indices; ni++) {
+									printf("%d ", cur_pos[ch * num_indices + ni]);
+								}
+								printf("\n");
+							}
+							printf("\n");
+							printf("update start index_priority\n");
 							for (int ch = 0; ch < num_heads; ch++) {
 								printf("head: %d\n", ch);
 								for (int ni = 0; ni < num_indices; ni++) {
@@ -1084,7 +1093,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							printf("\n");
 						}
 					}
-					*/
 
 					// possible issue 1
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
@@ -1243,6 +1251,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						//		&(left_pos[idx]), &(right_pos[idx]), query_proj_column[curr_idx + curr_head * num_indices],
 						//		num_points_in_block);
 
+						/*
 						if (blockIdx.x == 0) {
 							if (threadIdx.x == 0) {
 								printf("\n");
@@ -1267,6 +1276,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("\n");
 							}
 						}
+						*/
 
 						cur_pos[i[curr_head]] = dci_next_closest_proj(
 								&(dci_inst->indices[i[curr_head] * (dci_inst->num_points)
