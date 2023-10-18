@@ -997,10 +997,10 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						position[curr_head] = cur_pos[i[curr_head]]; // position already adjust on current head
 
 						printf("\n");
-						printf("curr_head: %d", curr_head);
-						printf("top_h: %d", top_h[curr_head]);
-						printf("m: %d", m[curr_head]);
-						printf("position: %d", cur_pos[i[curr_head]]);
+						printf("curr_head: %d\n", curr_head);
+						printf("top_h: %d\n", top_h[curr_head]);
+						printf("m: %d\n", m[curr_head]);
+						printf("position: %d\n", cur_pos[i[curr_head]]);
 						printf("\n");
 					}
 
