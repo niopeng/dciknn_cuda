@@ -1107,9 +1107,20 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					}
 					*/
 					
-					printf("\n");
 					if (blockIdx.x == 0) {
-						printf("%d ", dci_inst->indices[cur_index + dci_inst->num_points * i[curr_head] + blockIdx.x * points_per_block].value);
+						if (threadIdx.x == 0) {
+							printf("\n");
+							printf("count_size: %d\n", num_indices * num_heads);
+							for (int ni = 0; ni < num_heads; ni++) {
+								printf("Head: %d\n", ni);
+								for (int ch = 0; ch < num_indices; ch++) {
+									printf("%d ", counts[ni * num_indices + ch]);
+								}
+								printf("\n");
+							}
+							printf("\n");
+						}
+						//printf("%d ", dci_inst->indices[cur_index + dci_inst->num_points * i[curr_head] + blockIdx.x * points_per_block].value);
 					}	
 
 					// possible issue 1: cur_index < num_points_in_block
