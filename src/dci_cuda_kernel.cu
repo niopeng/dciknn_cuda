@@ -996,16 +996,16 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						i[curr_head] = top_h[curr_head] + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices;
 						position[curr_head] = cur_pos[i[curr_head]]; // position already adjust on current head
 
-						if (blockIdx.x == 0) {
-							if (threadIdx.x == 0) {
-								printf("\n");
-								printf("curr_head: %d\n", curr_head);
-								printf("top_h: %d\n", top_h[curr_head]);
-								printf("m: %d\n", m[curr_head]);
-								printf("position: %d\n", cur_pos[i[curr_head]]);
-								printf("\n");
-							}
-						}
+						//if (blockIdx.x == 0) {
+						//	if (threadIdx.x == 0) {
+						//		printf("\n");
+						//		printf("curr_head: %d\n", curr_head);
+						//		printf("top_h: %d\n", top_h[curr_head]);
+						//		printf("m: %d\n", m[curr_head]);
+						//		printf("position: %d\n", cur_pos[i[curr_head]]);
+						//		printf("\n");
+						//	}
+						//}
 					}
 
 					__syncthreads();
@@ -1106,24 +1106,11 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						}
 					}
 					*/
-
+					
+					printf("\n");
 					if (blockIdx.x == 0) {
-						if (threadIdx.x == 0) {
-							printf("num_points_in_block: %d\n", num_points_in_block);
-							printf("cur_index: %d\n", cur_index);
-							/*
-							printf("\n");
-							for (int h1 = 0; h1 < num_heads; h1++) {
-								printf("head: %d\n", h1);
-								for (int h2 = 0; h2 < dci_inst->num_points * dci_inst->num_comp_indices; h2++) {
-									printf("%d ", counts[dci_inst->num_points * dci_inst->num_comp_indices * h1 + h2]);
-								}
-								printf("\n");
-							}
-							*/
-							printf("\n");
-						}
-					}
+						printf("%d ", dci_inst->indices[cur_index + dci_inst->num_points * i[curr_head] + blockIdx.x * points_per_block].value);
+					}	
 
 					// possible issue 1: cur_index < num_points_in_block
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
@@ -1153,6 +1140,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]
 								== dci_inst->num_simp_indices) { 
 							// add offset to candidate_dists
+
 							if (candidate_dists[cur_point + dci_inst->num_points * curr_head] == -2.0) { // curent here ---------------
 								if (query_config.blind) {
 									candidate_dists[cur_point + dci_inst->num_points * curr_head] = -1.0;
