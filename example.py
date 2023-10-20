@@ -39,7 +39,7 @@ def main():
     #                                                                                                                                           #
     #############################################################################################################################################
     dim = 10
-    num_pts = 500
+    num_pts = 100
     num_queries = 50
     num_heads = 1
     #dim = 100
@@ -50,7 +50,8 @@ def main():
     # num_pts = 3000
     # num_queries = 500
 
-    intrinsic_dim = 400
+    intrinsic_dim = 100
+    #intrinsic_dim = 400
     
     data_and_queries = gen_data(dim, intrinsic_dim, num_pts + num_queries, num_heads)
 
@@ -69,7 +70,7 @@ def main():
     # DCI Hyperparameters                                                                                                                       #
     #                                                                                                                                           #
     #############################################################################################################################################
-    block_size = 100
+    block_size = 2
     thread_size = 10
     num_comp_indices = 2
     num_simp_indices = 10
