@@ -815,6 +815,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
+		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				printf("data size: %d\n", (num_indices * num_heads));
@@ -857,6 +858,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
+		*/
 
 		/*
 		init_index_priority_original(dci_inst, query_proj, num_indices, left_pos, right_pos,
