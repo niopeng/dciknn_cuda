@@ -713,6 +713,9 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		__shared__ int* cur_pos;
 		__shared__ float* index_priority;
 
+		__shared__ int* left_pos2;
+		__shared__ int* right_pos2;
+
 		// init variables
 		if (threadIdx.x == 0) {
 			top_index_priority = new float[num_heads];
@@ -727,11 +730,13 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			right_pos = new int[num_indices * num_heads];
 			cur_pos = new int[num_indices * num_heads];
 			index_priority = new float[num_indices * num_heads];
+
+			left_pos2 = new int[num_indices * num_heads];
+			right_pos2 = new int[num_indices * num_heads];
 		}
 		__syncthreads();
 
 		// left_pos and right_pos already account for multi-head
-		/*
 		search_index(
 			dci_inst, 
 			query_proj_column, 
@@ -769,14 +774,13 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
-		*/
 
 		search_index_original(
 				dci_inst, 
 				query_proj, 
 				num_indices, 
-				left_pos, 
-				right_pos,
+				left_pos2, 
+				right_pos2,
 				points_per_block); // one head testing, result should be the same or similar partten
 
 		if (blockIdx.x == 0) {
@@ -788,7 +792,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					//printf("head: %d\n", ch);
 					printf("head: %d\n", ch);
 					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%d ", left_pos[ch * num_indices + ni]);
+						printf("%d ", left_pos2[ch * num_indices + ni]);
 					}
 					printf("\n");
 				}
@@ -797,7 +801,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				for (int ch = 0; ch < num_heads; ch++) {
 					printf("head: %d\n", ch);
 					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%d ", right_pos[ch * num_indices + ni]);
+						printf("%d ", right_pos2[ch * num_indices + ni]);
 					}
 					printf("\n");
 				}
