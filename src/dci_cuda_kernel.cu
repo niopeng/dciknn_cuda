@@ -747,7 +747,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			if (threadIdx.x == 0) {
 				//for (int b = 0; b < block_size; b++) {
 				//printf("block: %d\n", b);
-				printf("points_per_block: %d\n", points_per_block);
 				printf("search_index left_pos\n");
 				for (int ch = 0; ch < num_heads; ch++) {
 					//printf("head: %d\n", ch);
@@ -770,7 +769,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			}
 		}
 
-		/*
 		search_index_original(
 				dci_inst, 
 				query_proj, 
@@ -779,6 +777,24 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				right_pos,
 				points_per_block); // one head testing, result should be the same or similar partten
 
+		if (blockIdx.x == 0) {
+			if (threadIdx.x == 0) {
+				//for (int b = 0; b < block_size; b++) {
+				//printf("block: %d\n", b);
+				printf("search_index_original left_pos\n");
+				for (int ni = 0; ni < num_indices; ni++) {
+					printf("%d ", left_pos[ni]);
+				}
+				printf("\n");
+				printf("search_index_original right_pos\n");
+				for (int ni = 0; ni < num_indices; ni++) {
+					printf("%d ", right_pos[ni]);
+				}
+				printf("\n");
+			}
+		}
+
+		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				//for (int b = 0; b < block_size; b++) {
@@ -820,9 +836,9 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
+		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
-				printf("data size: %d\n", (num_indices * num_heads));
 				printf("init_index_priority left_pos\n");
 				for (int ch = 0; ch < num_heads; ch++) {
 					//printf("head: %d\n", ch);
@@ -862,6 +878,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
+		*/
 
 		/*
 		init_index_priority_original(dci_inst, query_proj, num_indices, left_pos, right_pos,
