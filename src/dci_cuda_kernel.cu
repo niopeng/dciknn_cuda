@@ -485,7 +485,7 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 }
 
 __device__ void search_index_original(const dci* const dci_inst,
-		const float* const query_proj, const int num_indices,
+		const float* const query_proj, const int num_indices, const idx_elem* indices,
 		int* const left_pos, int* const right_pos, const int points_per_block) {
 	int total = num_indices;
 	int chunk_size = (total + blockDim.x - 1) / blockDim.x;
@@ -494,7 +494,7 @@ __device__ void search_index_original(const dci* const dci_inst,
 		idx = threadIdx.x * chunk_size + j;
 		if (idx < total) {
 			left_pos[idx] = dci_search_index(
-					&(dci_inst->indices[idx * (dci_inst->num_points)
+					&(indices[idx * (dci_inst->num_points)
 							+ blockIdx.x * points_per_block]),
 					query_proj[idx],
 					min(dci_inst->num_points - blockIdx.x * points_per_block,
@@ -774,14 +774,17 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
-
-		search_index_original(
-				dci_inst, 
-				query_proj, 
-				num_indices, 
-				left_pos2, 
-				right_pos2,
-				points_per_block); // one head testing, result should be the same or similar partten
+		
+		for (int ch = 0; ch < num_heads; ch++) {
+			search_index_original(
+					dci_inst, 
+					&(query_proj[num_indices * num_queries * ch]), 
+					num_indices, 
+					&(dci_inst->indices[dci_inst->num_points * num_indices * ch]),
+					&(left_pos2[num_indices * ch]), 
+					&(right_pos2[num_indices * ch]),
+					points_per_block); // one head testing, result should be the same or similar partten
+		}
 
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
