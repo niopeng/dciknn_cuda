@@ -1514,7 +1514,7 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 		__syncthreads();
 
 		/* Search index */
-		search_index_original(dci_inst, query_proj, num_indices, left_pos, right_pos,
+		search_index_original(dci_inst, query_proj, num_indices, dci_inst->indices, left_pos, right_pos,
 				points_per_block);
 
 		/* Synchronize the threads */
