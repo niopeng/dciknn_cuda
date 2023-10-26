@@ -900,18 +900,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			}
 		}
 
-		init_index_priority_original(
-				dci_inst,
-				query_proj,
-				num_indices,
-
-				left_pos2,
-				right_pos2,
-				index_priority2,
-				cur_pos2, 
-				points_per_block
-			);
-
 		for (int ch = 0; ch < num_heads; ch++) {
 			init_index_priority_original(
 					dci_inst,
@@ -1546,7 +1534,7 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 		__syncthreads();
 
 		/* Populate the closest indices */
-		init_index_priority_original(dci_inst, query_proj, num_indices, left_pos, right_pos,
+		init_index_priority_original(dci_inst, query_proj, num_indices, dci_inst->indices, left_pos, right_pos,
 				index_priority, cur_pos, points_per_block);
 
 		/* Synchronize the threads */
