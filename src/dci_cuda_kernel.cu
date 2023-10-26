@@ -1034,9 +1034,10 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
 
 			if (blockIdx.x == 0) {
-				if (threadIdx.x == 0) {
-					printf("k = %d | num_candidates = %d\n", k[curr_head], num_candidates);
-				}
+				//if (threadIdx.x == 0) {
+				//	printf("k = %d | num_candidates = %d | \n", k[curr_head], num_candidates);
+				//}
+				printf("k = %d | num_candidates = %d | threadIdx.x = %d\n", k[curr_head], num_candidates, threadIdx.x);
 			}
 
 			if ((threadIdx.x % thread_per_head) == 0) {
@@ -2078,7 +2079,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		//float* h_data;
 		//int * i_data;
 
-		/*
 		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
 				num_neighbours * block_size * thread_size * num_heads, DBL_MAX);
 
@@ -2107,7 +2107,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			);
 
 		cudaDeviceSynchronize();
-		*/
 
 		// candidate_dists
 
@@ -2213,6 +2212,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		// -------- original result --------
 		
+		/*
 		// need to refresh the result holder to avoid carry over results
 		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
 				num_neighbours * block_size * thread_size * num_heads, DBL_MAX);
@@ -2234,7 +2234,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		// candidate_dists
 
-		/*
 		data_total = dci_inst->num_points * num_heads;
 		data_size = sizeof(float) * data_total;
 		h_data = (float *) malloc(data_size);
