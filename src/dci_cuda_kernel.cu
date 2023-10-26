@@ -713,10 +713,12 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		__shared__ int* cur_pos;
 		__shared__ float* index_priority;
 
+		/*
 		__shared__ int* left_pos2;
 		__shared__ int* right_pos2;
 		__shared__ int* cur_pos2;
 		__shared__ float* index_priority2;
+		*/
 
 		// init variables
 		if (threadIdx.x == 0) {
@@ -733,12 +735,21 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			cur_pos = new int[num_indices * num_heads];
 			index_priority = new float[num_indices * num_heads];
 
+			/*
 			left_pos2 = new int[num_indices * num_heads];
 			right_pos2 = new int[num_indices * num_heads];
 			cur_pos2 = new int[num_indices * num_heads];
 			index_priority2 = new float[num_indices * num_heads];
+			*/
 		}
+
 		__syncthreads();
+
+		// init variables
+		if ((threadIdx.x % thread_per_head) == 0) {
+			k[curr_head] = 0;
+			could_break[curr_head] = false;
+		}
 
 		// left_pos and right_pos already account for multi-head
 		search_index(
@@ -753,6 +764,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
+		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				//for (int b = 0; b < block_size; b++) {
@@ -778,7 +790,9 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
+		*/
 		
+		/*
 		for (int ch = 0; ch < num_heads; ch++) {
 			search_index_original(
 					dci_inst, 
@@ -815,6 +829,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
+		*/
 
 		/*
 		if (blockIdx.x == 0) {
@@ -858,6 +873,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
+		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				printf("init_index_priority left_pos\n");
@@ -955,6 +971,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
+		*/
 
 		/*
 		if (blockIdx.x == 0) {
@@ -1000,16 +1017,26 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		}
 		*/
 
-		// init variables
-		if ((threadIdx.x % thread_per_head) == 0) {
-			k[curr_head] = 0;
-			could_break[curr_head] = false;
+		if (blockIdx.x == 0) {
+			if (threadIdx.x == 0) {
+				printf("Loop: k < %d\n", (num_points_in_block * dci_inst->num_simp_indices * blockDim.x));
+				printf("num_candidates: %d\n", num_candidates);
+				printf("num_neighbours: %d\n", num_neighbours);
+				printf("could_break_1: %d\n", (query_config.num_outer_iterations * dci_inst->num_simp_indices));
+				printf("could_break_2: %d\n", (query_config.max_num_candidates));
+			}
 		}
 
 		// ---------------------------------------------------------------------
 		// Possible problem 1
 		// ---------------------------------------------------------------------
 		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
+
+			//if (blockIdx.x == 0) {
+			//	if (threadIdx.x == 0) {
+			//		printf("k = %d\n", k[curr_head]);
+			//	}
+			//}
 
 			if ((threadIdx.x % thread_per_head) == 0) {
 				m[curr_head] = 0;
