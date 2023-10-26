@@ -1024,6 +1024,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("num_neighbours: %d\n", num_neighbours);
 				printf("could_break_1: %d\n", (query_config.num_outer_iterations * dci_inst->num_simp_indices));
 				printf("could_break_2: %d\n", (query_config.max_num_candidates));
+				printf("\n");
 			}
 		}
 
@@ -1032,11 +1033,11 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		// ---------------------------------------------------------------------
 		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
 
-			//if (blockIdx.x == 0) {
-			//	if (threadIdx.x == 0) {
-			//		printf("k = %d\n", k[curr_head]);
-			//	}
-			//}
+			if (blockIdx.x == 0) {
+				if (threadIdx.x == 0) {
+					printf("k = %d | num_candidates = %d\n", k[curr_head], num_candidates);
+				}
+			}
 
 			if ((threadIdx.x % thread_per_head) == 0) {
 				m[curr_head] = 0;
