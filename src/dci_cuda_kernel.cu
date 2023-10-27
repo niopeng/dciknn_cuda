@@ -1069,7 +1069,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							top_h[curr_head] = h;
 						}
 
-						if (blockIdx.x == 0) {
+						//if (blockIdx.x == 0) {
 							/*
 							if (threadIdx.x == 0) {
 								printf("\n");
@@ -1094,12 +1094,13 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("\n");
 							}
 							*/
-						}
+						//}
 					}
 				}
 
 				__syncthreads();
 
+				/*
 				if (blockIdx.x == 0) {
 					if (threadIdx.x == 0) {
 						
@@ -1113,6 +1114,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						}
 					}
 				}
+				*/
 
 				if (top_h[curr_head] >= 0) {
 					// first thread only
