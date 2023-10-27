@@ -667,7 +667,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	float cur_dist;
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	int num_heads = dci_inst->num_heads;
-	int thread_per_head = (int) (thread_size / num_heads);
 
 	// shared value is an array, each value in the array is correspond to a head
 	// the array size is num_heads
@@ -685,8 +684,11 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			query_config.max_num_candidates,
 			query_config.num_outer_iterations);
 
+	int thread_per_head = (int) (thread_size / num_heads);
 	int curr_head = (int) (threadIdx.x / thread_per_head);
 	int curr_start = curr_head * thread_per_head;
+
+	// for each head there are a number of thread assign to each head, and head_threadIdx is just thread id adjust to head
 	int head_threadIdx = threadIdx.x % thread_per_head;
 
 	int points_per_block = (dci_inst->num_points + gridDim.x - 1) / gridDim.x; // default number of data processed by a block
@@ -1121,7 +1123,9 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					// find the actual index position (complex indices and simple indices) for top_h
 					// then get position from cur_pos
 					if ((threadIdx.x % thread_per_head) == 0) {
-						// find the actual index position (complex indices + simple indices), adjust based on current head
+						// top_h: simple index with top value (from previous step)
+						// m: current complex index
+						// find the actual index position (complex indices * simple indices), adjust based on current head
 						i[curr_head] = top_h[curr_head] + m[curr_head] * dci_inst->num_simp_indices + curr_head * num_indices;
 						position[curr_head] = cur_pos[i[curr_head]]; // position already adjust on current head
 
@@ -1143,7 +1147,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					// need to calculate cur_index based on current head 
 					// this also mean it now process less number of index but work on multiple head
 					int cur_index = position[curr_head] + head_threadIdx;
-	
 
 					//if (blockIdx.x == 0) {
 						/*
@@ -1239,6 +1242,13 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					}
 					*/
 
+					if (curr_head == 0) {
+						if (k[curr_head] < 10) {
+							printf("%d ", cur_index);
+						}
+					}
+
+					/*
 					if (blockIdx.x == 0) {
 						if (threadIdx.x == 0) {
 							printf("\n");
@@ -1253,13 +1263,14 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							printf("\n");
 						}
 						//printf("%d ", dci_inst->indices[cur_index + dci_inst->num_points * i[curr_head] + blockIdx.x * points_per_block].value);
-					}
+					}*/
 
 					// possible issue 1: cur_index < num_points_in_block
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
 						int cur_point = dci_inst->indices[cur_index
 								+ dci_inst->num_points * i[curr_head]
 								+ blockIdx.x * points_per_block].value; // cur_point is index within the head (need adjust to head)
+
 						counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]++;
 
@@ -1281,12 +1292,13 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							*/
 
 						// possible issue 2
+						//int cur_index = position[curr_head] + head_threadIdx;
 						if (counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]
 								== dci_inst->num_simp_indices) { 
 							// add offset to candidate_dists
 
-							if (candidate_dists[cur_point + dci_inst->num_points * curr_head] == -2.0) { // curent here ---------------
+							if (candidate_dists[cur_point + dci_inst->num_points * curr_head] == -2.0) {
 								if (query_config.blind) {
 									candidate_dists[cur_point + dci_inst->num_points * curr_head] = -1.0;
 									// lock
