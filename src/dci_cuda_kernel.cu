@@ -1106,6 +1106,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						for (int tmp = 0; tmp < num_heads; tmp++) {
 							printf("\n");
 							printf("head: %d\n", tmp);
+							printf("k: %d\n", k[curr_head]);
+							printf("m: %d\n", m[curr_head]);
 							printf("top_h: %d\n", top_h[tmp]);
 							printf("top_index_priority: %f\n", top_index_priority[tmp]);
 						}
