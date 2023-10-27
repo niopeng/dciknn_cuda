@@ -1243,7 +1243,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					*/
 
 					if (curr_head == 0) {
-						if (k[curr_head] < 10) {
+						if (k[curr_head] > 60) {
 							printf("%d ", cur_index);
 						}
 					}
