@@ -1017,6 +1017,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		}
 		*/
 
+		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				printf("Loop: k < %d\n", (num_points_in_block * dci_inst->num_simp_indices * blockDim.x));
@@ -1027,6 +1028,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
+		*/
 
 		// ---------------------------------------------------------------------
 		// Possible problem 1
@@ -1048,7 +1050,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			}
 			__syncthreads();
 
-			// iterate for each complex index
+			// iterate for each complex index (work properly)
 			while (m[curr_head] < dci_inst->num_comp_indices) {
 				// first thread only
 				// For each complex index, we find the simple index that has the lowest
@@ -1067,7 +1069,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							top_h[curr_head] = h;
 						}
 
-						/*
 						if (blockIdx.x == 0) {
 							if (threadIdx.x == 0) {
 								printf("\n");
@@ -1078,7 +1079,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("top_index_priority: %f\n", top_index_priority[curr_head]);
 								printf("\n");
 							}
-
+							/*
 							if (h == (dci_inst->num_simp_indices - 1)) {
 								printf("\n");
 								printf("curr_head: %d\n", curr_head);
@@ -1089,8 +1090,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								printf("top_index_priority: %f\n", top_index_priority[curr_head]);
 								printf("\n");
 							}
+							*/
 						}
-						*/
 					}
 				}
 
@@ -1487,8 +1488,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 				if ((threadIdx.x % thread_per_head) == 0) {
 					m[curr_head] = m[curr_head] + 1;
-
-					printf("threadID.x = %d | m = %d\n", threadIdx.x, m[curr_head]);
+					//printf("threadID.x = %d | m = %d\n", threadIdx.x, m[curr_head]);
 				}
 				__syncthreads();
 			}
