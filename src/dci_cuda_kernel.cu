@@ -528,7 +528,7 @@ __device__ void init_index_priority(const dci* const dci_inst,
 						+ blockIdx.x * points_per_block // position within each index
 						+ dci_inst->num_points * num_indices * curr_head]),
 					&(left_pos[idx]), &(right_pos[idx]), query_proj_column[curr_idx + curr_head * num_indices],
-					num_points_in_block);
+					num_points_in_block); // maybe problem?
 
 			//if (blockIdx.x == 0) {
 			//	if (threadIdx.x == 0) {
@@ -1052,12 +1052,15 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			}
 			__syncthreads();
 
+			
 			// iterate for each complex index (work properly)
 			while (m[curr_head] < dci_inst->num_comp_indices) {
 				// first thread only
 				// For each complex index, we find the simple index that has the lowest
 				// index priority, that is cloest to the query point (projection on projection 
 				// vector), this simple index will be top_h
+
+				// inner loop one
 				if ((threadIdx.x % thread_per_head) == 0) {
 					// Get the top priority and data index in priority queue
 					top_index_priority[curr_head] = DBL_MAX;
@@ -1242,13 +1245,26 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					}
 					*/
 
-					if (curr_head == 0) {
-						if (k[curr_head] >= 60 && k[curr_head] <=70) {
-							printf("%d ", cur_index);
-						}
-					}
+					//if (curr_head == 0) {
+					//	if (k[curr_head] >= 60 && k[curr_head] <=70) {
+					//		printf("%d ", cur_index);
+					//	}
+					//}
 
 					/*
+					if (cur_index < 0) {
+						printf("curr_head: %d | i = %d | threadIdx.x = %d\n", curr_head, i[curr_head], threadIdx.x);
+						for (int ch = 0; ch < num_heads; ch++) {
+							printf("head: %d\n", ch);
+							for (int ni = 0; ni < num_indices; ni++) {
+								printf("%d ", cur_pos[ch * num_indices + ni]);
+							}
+							printf("\n");
+						}
+						printf("\n");
+					}
+					*/
+
 					if (blockIdx.x == 0) {
 						if (threadIdx.x == 0) {
 							printf("\n");
@@ -1263,7 +1279,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							printf("\n");
 						}
 						//printf("%d ", dci_inst->indices[cur_index + dci_inst->num_points * i[curr_head] + blockIdx.x * points_per_block].value);
-					}*/
+					}
 
 					// possible issue 1: cur_index < num_points_in_block
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
@@ -1553,10 +1569,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			//	printf("\n");
 			//}
 		}
-
-		printf("\n");
-		printf("num_points_in_block: %d\n", num_points_in_block);
-		printf("\n");
 
 		__syncthreads();
 		// free variables
@@ -2249,11 +2261,17 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
-		dci_query_single_point_by_block_original<<<block_size, thread_size>>>(dci_inst,
-				num_neighbours, &(query[j * dim]),
-				&(query_proj[j * num_indices]), *d_query_config,
-				d_top_candidates_dist, d_top_candidates_index, d_all_candidates,
-				counts, candidate_dists);
+		dci_query_single_point_by_block_original<<<block_size, thread_size>>>(
+				dci_inst,
+				num_neighbours, 
+				&(query[j * dim]),
+				&(query_proj[j * num_indices]), 
+				*d_query_config,
+				d_top_candidates_dist, 
+				d_top_candidates_index, 
+				d_all_candidates,
+				counts, 
+				candidate_dists);
 
 		cudaDeviceSynchronize();
 
