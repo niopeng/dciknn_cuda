@@ -2112,9 +2112,9 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	for (int j = 0; j < num_queries; j++) { 
 		// need to refresh the result holder to avoid carry over results
 
-		//int data_total, data_size;
-		//float* h_data;
-		//int * i_data;
+		int data_total, data_size;
+		float* h_data;
+		int * i_data;
 
 		/*
 		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
@@ -2149,12 +2149,12 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		// candidate_dists
 
+		/*
 		data_total = dci_inst->num_points * num_heads;
 		data_size = sizeof(float) * data_total;
 		h_data = (float *) malloc(data_size);
 		cudaMemcpy(h_data, candidate_dists, data_size, cudaMemcpyDeviceToHost);
 
-		/*
 		if (j == 0) {
 			data_total = dci_inst->num_points * num_heads;
 			data_size = sizeof(float) * data_total;
