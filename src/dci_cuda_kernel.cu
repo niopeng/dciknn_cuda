@@ -2116,6 +2116,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		//float* h_data;
 		//int * i_data;
 
+		/*
 		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
 				num_neighbours * block_size * thread_size * num_heads, DBL_MAX);
 
@@ -2144,6 +2145,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			);
 
 		cudaDeviceSynchronize();
+		*/
 
 		// candidate_dists
 
@@ -2249,7 +2251,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		// -------- original result --------
 		
-		/*
+
 		// need to refresh the result holder to avoid carry over results
 		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
 				num_neighbours * block_size * thread_size * num_heads, DBL_MAX);
@@ -2369,7 +2371,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		}
 		printf("\n");
 		cudaFree(i_data);
-		*/
 
 		//dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
 		//		num_neighbours, &(query[j * dim]),

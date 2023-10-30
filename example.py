@@ -71,7 +71,7 @@ def main():
     #                                                                                                                                           #
     #############################################################################################################################################
     block_size = 2
-    thread_size = 20
+    thread_size = 10
     num_comp_indices = 2
     num_simp_indices = 10
     num_outer_iterations = 80
