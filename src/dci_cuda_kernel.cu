@@ -1466,12 +1466,72 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						}
 						*/
 
+						/*
+						if (idx < total && num_points_in_block > 0) {
+							cur_pos[idx] = dci_next_closest_proj(
+									&(dci_inst->indices[curr_idx * (dci_inst->num_points)	// position of index (single head)
+										+ blockIdx.x * points_per_block // position within each index
+										+ dci_inst->num_points * num_indices * curr_head]),
+									&(left_pos[idx]), &(right_pos[idx]), query_proj_column[curr_idx + curr_head * num_indices],
+									num_points_in_block); // maybe problem?
+
+							//if (blockIdx.x == 0) {
+							//	if (threadIdx.x == 0) {
+							//		printf("\n");
+							//		printf("init_index_priority idx: %d\n", idx);
+							//		printf("curr_idx: %d\n", curr_idx);
+							//		printf("curr_head: %d\n", curr_head);
+							//		printf("cur_pos: %d\n", cur_pos[idx]);
+							//	}
+							//}
+
+							int position;
+							if ((cur_pos[idx] < 0) && (cur_pos[idx] > -blockDim.x)) {
+								position = 0;
+							} else if ((cur_pos[idx] < (num_points_in_block + blockDim.x - 1))
+									&& (cur_pos[idx] >= num_points_in_block)) {
+								position = num_points_in_block - 1;
+							} else {
+								position = cur_pos[idx];
+							}
+
+							assert(position >= 0); // There should be at least one point in the index
+							assert(position < num_points_in_block);
+							index_priority[idx] = abs_d(
+									dci_inst->indices[position + curr_idx * (dci_inst->num_points)	// position of index (single head)
+										+ blockIdx.x * points_per_block // position within each index
+										+ dci_inst->num_points * num_indices * curr_head].key
+											- query_proj_column[curr_idx + curr_head * num_indices]);
+						}
+						*/
+
+						//idx = threadIdx.x * chunk_size + j;
+						//curr_idx = idx % num_indices;			// index within each head
+						//curr_head = (int) (idx / num_indices);	// which head the given index belong to
+
+						//cur_pos[idx] = dci_next_closest_proj(
+						//		&(dci_inst->indices[curr_idx * (dci_inst->num_points)	// position of index (single head)
+						//			+ blockIdx.x * points_per_block // position within each index
+						//			+ dci_inst->num_points * num_indices * curr_head]),
+						//		&(left_pos[idx]), &(right_pos[idx]), query_proj_column[curr_idx + curr_head * num_indices],
+						//		num_points_in_block); // maybe problem?
+
 						cur_pos[i[curr_head]] = dci_next_closest_proj(
 								&(dci_inst->indices[i[curr_head] * (dci_inst->num_points)
 										+ blockIdx.x * points_per_block]),
 								&(left_pos[i[curr_head]]), &(right_pos[i[curr_head]]), query_proj_column[i[curr_head]], // need reconsider
 								num_points_in_block);
 						
+						if (blockIdx.x == 0) {
+							if (threadIdx.x == 0) {
+								printf("i = %d | indices = %f | cur_pos = %d\n", 
+									i[curr_head], 
+									dci_inst->indices[i[curr_head] * (dci_inst->num_points) + blockIdx.x * points_per_block].key,
+									cur_pos[i[curr_head]]
+								);
+							}
+						}
+
 						if ((cur_pos[i[curr_head]] < 0) && (cur_pos[i[curr_head]] > -blockDim.x)) {
 							position[curr_head] = 0;
 						} else if ((cur_pos[i[curr_head]]
@@ -1650,11 +1710,11 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 
 		while (k < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
 
-			if (blockIdx.x == 0) {
-				if (threadIdx.x == 0) {
-					printf("k = %d | num_candidates = %d\n", k, num_candidates);
-				}
-			}
+			//if (blockIdx.x == 0) {
+			//	if (threadIdx.x == 0) {
+			//		printf("k = %d | num_candidates = %d\n", k, num_candidates);
+			//	}
+			//}
 
 			if (threadIdx.x == 0) {
 				m = 0;
@@ -2112,11 +2172,10 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	for (int j = 0; j < num_queries; j++) { 
 		// need to refresh the result holder to avoid carry over results
 
-		int data_total, data_size;
-		float* h_data;
-		int * i_data;
+		//int data_total, data_size;
+		//float* h_data;
+		//int * i_data;
 
-		/*
 		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
 				num_neighbours * block_size * thread_size * num_heads, DBL_MAX);
 
@@ -2145,7 +2204,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			);
 
 		cudaDeviceSynchronize();
-		*/
 
 		// candidate_dists
 
@@ -2251,7 +2309,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		// -------- original result --------
 		
-
+		/*
 		// need to refresh the result holder to avoid carry over results
 		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
 				num_neighbours * block_size * thread_size * num_heads, DBL_MAX);
@@ -2371,6 +2429,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		}
 		printf("\n");
 		cudaFree(i_data);
+		*/
 
 		//dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
 		//		num_neighbours, &(query[j * dim]),
