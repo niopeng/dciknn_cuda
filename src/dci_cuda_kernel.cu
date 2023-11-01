@@ -1265,6 +1265,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					}
 					*/
 
+					/*
 					if (blockIdx.x == 0) {
 						if (threadIdx.x == 0) {
 							printf("\n");
@@ -1280,6 +1281,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						}
 						//printf("%d ", dci_inst->indices[cur_index + dci_inst->num_points * i[curr_head] + blockIdx.x * points_per_block].value);
 					}
+					*/
 
 					// possible issue 1: cur_index < num_points_in_block
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
@@ -1534,13 +1536,32 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 						if ((cur_pos[i[curr_head]] < 0) && (cur_pos[i[curr_head]] > -blockDim.x)) {
 							position[curr_head] = 0;
+
+							if (blockIdx.x == 0) {
+								if (threadIdx.x == 0) {
+									printf("curr_head = %d | i = %d | position = %d | situation 1\n", ch, i[ch], position[ch]);
+								}
+							}
 						} else if ((cur_pos[i[curr_head]]
 								< (num_points_in_block + blockDim.x - 1))
 								&& (cur_pos[i[curr_head]] >= num_points_in_block)) {
 							position[curr_head] = num_points_in_block - 1;
+
+							if (blockIdx.x == 0) {
+								if (threadIdx.x == 0) {
+									printf("curr_head = %d | i = %d | position = %d | situation 2\n", ch, i[ch], position[ch]);
+								}
+							}
 						} else {
 							position[curr_head] = cur_pos[i[curr_head]];
+
+							if (blockIdx.x == 0) {
+								if (threadIdx.x == 0) {
+									printf("curr_head = %d | i = %d | position = %d | situation 3\n", ch, i[ch], position[ch]);
+								}
+							}
 						}
+
 						if (position[curr_head] >= 0 && position[curr_head] < num_points_in_block) {
 							index_priority[i[curr_head]] = abs_d(
 									dci_inst->indices[position[curr_head]
@@ -1552,6 +1573,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							cur_pos[i[curr_head]] = -blockDim.x;
 						}
 
+						/*
 						if (blockIdx.x == 0) {
 							if (threadIdx.x == 0) {
 								printf("\n");
@@ -1561,7 +1583,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							}
 						}
 
-						/*
 						if (blockIdx.x == 0) {
 							if (threadIdx.x == 0) {
 								printf("\n");
