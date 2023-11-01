@@ -1532,31 +1532,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								&(left_pos[i[curr_head]]), &(right_pos[i[curr_head]]), query_proj_column[i[curr_head]], // need reconsider
 								num_points_in_block);
 
-						if (blockIdx.x == 0) {
-							if (threadIdx.x == 0) {
-								printf("\n");
-								printf("i: %d\n", i[curr_head]);
-								printf("update start cur_pos\n");
-								for (int ch = 0; ch < num_heads; ch++) {
-									printf("head: %d\n", ch);
-									for (int ni = 0; ni < num_indices; ni++) {
-										printf("%d ", cur_pos[ch * num_indices + ni]);
-									}
-									printf("\n");
-								}
-								printf("\n");
-								printf("update start index_priority\n");
-								for (int ch = 0; ch < num_heads; ch++) {
-									printf("head: %d\n", ch);
-									for (int ni = 0; ni < num_indices; ni++) {
-										printf("%f ", index_priority[ch * num_indices + ni]);
-									}
-									printf("\n");
-								}
-								printf("\n");
-							}
-						}
-
 						if ((cur_pos[i[curr_head]] < 0) && (cur_pos[i[curr_head]] > -blockDim.x)) {
 							position[curr_head] = 0;
 						} else if ((cur_pos[i[curr_head]]
@@ -1577,7 +1552,14 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							cur_pos[i[curr_head]] = -blockDim.x;
 						}
 
-
+						if (blockIdx.x == 0) {
+							if (threadIdx.x == 0) {
+								printf("\n");
+								for (int ch = 0; ch < num_heads; ch++) {
+									printf("curr_head = %d | i = %d | position %d\n", ch, i[ch], position[ch]);
+								}
+							}
+						}
 
 						/*
 						if (blockIdx.x == 0) {
