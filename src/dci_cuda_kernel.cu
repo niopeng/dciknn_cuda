@@ -670,6 +670,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 	__shared__ int tmp_count1;
 	__shared__ int tmp_count2;
+	__shared__ int tmp_count3;
 
 	// shared value is an array, each value in the array is correspond to a head
 	// the array size is num_heads
@@ -748,6 +749,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			*/
 			tmp_count1 = 0;
 			tmp_count2 = 0;
+			tmp_count3 = 0;
 		}
 
 		__syncthreads();
@@ -1541,21 +1543,24 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 						if ((cur_pos[i[curr_head]] < 0) && (cur_pos[i[curr_head]] > -blockDim.x)) {
 							position[curr_head] = 0;
-							//if (curr_head == 0) {
-							//	printf("threadIdx.x = %d | i = %d | position = %d | situation 1\n", threadIdx.x, i[curr_head], position[curr_head]);
-							//}
+							if (curr_head == 0) {
+								printf("threadIdx.x = %d | i = %d | position = %d | tmp_count1 = %d | situation 1\n", threadIdx.x, i[curr_head], position[curr_head], tmp_count1);
+								tmp_count1++;
+							}
 						} else if ((cur_pos[i[curr_head]]
 								< (num_points_in_block + blockDim.x - 1))
 								&& (cur_pos[i[curr_head]] >= num_points_in_block)) {
 							position[curr_head] = num_points_in_block - 1;
-							//if (curr_head == 0) {
-							//	printf("threadIdx.x = %d | i = %d | position = %d | situation 2\n", threadIdx.x, i[curr_head], position[curr_head]);
-							//}
+							if (curr_head == 0) {
+								printf("threadIdx.x = %d | i = %d | position = %d | tmp_count2 = %d | situation 2\n", threadIdx.x, i[curr_head], position[curr_head], tmp_count2);
+								tmp_count2++;
+							}
 						} else {
 							position[curr_head] = cur_pos[i[curr_head]];
-							//if (curr_head == 0) {
-							//	printf("threadIdx.x = %d | i = %d | position = %d | situation 3\n", threadIdx.x, i[curr_head], position[curr_head]);
-							//}
+							if (curr_head == 0) {
+								printf("threadIdx.x = %d | i = %d | position = %d | tmp_count3 = %d | situation 3\n", threadIdx.x, i[curr_head], position[curr_head], tmp_count3);
+								tmp_count3++;
+							}
 						}
 
 						if (position[curr_head] >= 0 && position[curr_head] < num_points_in_block) {
@@ -1565,18 +1570,18 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 											+ blockIdx.x * points_per_block].key
 											- query_proj_column[i[curr_head]]);
 
-							if (curr_head == 0) {
-								printf("threadIdx.x = %d | i = %d | position = %d | tmp_count1 = %d | situation 1\n", threadIdx.x, i[curr_head], position[curr_head], tmp_count1);
-								tmp_count1++;
-							}
+							//if (curr_head == 0) {
+							//	printf("threadIdx.x = %d | i = %d | position = %d | tmp_count1 = %d | situation 1\n", threadIdx.x, i[curr_head], position[curr_head], tmp_count1);
+							//	tmp_count1++;
+							//}
 						} else {
 							index_priority[i[curr_head]] = DBL_MAX;
 							cur_pos[i[curr_head]] = -blockDim.x;
 
-							if (curr_head == 0) {
-								printf("threadIdx.x = %d | i = %d | position = %d | tmp_count2 = %d | situation 2\n", threadIdx.x, i[curr_head], position[curr_head], tmp_count2);
-								tmp_count2++;
-							}
+							//if (curr_head == 0) {
+							//	printf("threadIdx.x = %d | i = %d | position = %d | tmp_count2 = %d | situation 2\n", threadIdx.x, i[curr_head], position[curr_head], tmp_count2);
+							//	tmp_count2++;
+							//}
 						}
 
 						/*
