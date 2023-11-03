@@ -1536,24 +1536,21 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 						if ((cur_pos[i[curr_head]] < 0) && (cur_pos[i[curr_head]] > -blockDim.x)) {
 							position[curr_head] = 0;
-
-							if (curr_head == 0) {
-								printf("threadIdx.x = %d | i = %d | position = %d | situation 1\n", threadIdx.x, i[curr_head], position[curr_head]);
-							}
+							//if (curr_head == 0) {
+							//	printf("threadIdx.x = %d | i = %d | position = %d | situation 1\n", threadIdx.x, i[curr_head], position[curr_head]);
+							//}
 						} else if ((cur_pos[i[curr_head]]
 								< (num_points_in_block + blockDim.x - 1))
 								&& (cur_pos[i[curr_head]] >= num_points_in_block)) {
 							position[curr_head] = num_points_in_block - 1;
-
-							if (curr_head == 0) {
-								printf("threadIdx.x = %d | i = %d | position = %d | situation 2\n", threadIdx.x, i[curr_head], position[curr_head]);
-							}
+							//if (curr_head == 0) {
+							//	printf("threadIdx.x = %d | i = %d | position = %d | situation 2\n", threadIdx.x, i[curr_head], position[curr_head]);
+							//}
 						} else {
 							position[curr_head] = cur_pos[i[curr_head]];
-
-							if (curr_head == 0) {
-								printf("threadIdx.x = %d | i = %d | position = %d | situation 3\n", threadIdx.x, i[curr_head], position[curr_head]);
-							}
+							//if (curr_head == 0) {
+							//	printf("threadIdx.x = %d | i = %d | position = %d | situation 3\n", threadIdx.x, i[curr_head], position[curr_head]);
+							//}
 						}
 
 						if (position[curr_head] >= 0 && position[curr_head] < num_points_in_block) {
@@ -1562,9 +1559,17 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 											+ i[curr_head] * (dci_inst->num_points)
 											+ blockIdx.x * points_per_block].key
 											- query_proj_column[i[curr_head]]);
+
+							if (curr_head == 0) {
+								printf("threadIdx.x = %d | i = %d | position = %d | situation 1\n", threadIdx.x, i[curr_head], position[curr_head]);
+							}
 						} else {
 							index_priority[i[curr_head]] = DBL_MAX;
 							cur_pos[i[curr_head]] = -blockDim.x;
+
+							if (curr_head == 0) {
+								printf("threadIdx.x = %d | i = %d | position = %d | situation 1\n", threadIdx.x, i[curr_head], position[curr_head]);
+							}
 						}
 
 						/*
