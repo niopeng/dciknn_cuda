@@ -668,8 +668,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	int num_heads = dci_inst->num_heads;
 
-	__shared__ int *tmp_count1 = 0;
-	__shared__ int *tmp_count2 = 0;
+	__shared__ int *tmp_count1;
+	__shared__ int *tmp_count2;
 
 	// shared value is an array, each value in the array is correspond to a head
 	// the array size is num_heads
@@ -746,6 +746,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			cur_pos2 = new int[num_indices * num_heads];
 			index_priority2 = new float[num_indices * num_heads];
 			*/
+			tmp_count1 = 0;
+			tmp_count2 = 0;
 		}
 
 		__syncthreads();
