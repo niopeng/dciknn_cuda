@@ -1641,11 +1641,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				}
 			}
 			*/
-			if (blockIdx.x == 0) {
-				if (threadIdx.x == 0) {
-					printf("tmp_count1 = %d | tmp_count2 = %d | tmp_count3 = %d\n", tmp_count1, tmp_count2, tmp_count3);
-				}
-			}
 
 			// k judgement
 			if ((threadIdx.x % thread_per_head) == 0) {
@@ -1674,6 +1669,12 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			//	}
 			//	printf("\n");
 			//}
+		}
+
+		if (blockIdx.x == 0) {
+			if (threadIdx.x == 0) {
+				printf("tmp_count1 = %d | tmp_count2 = %d | tmp_count3 = %d\n", tmp_count1, tmp_count2, tmp_count3);
+			}
 		}
 
 		__syncthreads();
