@@ -668,6 +668,9 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	int num_heads = dci_inst->num_heads;
 
+	__shared__ int *tmp_count1 = 0;
+	__shared__ int *tmp_count2 = 0;
+
 	// shared value is an array, each value in the array is correspond to a head
 	// the array size is num_heads
 	__shared__ float *top_index_priority;
@@ -1561,14 +1564,16 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 											- query_proj_column[i[curr_head]]);
 
 							if (curr_head == 0) {
-								printf("threadIdx.x = %d | i = %d | position = %d | situation 1\n", threadIdx.x, i[curr_head], position[curr_head]);
+								printf("threadIdx.x = %d | i = %d | position = %d | tmp_count1 = %d | situation 1\n", threadIdx.x, i[curr_head], position[curr_head], tmp_count1);
+								tmp_count1++;
 							}
 						} else {
 							index_priority[i[curr_head]] = DBL_MAX;
 							cur_pos[i[curr_head]] = -blockDim.x;
 
 							if (curr_head == 0) {
-								printf("threadIdx.x = %d | i = %d | position = %d | situation 2\n", threadIdx.x, i[curr_head], position[curr_head]);
+								printf("threadIdx.x = %d | i = %d | position = %d | tmp_count2 = %d | situation 2\n", threadIdx.x, i[curr_head], position[curr_head], tmp_count2);
+								tmp_count2++;
 							}
 						}
 
