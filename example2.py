@@ -19,7 +19,7 @@ import torch
 import random
 import datetime
 
-random_seed = 105
+random_seed = 1
 torch.manual_seed(random_seed)
 
 def gen_data(ambient_dim, intrinsic_dim, num_points, num_heads):

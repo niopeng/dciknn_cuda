@@ -1305,6 +1305,10 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								+ dci_inst->num_points * i[curr_head]
 								+ blockIdx.x * points_per_block].value; // cur_point is index within the head (need adjust to head)
 
+						if (curr_head == 0) {
+							printf("%d ", cur_point);
+						}
+
 						counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]++;
 
@@ -1680,6 +1684,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			//}
 		}
 
+		printf("\n");
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				printf("tmp_count1 = %d | tmp_count2 = %d\n", tmp_count1, tmp_count2);
