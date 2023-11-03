@@ -1543,7 +1543,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 						if ((cur_pos[i[curr_head]] < 0) && (cur_pos[i[curr_head]] > -blockDim.x)) {
 							position[curr_head] = 0;
-							if (curr_head == 0) {
+							if (curr_head == 1) {
 								printf("threadIdx.x = %d | i = %d | position = %d | tmp_count1 = %d | situation 1\n", threadIdx.x, i[curr_head], position[curr_head], tmp_count1);
 								tmp_count1++;
 							}
@@ -1551,13 +1551,13 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								< (num_points_in_block + blockDim.x - 1))
 								&& (cur_pos[i[curr_head]] >= num_points_in_block)) {
 							position[curr_head] = num_points_in_block - 1;
-							if (curr_head == 0) {
+							if (curr_head == 1) {
 								printf("threadIdx.x = %d | i = %d | position = %d | tmp_count2 = %d | situation 2\n", threadIdx.x, i[curr_head], position[curr_head], tmp_count2);
 								tmp_count2++;
 							}
 						} else {
 							position[curr_head] = cur_pos[i[curr_head]];
-							if (curr_head == 0) {
+							if (curr_head == 1) {
 								printf("threadIdx.x = %d | i = %d | position = %d | tmp_count3 = %d | situation 3\n", threadIdx.x, i[curr_head], position[curr_head], tmp_count3);
 								tmp_count3++;
 							}
