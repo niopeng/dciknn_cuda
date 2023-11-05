@@ -1296,13 +1296,17 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					}
 					*/
 
+					//if (curr_head == 0) {
+					//	if (cur_index >= 0 && cur_index < num_points_in_block) {
+					//		tmp_count1++;
+					//	}
+					//	else {
+					//		tmp_count2++;
+					//	}
+					//}
+
 					if (curr_head == 0) {
-						if (cur_index >= 0 && cur_index < num_points_in_block) {
-							tmp_count1++;
-						}
-						else {
-							tmp_count2++;
-						}
+						printf("%d ", cur_index);
 					}
 
 					// possible issue 1: cur_index < num_points_in_block
@@ -1311,10 +1315,10 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								+ dci_inst->num_points * i[curr_head]
 								+ blockIdx.x * points_per_block].value; // cur_point is index within the head (need adjust to head)
 
-						if (curr_head == 0) {
-							printf("%d ", cur_point);
-							tmp_count3++;
-						}
+						//if (curr_head == 0) {
+						//	printf("%d ", cur_point);
+						//	tmp_count3++;
+						//}
 
 						counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]++;
