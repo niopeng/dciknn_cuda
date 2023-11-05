@@ -193,7 +193,7 @@ __global__ void copy_to_indices(dci* const dci_inst, float* const data_proj,
 void dci_add(dci* const dci_inst, const int dim, const int num_points, const int num_heads,
 		float* const data, const int block_size, const int thread_size) {
 
-	printf("dci_add in dci_cuda_kernel.cu\n");
+	printf("dci_add in dci_cuda_kernel.cu | thread_size = %d\n", thread_size);
 
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	float *data_proj;
@@ -1691,6 +1691,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			if (threadIdx.x == 0) {
 				printf("\n");
 				printf("tmp_count1 = %d | tmp_count2 = %d | tmp_count3 = %d\n", tmp_count1, tmp_count2, tmp_count3);
+				printf("thread_size = %d\n", thread_size);
 			}
 		}
 		
@@ -2132,6 +2133,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		const dci_query_config query_config, int* const nearest_neighbours,
 		float* const nearest_neighbour_dists, const int block_size,
 		const int thread_size) {
+
+	printf("dci_query in dci_cuda_kernel.cu | thread_size = %d\n", thread_size);
 
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	int max_possible_num_candidates = min(query_config.max_num_candidates,
