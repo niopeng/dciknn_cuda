@@ -1065,7 +1065,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			}
 			__syncthreads();
 
-			
 			// iterate for each complex index (work properly)
 			while (m[curr_head] < dci_inst->num_comp_indices) {
 				// first thread only
@@ -1135,7 +1134,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				*/
 
 				if (curr_head == 0) {
-					printf("%d " head_threadIdx);
+					printf("%d ", top_h[curr_head]);
 				}
 
 				if (top_h[curr_head] >= 0) {
@@ -1167,6 +1166,12 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					// need to calculate cur_index based on current head 
 					// this also mean it now process less number of index but work on multiple head
 					int cur_index = position[curr_head] + head_threadIdx;
+
+					//if (curr_head == 0) {
+					//	if (k[curr_head] >= 60 && k[curr_head] <=70) {
+					//		printf("%d ", cur_index);
+					//	}
+					//}
 
 					//if (blockIdx.x == 0) {
 						/*
@@ -1261,12 +1266,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						}
 					}
 					*/
-
-					//if (curr_head == 0) {
-					//	if (k[curr_head] >= 60 && k[curr_head] <=70) {
-					//		printf("%d ", cur_index);
-					//	}
-					//}
 
 					/*
 					if (cur_index < 0) {
