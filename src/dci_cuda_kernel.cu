@@ -1133,8 +1133,18 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				}
 				*/
 
-				if (curr_head == 0) {
-					printf("%d ", top_h[curr_head]);
+				//if (curr_head == 0) {
+				//	printf("%d ", top_h[curr_head]);
+				//}
+
+				if (blockIdx.x == 0) {
+					if (threadIdx.x == 0) {
+						printf("\n");
+						printf("k: %d | %d\n", k[0], k[1]);
+						printf("m: %d | %d\n", m[0], m[1]);
+						printf("top_h: %d | %d\n", top_h[0], top_h[1]);
+						printf("\n");
+					}
 				}
 
 				if (top_h[curr_head] >= 0) {
