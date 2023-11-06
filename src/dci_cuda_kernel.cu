@@ -1046,7 +1046,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		*/
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
-				printf("blockDim.x = \n", blockDim.x);
+				printf("blockDim.x = %d\n", blockDim.x);
 			}
 		}
 
