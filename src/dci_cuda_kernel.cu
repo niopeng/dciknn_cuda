@@ -970,7 +970,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		// Possible problem 1
 		// confirm issue: number_candidate not increase
 		// ---------------------------------------------------------------------
-		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim_head) {
+		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
 
 			if ((threadIdx.x % thread_per_head) == 0) {
 				m[curr_head] = 0;
@@ -1819,6 +1819,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 			// d_top_candidates_dist
 
+			/*
 			data_total = num_neighbours * block_size * thread_size * num_heads;
 			data_size = sizeof(float) * data_total;
 			h_data = (float *) malloc(data_size);
@@ -1835,7 +1836,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			}
 			printf("\n");
 			cudaFree(h_data);
-
 			// d_top_candidates_index
 
 			data_total = num_neighbours * block_size * thread_size * num_heads;
@@ -1873,6 +1873,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			}
 			printf("\n");
 			cudaFree(i_data);
+			*/
 		}
 
 		// -------- original result --------
