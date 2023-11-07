@@ -970,7 +970,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		// Possible problem 1
 		// confirm issue: number_candidate not increase
 		// ---------------------------------------------------------------------
-		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
+		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim_head) {
 
 			if ((threadIdx.x % thread_per_head) == 0) {
 				m[curr_head] = 0;
@@ -1032,6 +1032,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					// this also mean it now process less number of index but work on multiple head
 					int cur_index = position[curr_head] + head_threadIdx;
 
+					/*
 					if (blockIdx.x == 0) {
 						if (threadIdx.x == 0) {
 							printf("\n");
@@ -1046,6 +1047,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							printf("\n");
 						}
 					}
+					*/
 
 					// possible issue 1: cur_index < num_points_in_block
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
@@ -1055,6 +1057,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 						counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]++;
+
+						printf("%d ", cur_point + dci_inst->num_points * m[curr_head] + dci_inst->num_comp_indices * dci_inst->num_points * curr_head);
 
 						// possible issue 2
 						//int cur_index = position[curr_head] + head_threadIdx;
@@ -1788,6 +1792,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			h_data = (float *) malloc(data_size);
 			cudaMemcpy(h_data, candidate_dists, data_size, cudaMemcpyDeviceToHost);
 
+			printf("\n");
 			printf("\n");
 			printf("candidate_dists\n");
 			for (int j = 0; j < num_heads; j ++) {
