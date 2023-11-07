@@ -408,25 +408,25 @@ void mix_sort(idx_elem arr[], int n) {
 __device__
 static inline int dci_next_closest_proj(const idx_elem* const idx,
 		int* const left_pos, int* const right_pos, const float query_proj,
-		const int num_elems) {
+		const int num_elems, const int blockDim_head) {
 	int cur_pos;
-	int lower_bound = -blockDim.x;
-	int upper_bound = num_elems + blockDim.x - 1;
+	int lower_bound = -blockDim_head;
+	int upper_bound = num_elems + blockDim_head - 1;
 	if ((*left_pos <= lower_bound) && (*right_pos >= upper_bound)) {
 		cur_pos = lower_bound;
 	} else if (*left_pos <= lower_bound) {
 		cur_pos = *right_pos;
-		(*right_pos) += blockDim.x;
+		(*right_pos) += blockDim_head;
 	} else if (*right_pos >= upper_bound) {
 		cur_pos = *left_pos;
-		(*left_pos) -= blockDim.x;
+		(*left_pos) -= blockDim_head;
 	} else if (idx[min(*right_pos, num_elems - 1)].key - query_proj
 			< query_proj - idx[max(*left_pos, 0)].key) {
 		cur_pos = *right_pos;
-		(*right_pos) += blockDim.x;
+		(*right_pos) += blockDim_head;
 	} else {
 		cur_pos = *left_pos;
-		(*left_pos) -= blockDim.x;
+		(*left_pos) -= blockDim_head;
 	}
 	return cur_pos;
 }
@@ -485,36 +485,6 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 	}
 }
 
-// blockDim.x change
-/*
-__device__ void search_index(const dci* const dci_inst, const float* const query_proj_column, 
-		const int num_indices, const int num_heads, int* const left_pos, int* const right_pos, 
-		const int points_per_block) {
-
-	int total = num_indices * num_heads;
-	int chunk_size = (total + blockDim.x - 1) / blockDim.x;
-
-	int idx, curr_idx, curr_head;
-	for (int j = 0; j < chunk_size; j++) {
-		idx = threadIdx.x * chunk_size + j;
-		curr_idx = idx % num_indices;			// index within each head
-		curr_head = (int) (idx / num_indices);	// which head the given index belong to
-
-		if (idx < total) {
-			left_pos[idx] = dci_search_index(
-				&(dci_inst->indices[curr_idx * (dci_inst->num_points)	// position of index (single head)
-						+ blockIdx.x * points_per_block // position within each index
-						+ dci_inst->num_points * num_indices * curr_head]),
-				query_proj_column[curr_idx + curr_head * num_indices],
-				min(dci_inst->num_points - blockIdx.x * points_per_block,
-							points_per_block)) - blockDim.x + 1;
-
-			right_pos[idx] = left_pos[idx] + blockDim.x;
-		}
-	}
-}
-*/
-
 __device__ void search_index_original(const dci* const dci_inst,
 		const float* const query_proj, const int num_indices, const idx_elem* indices,
 		int* const left_pos, int* const right_pos, const int points_per_block) {
@@ -559,17 +529,7 @@ __device__ void init_index_priority(const dci* const dci_inst,
 						+ blockIdx.x * points_per_block // position within each index
 						+ dci_inst->num_points * num_indices * curr_head]),
 					&(left_pos[idx]), &(right_pos[idx]), query_proj_column[curr_idx + curr_head * num_indices],
-					num_points_in_block); // maybe problem?
-
-			//if (blockIdx.x == 0) {
-			//	if (threadIdx.x == 0) {
-			//		printf("\n");
-			//		printf("init_index_priority idx: %d\n", idx);
-			//		printf("curr_idx: %d\n", curr_idx);
-			//		printf("curr_head: %d\n", curr_head);
-			//		printf("cur_pos: %d\n", cur_pos[idx]);
-			//	}
-			//}
+					num_points_in_block, blockDim_head); // maybe problem?
 
 			int position;
 			if ((cur_pos[idx] < 0) && (cur_pos[idx] > -blockDim_head)) {
@@ -612,7 +572,7 @@ __device__ void init_index_priority_original(const dci* const dci_inst,
 					&(indices[idx * (dci_inst->num_points)
 							+ blockIdx.x * points_per_block]),
 					&(left_pos[idx]), &(right_pos[idx]), query_proj[idx],
-					num_points_in_block);
+					num_points_in_block, blockDim.x);
 
 			//if (blockIdx.x == 0) {
 			//	if (threadIdx.x == 0) {
@@ -905,7 +865,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		}
 		*/
 
-		/*
 		init_index_priority(
 			dci_inst, 
 			query_proj_column, 
@@ -920,9 +879,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		);
 
 		__syncthreads();
-		*/
 
-		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				printf("init_index_priority left_pos\n");
@@ -1020,64 +977,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
-		*/
-
-		/*
-		if (blockIdx.x == 0) {
-			if (threadIdx.x == 0) {
-				printf("init_index_priority_original left_pos\n");
-				for (int ch = 0; ch < num_heads; ch++) {
-					//printf("head: %d\n", ch);
-					printf("head: %d\n", ch);
-					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%d ", left_pos[ch * num_indices + ni]);
-					}
-					printf("\n");
-				}
-				printf("\n");
-				printf("init_index_priority_original right_pos\n");
-				for (int ch = 0; ch < num_heads; ch++) {
-					printf("head: %d\n", ch);
-					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%d ", right_pos[ch * num_indices + ni]);
-					}
-					printf("\n");
-				}
-				printf("\n");
-				printf("init_index_priority_original cur_pos\n");
-				for (int ch = 0; ch < num_heads; ch++) {
-					printf("head: %d\n", ch);
-					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%d ", cur_pos[ch * num_indices + ni]);
-					}
-					printf("\n");
-				}
-				printf("\n");
-				printf("init_index_priority_original cur_pos\n");
-				for (int ch = 0; ch < num_heads; ch++) {
-					printf("head: %d\n", ch);
-					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%f ", index_priority[ch * num_indices + ni]);
-					}
-					printf("\n");
-				}
-				printf("\n");
-			}
-		}
-		*/
-
-		/*
-		if (blockIdx.x == 0) {
-			if (threadIdx.x == 0) {
-				printf("Loop: k < %d\n", (num_points_in_block * dci_inst->num_simp_indices * blockDim.x));
-				printf("num_candidates: %d\n", num_candidates);
-				printf("num_neighbours: %d\n", num_neighbours);
-				printf("could_break_1: %d\n", (query_config.num_outer_iterations * dci_inst->num_simp_indices));
-				printf("could_break_2: %d\n", (query_config.max_num_candidates));
-				printf("\n");
-			}
-		}
-		*/
 
 		// ---------------------------------------------------------------------
 		// Possible problem 1
@@ -1500,7 +1399,7 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 								&(dci_inst->indices[i * (dci_inst->num_points)
 										+ blockIdx.x * points_per_block]),
 								&(left_pos[i]), &(right_pos[i]), query_proj[i],
-								num_points_in_block);
+								num_points_in_block, blockDim.x);
 						if ((cur_pos[i] < 0) && (cur_pos[i] > -blockDim.x)) {
 							position = 0;
 						} else if ((cur_pos[i]
