@@ -459,10 +459,11 @@ static inline int dci_search_index(const idx_elem* const idx, const float key,
 // right_pos: num_indices * num_heads
 __device__ void search_index(const dci* const dci_inst, const float* const query_proj_column, 
 		const int num_indices, const int num_heads, 
-		int* const left_pos, int* const right_pos, const int points_per_block) {
+		int* const left_pos, int* const right_pos, 
+		const int points_per_block, const int blockDim_head) {
 
 	int total = num_indices * num_heads;
-	int chunk_size = (total + blockDim.x - 1) / blockDim.x;
+	int chunk_size = (total + blockDim_head - 1) / blockDim_head;
 
 	int idx, curr_idx, curr_head;
 	for (int j = 0; j < chunk_size; j++) {
@@ -477,9 +478,9 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 						+ dci_inst->num_points * num_indices * curr_head]),
 				query_proj_column[curr_idx + curr_head * num_indices],
 				min(dci_inst->num_points - blockIdx.x * points_per_block,
-							points_per_block)) - blockDim.x + 1;
+							points_per_block)) - blockDim_head + 1;
 
-			right_pos[idx] = left_pos[idx] + blockDim.x;
+			right_pos[idx] = left_pos[idx] + blockDim_head;
 		}
 	}
 }
@@ -508,10 +509,10 @@ __device__ void init_index_priority(const dci* const dci_inst,
 		const float* const query_proj_column, 
 		const int num_indices, const int num_heads, 
 		int* const left_pos, int* const right_pos, float* const index_priority,
-		int* const cur_pos, const int points_per_block) {
+		int* const cur_pos, const int points_per_block, const int blockDim_head) {
 
 	int total = num_indices * num_heads;
-	int chunk_size = (total + blockDim.x - 1) / blockDim.x;
+	int chunk_size = (total + blockDim_head - 1) / blockDim_head;
 	int num_points_in_block = min(
 			(int) (dci_inst->num_points - blockIdx.x * points_per_block),
 			points_per_block);
@@ -541,9 +542,9 @@ __device__ void init_index_priority(const dci* const dci_inst,
 			//}
 
 			int position;
-			if ((cur_pos[idx] < 0) && (cur_pos[idx] > -blockDim.x)) {
+			if ((cur_pos[idx] < 0) && (cur_pos[idx] > -blockDim_head)) {
 				position = 0;
-			} else if ((cur_pos[idx] < (num_points_in_block + blockDim.x - 1))
+			} else if ((cur_pos[idx] < (num_points_in_block + blockDim_head - 1))
 					&& (cur_pos[idx] >= num_points_in_block)) {
 				position = num_points_in_block - 1;
 			} else {
@@ -700,8 +701,12 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 	// for each head there are a number of thread assign to each head, and head_threadIdx is just thread id adjust to head
 	int head_threadIdx = threadIdx.x % thread_per_head;
+	
+	// adjust thread_size and blocker_size by the number of head
+	int gridDim_head = (int) (gridDim.x / num_heads);
+	int blockDim_head = (int) (blockDim.x / num_heads);
 
-	int points_per_block = (dci_inst->num_points + gridDim.x - 1) / gridDim.x; // default number of data processed by a block
+	int points_per_block = (dci_inst->num_points + gridDim_head - 1) / gridDim_head; // default number of data processed by a block
 	int num_points_in_block = min(
 			(int) (dci_inst->num_points - blockIdx.x * points_per_block), // should not process data beyond the current block
 			points_per_block);
@@ -774,7 +779,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			num_heads,
 			left_pos,
 			right_pos,
-			points_per_block
+			points_per_block,
+			blockDim_head
 		);
 
 		__syncthreads();
@@ -883,7 +889,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			right_pos,
 			index_priority, 
 			cur_pos, 
-			points_per_block
+			points_per_block,
+			blockDim_head
 		);
 
 		__syncthreads();
@@ -1046,7 +1053,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		*/
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
-				printf("blockDim.x = %d | gridDim.x = %d\n", blockDim.x, gridDim.x);
+				printf("blockDim_head = %d | gridDim_head = %d\n", blockDim_head, gridDim_head);
 			}
 		}
 
@@ -1054,7 +1061,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		// Possible problem 1
 		// confirm issue: number_candidate not increase
 		// ---------------------------------------------------------------------
-		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
+		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim_head) {
 
 			/*
 			if (blockIdx.x == 0) {
@@ -1569,14 +1576,14 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								&(left_pos[i[curr_head]]), &(right_pos[i[curr_head]]), query_proj_column[i[curr_head]], // need reconsider
 								num_points_in_block);
 
-						if ((cur_pos[i[curr_head]] < 0) && (cur_pos[i[curr_head]] > -blockDim.x)) {
+						if ((cur_pos[i[curr_head]] < 0) && (cur_pos[i[curr_head]] > -blockDim_head)) {
 							position[curr_head] = 0;
 							//if (curr_head == 0) {
 							//	printf("threadIdx.x = %d | i = %d | position = %d | tmp_count1 = %d | situation 1\n", threadIdx.x, i[curr_head], position[curr_head], tmp_count1);
 							//	tmp_count1++;
 							//}
 						} else if ((cur_pos[i[curr_head]]
-								< (num_points_in_block + blockDim.x - 1))
+								< (num_points_in_block + blockDim_head - 1))
 								&& (cur_pos[i[curr_head]] >= num_points_in_block)) {
 							position[curr_head] = num_points_in_block - 1;
 							//if (curr_head == 0) {
@@ -1604,7 +1611,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							//}
 						} else {
 							index_priority[i[curr_head]] = DBL_MAX;
-							cur_pos[i[curr_head]] = -blockDim.x;
+							cur_pos[i[curr_head]] = -blockDim_head;
 
 							//if (curr_head == 0) {
 							//	printf("threadIdx.x = %d | i = %d | position = %d | tmp_count2 = %d | situation 2\n", threadIdx.x, i[curr_head], position[curr_head], tmp_count2);
@@ -1700,14 +1707,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		}
 
 		__syncthreads();
-		
-		if (blockIdx.x == 0) {
-			if (threadIdx.x == 0) {
-				printf("\n");
-				//printf("tmp_count1 = %d | tmp_count2 = %d | tmp_count3 = %d\n", tmp_count1, tmp_count2, tmp_count3);
-				printf("thread_size = %d\n", thread_size);
-			}
-		}
 		
 		// free variables
 		if (threadIdx.x == 0) {
