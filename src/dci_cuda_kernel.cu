@@ -730,12 +730,10 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		__shared__ int* cur_pos;
 		__shared__ float* index_priority;
 
-		/*
 		__shared__ int* left_pos2;
 		__shared__ int* right_pos2;
 		__shared__ int* cur_pos2;
 		__shared__ float* index_priority2;
-		*/
 
 		// init variables
 		if (threadIdx.x == 0) {
@@ -752,15 +750,10 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			cur_pos = new int[num_indices * num_heads];
 			index_priority = new float[num_indices * num_heads];
 
-			/*
 			left_pos2 = new int[num_indices * num_heads];
 			right_pos2 = new int[num_indices * num_heads];
 			cur_pos2 = new int[num_indices * num_heads];
 			index_priority2 = new float[num_indices * num_heads];
-			*/
-			//tmp_count1 = 0;
-			//tmp_count2 = 0;
-			//tmp_count3 = 0;
 		}
 
 		__syncthreads();
@@ -1290,6 +1283,11 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			free(m);
 			free(i);
 			free(could_break);
+
+			free(left_pos2);
+			free(right_pos2);
+			free(cur_pos2);
+			free(index_priority2);
 		}
 	}
 
