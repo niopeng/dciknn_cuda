@@ -1047,8 +1047,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						counts[cur_point + dci_inst->num_points * m[curr_head]
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]++;
 
-						//printf("%d ", cur_point + dci_inst->num_points * m[curr_head] + dci_inst->num_comp_indices * dci_inst->num_points * curr_head);
-						__syncthreads();
+						printf("%d ", cur_point + dci_inst->num_points * m[curr_head] + dci_inst->num_comp_indices * dci_inst->num_points * curr_head);
+						//__syncthreads();
 
 						// possible issue 2
 						//int cur_index = position[curr_head] + head_threadIdx;
