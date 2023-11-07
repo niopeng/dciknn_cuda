@@ -720,11 +720,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		__shared__ int* cur_pos;
 		__shared__ float* index_priority;
 
-		__shared__ int* left_pos2;
-		__shared__ int* right_pos2;
-		__shared__ int* cur_pos2;
-		__shared__ float* index_priority2;
-
 		// init variables
 		if (threadIdx.x == 0) {
 			top_index_priority = new float[num_heads];
@@ -739,11 +734,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			right_pos = new int[num_indices * num_heads];
 			cur_pos = new int[num_indices * num_heads];
 			index_priority = new float[num_indices * num_heads];
-
-			left_pos2 = new int[num_indices * num_heads];
-			right_pos2 = new int[num_indices * num_heads];
-			cur_pos2 = new int[num_indices * num_heads];
-			index_priority2 = new float[num_indices * num_heads];
 		}
 
 		__syncthreads();
@@ -1223,11 +1213,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			free(m);
 			free(i);
 			free(could_break);
-
-			free(left_pos2);
-			free(right_pos2);
-			free(cur_pos2);
-			free(index_priority2);
 		}
 	}
 
@@ -1792,7 +1777,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		// candidate_dists
 
-		/*
 		data_total = dci_inst->num_points * num_heads;
 		data_size = sizeof(float) * data_total;
 		h_data = (float *) malloc(data_size);
@@ -1890,7 +1874,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			printf("\n");
 			cudaFree(i_data);
 		}
-		*/
 
 		// -------- original result --------
 		
