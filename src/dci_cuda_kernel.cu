@@ -457,7 +457,6 @@ static inline int dci_search_index(const idx_elem* const idx, const float key,
 
 // left_pos: num_indices * num_heads
 // right_pos: num_indices * num_heads
-/*
 __device__ void search_index(const dci* const dci_inst, const float* const query_proj_column, 
 		const int num_indices, const int num_heads, 
 		int* const left_pos, int* const right_pos, 
@@ -485,9 +484,9 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 		}
 	}
 }
-*/
 
 // blockDim.x change
+/*
 __device__ void search_index(const dci* const dci_inst, const float* const query_proj_column, 
 		const int num_indices, const int num_heads, int* const left_pos, int* const right_pos, 
 		const int points_per_block) {
@@ -514,6 +513,7 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 		}
 	}
 }
+*/
 
 __device__ void search_index_original(const dci* const dci_inst,
 		const float* const query_proj, const int num_indices, const idx_elem* indices,
@@ -736,7 +736,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	int gridDim_head = (int) (gridDim.x / num_heads);
 	int blockDim_head = (int) (blockDim.x / num_heads);
 
-	int points_per_block = (dci_inst->num_points + gridDim_head - 1) / gridDim_head; // default number of data processed by a block
+	int points_per_block = (dci_inst->num_points + gridDim.x - 1) / gridDim.x; // default number of data processed by a block
 	int num_points_in_block = min(
 			(int) (dci_inst->num_points - blockIdx.x * points_per_block), // should not process data beyond the current block
 			points_per_block);
@@ -802,7 +802,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			num_heads,
 			left_pos,
 			right_pos,
-			points_per_block
+			points_per_block,
+			blockDim_head
 		);
 
 		__syncthreads();
