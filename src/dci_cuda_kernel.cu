@@ -693,7 +693,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	int head_threadIdx = threadIdx.x % thread_per_head;
 	
 	// adjust thread_size and blocker_size by the number of head
-	int gridDim_head = (int) (gridDim.x / num_heads);
+	//int gridDim_head = (int) (gridDim.x / num_heads);
 	int blockDim_head = (int) (blockDim.x / num_heads);
 
 	int points_per_block = (dci_inst->num_points + gridDim.x - 1) / gridDim.x; // default number of data processed by a block
@@ -768,12 +768,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
-		if (blockIdx.x == 0) {
-			if (threadIdx.x == 0) {
-				printf("blockDim_head = %d | gridDim_head = %d\n", blockDim_head, gridDim_head);
-			}
-		}
-
+		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				//for (int b = 0; b < block_size; b++) {
@@ -836,6 +831,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
+		*/
 
 		/*
 		if (blockIdx.x == 0) {
@@ -880,6 +876,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
+		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				printf("init_index_priority left_pos\n");
@@ -977,12 +974,12 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
+		*/
 
 		// ---------------------------------------------------------------------
 		// Possible problem 1
 		// confirm issue: number_candidate not increase
 		// ---------------------------------------------------------------------
-		/*
 		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim_head) {
 
 			if ((threadIdx.x % thread_per_head) == 0) {
@@ -1044,6 +1041,21 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					// need to calculate cur_index based on current head 
 					// this also mean it now process less number of index but work on multiple head
 					int cur_index = position[curr_head] + head_threadIdx;
+
+					if (blockIdx.x == 0) {
+						if (threadIdx.x == 0) {
+							printf("\n");
+							printf("count_size: %d\n", dci_inst->num_points * dci_inst->num_comp_indices * num_heads);
+							for (int ni = 0; ni < num_heads; ni++) {
+								printf("Head: %d\n", ni);
+								for (int ch = 0; ch < dci_inst->num_points * dci_inst->num_comp_indices; ch++) {
+									printf("%d ", counts[dci_inst->num_points * dci_inst->num_comp_indices *ni + ch]);
+								}
+								printf("\n");
+							}
+							printf("\n");
+						}
+					}
 
 					// possible issue 1: cur_index < num_points_in_block
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
@@ -1143,7 +1155,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								&(dci_inst->indices[i[curr_head] * (dci_inst->num_points)
 										+ blockIdx.x * points_per_block]),
 								&(left_pos[i[curr_head]]), &(right_pos[i[curr_head]]), query_proj_column[i[curr_head]], // need reconsider
-								num_points_in_block);
+								num_points_in_block, blockDim_head);
 
 						if ((cur_pos[i[curr_head]] < 0) && (cur_pos[i[curr_head]] > -blockDim_head)) {
 							position[curr_head] = 0;
@@ -1194,7 +1206,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			    break;
 			}
 		}
-		*/
 
 		__syncthreads();
 		
