@@ -1012,8 +1012,9 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					if (blockIdx.x == 0) {
 						if (threadIdx.x == 0) {
 							printf("\n");
-							printf("head = 0 | i = %d | position = %f\n", i[0], position[0]);
-							printf("head = 1 | i = %d | position = %f\n", i[1], position[1]);
+							printf("k = %d | m = %d \n", k, m);
+							printf("head = 0 | i = %d | position = %d\n", i[0], position[0]);
+							printf("head = 1 | i = %d | position = %d\n", i[1], position[1]);
 						}
 					}
 				}
