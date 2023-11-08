@@ -994,7 +994,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 				if (blockIdx.x == 0) {
 					if (threadIdx.x == 0) {
-						printf("\n")
+						printf("\n");
 						printf("head: 0 | top_index_priority: %f | top_h: %d\n", top_index_priority[0], top_h[0]);
 						printf("head: 1 | top_index_priority: %f | top_h: %d\n", top_index_priority[1], top_h[1]);
 					}
