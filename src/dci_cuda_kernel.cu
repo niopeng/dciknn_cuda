@@ -671,7 +671,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 	int thread_per_head = (int) (blockDim.x / num_heads);
 	int curr_head = (int) (threadIdx.x / thread_per_head);
-	int curr_start = curr_head * thread_per_head;
+	//int curr_start = curr_head * thread_per_head;
 
 	// for each head there are a number of thread assign to each head, and head_threadIdx is just thread id adjust to head
 	int head_threadIdx = threadIdx.x % thread_per_head;
@@ -1712,7 +1712,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				d_top_candidates_index, 
 				d_all_candidates,
 				counts, 
-				candidate_dists,
+				candidate_dists
 			);
 
 		cudaDeviceSynchronize();
