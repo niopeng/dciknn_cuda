@@ -683,6 +683,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	int curr_head = (int) (threadIdx.x / thread_per_head);
 	int curr_start = curr_head * thread_per_head;
 
+	printf("blockIdx.x: %d | threadIdx.x: %d\n", blockIdx.x, threadIdx.x);
+
 	//if (blockIdx.x == 0) {
 	//	if (threadIdx.x == 0) {
 	//		printf("thread_per_head = %d | curr_head = %d | curr_start = %d\n", thread_per_head, curr_head, curr_start);
@@ -1169,10 +1171,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					}
 				}
 				k[curr_head] = k[curr_head] + 1;
-
-				if (curr_head == 0) {
-					printf("%d ", k[curr_head]);
-				}
 			}
 
 			__syncthreads();
