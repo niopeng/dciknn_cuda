@@ -1106,8 +1106,11 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 							}
 						}
 					}
-					
-					__syncthreads();
+				}
+
+				__syncthreads();
+				
+				if (top_h[curr_head] >= 0) {
 					// use the first thread to update
 					if ((threadIdx.x % thread_per_head) == 0) {
 
