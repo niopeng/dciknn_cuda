@@ -966,7 +966,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		}
 		*/
 
-		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
+		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim_head) {
 
 			if ((threadIdx.x % thread_per_head) == 0) {
 				m[curr_head] = 0;
@@ -1033,9 +1033,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						}
 					}
 					*/
-					if (blockIdx.x == 0) {
-						printf("%d ", cur_index);
-					}
 
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
 						int cur_point = dci_inst->indices[cur_index
