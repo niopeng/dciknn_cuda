@@ -966,10 +966,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		}
 		*/
 
-		// ---------------------------------------------------------------------
-		// Possible problem 1
-		// confirm issue: number_candidate not increase
-		// ---------------------------------------------------------------------
 		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim_head) {
 
 			if ((threadIdx.x % thread_per_head) == 0) {
@@ -1020,7 +1016,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					// need to calculate cur_index based on current head 
 					// this also mean it now process less number of index but work on multiple head
 					int cur_index = position[curr_head] + head_threadIdx;
-					__syncthreads();
 
 					/*
 					if (blockIdx.x == 0) {
@@ -1039,7 +1034,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					}
 					*/
 
-					// possible issue 1: cur_index < num_points_in_block
+					printf("%d ", cur_index);
+
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
 						int cur_point = dci_inst->indices[cur_index
 								+ dci_inst->num_points * i[curr_head]
