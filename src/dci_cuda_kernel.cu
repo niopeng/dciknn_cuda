@@ -1168,10 +1168,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			free(index_priority);
 
 			free(top_index_priority); 
-			free(k);
 			free(top_h);
 			free(position);
-			free(m);
 			free(i);
 			free(could_break);
 		}
