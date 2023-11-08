@@ -701,6 +701,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 	if (num_points_in_block > 0) {
 		// shared value is an array, each value in the array is correspond to a head
 		// the array size is num_heads
+		__shared__ int could_break_all;
 		__shared__ float *top_index_priority;
 		__shared__ int *k;
 		__shared__ int *top_h;
@@ -731,6 +732,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 			k[curr_head] = 0;
 			could_break[curr_head] = false;
+			could_break_all = 0;
 		}
 
 		__syncthreads();
@@ -957,8 +959,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		}
 		*/
 
-		//while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim_head) {
-		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
+		//while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
+		while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim_head) {
 
 			if ((threadIdx.x % thread_per_head) == 0) {
 				m[curr_head] = 0;
@@ -1125,15 +1127,17 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				__syncthreads();
 			}
 
-			// k judgement
+		
 			if ((threadIdx.x % thread_per_head) == 0) {
-				if (num_candidates >= num_neighbours) {
-					if (k[curr_head] + 1
-							>= query_config.num_outer_iterations
-									* dci_inst->num_simp_indices
-							|| num_candidates >= query_config.max_num_candidates) {
-						could_break[curr_head] = true;
-						break;
+				if (!could_break[curr_head]) {
+					if (num_candidates >= num_neighbours) {
+						if (k[curr_head] + 1
+								>= query_config.num_outer_iterations
+										* dci_inst->num_simp_indices
+								|| num_candidates >= query_config.max_num_candidates) {
+							could_break[curr_head] = true;
+							could_break_all++;
+						}
 					}
 				}
 				k[curr_head] = k[curr_head] + 1;
@@ -1141,7 +1145,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 			__syncthreads();
 
-			if (could_break[curr_head]) {
+			// need to ensure all could_break is could break 
+			if (could_break_all == num_heads) {
 			    break;
 			}
 		}
