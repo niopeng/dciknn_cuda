@@ -1145,9 +1145,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			if (threadIdx.x == 0) {
 				k = k + 1;
 			}
-
-			printf("%d ", k);
-
+			
 			__syncthreads();
 
 			// need to ensure all could_break is could break 
