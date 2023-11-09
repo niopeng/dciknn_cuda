@@ -1146,7 +1146,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				k = k + 1;
 			}
 
-			printf("%d ", top_h[curr_head]);
+			printf("%d ", k);
 
 			__syncthreads();
 
