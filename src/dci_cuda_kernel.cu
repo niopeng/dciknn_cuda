@@ -1122,8 +1122,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 					}
 				}
 
-				printf("%d ", top_h[curr_head]);
-
 				if (threadIdx.x == 0) {
 					m = m + 1;
 					//printf("threadID.x = %d | m = %d\n", threadIdx.x, m[curr_head]);
@@ -1147,6 +1145,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			if (threadIdx.x == 0) {
 				k = k + 1;
 			}
+
+			printf("%d ", top_h[curr_head]);
 
 			__syncthreads();
 
