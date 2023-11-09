@@ -1089,8 +1089,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 				__syncthreads();
 
-				printf("%d ", top_h[curr_head]);
-
 				if (top_h[curr_head] >= 0) {
 					// use the first thread to update
 					if ((threadIdx.x % thread_per_head) == 0) {
@@ -1123,6 +1121,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						}
 					}
 				}
+
+				printf("%d ", top_h[curr_head]);
 
 				if (threadIdx.x == 0) {
 					m = m + 1;
