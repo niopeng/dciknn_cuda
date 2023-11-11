@@ -648,7 +648,7 @@ __global__ void init_candidate_indices(const dci* const dci_inst,
 __global__
 static void dci_query_single_point_by_block(const dci* const dci_inst,
 		const int num_neighbours, const int num_queries, 
-		const float* const query, const float* const query_proj_column, const float* const query_proj, // query_proj is used for debugging
+		const float* const query, const float* const query_proj_column,
 		const dci_query_config query_config, float* const d_top_candidates_dist, 
 		int* const d_top_candidates_index, int* const all_candidates, 
 		int* counts, float* candidate_dists) {
@@ -778,71 +778,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
-		
-		for (int ch = 0; ch < num_heads; ch++) {
-			search_index_original(
-					dci_inst, 
-					&(query_proj[num_indices * num_queries * ch]), 
-					num_indices, 
-					&(dci_inst->indices[dci_inst->num_points * num_indices * ch]),
-					&(left_pos2[num_indices * ch]), 
-					&(right_pos2[num_indices * ch]),
-					points_per_block); // one head testing, result should be the same or similar partten
-		}
-
-		if (blockIdx.x == 0) {
-			if (threadIdx.x == 0) {
-				//for (int b = 0; b < block_size; b++) {
-				//printf("block: %d\n", b);
-				printf("search_index left_pos\n");
-				for (int ch = 0; ch < num_heads; ch++) {
-					//printf("head: %d\n", ch);
-					printf("head: %d\n", ch);
-					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%d ", left_pos2[ch * num_indices + ni]);
-					}
-					printf("\n");
-				}
-				printf("\n");
-				printf("search_index right_pos\n");
-				for (int ch = 0; ch < num_heads; ch++) {
-					printf("head: %d\n", ch);
-					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%d ", right_pos2[ch * num_indices + ni]);
-					}
-					printf("\n");
-				}
-				printf("\n");
-			}
-		}
-		*/
-
-		/*
-		if (blockIdx.x == 0) {
-			if (threadIdx.x == 0) {
-				//for (int b = 0; b < block_size; b++) {
-				//printf("block: %d\n", b);
-				printf("search_index_original left_pos\n");
-				for (int ch = 0; ch < num_heads; ch++) {
-					//printf("head: %d\n", ch);
-					printf("head: %d\n", ch);
-					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%d ", left_pos[ch * num_indices + ni]);
-					}
-					printf("\n");
-				}
-				printf("\n");
-				printf("search_index_original right_pos\n");
-				for (int ch = 0; ch < num_heads; ch++) {
-					printf("head: %d\n", ch);
-					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%d ", right_pos[ch * num_indices + ni]);
-					}
-					printf("\n");
-				}
-				printf("\n");
-			}
-		}
 		*/
 
 		init_index_priority(
@@ -902,62 +837,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
-
-		for (int ch = 0; ch < num_heads; ch++) {
-			init_index_priority_original(
-					dci_inst,
-					&(query_proj[num_indices * num_queries * ch]), 
-					num_indices,
-					&(dci_inst->indices[dci_inst->num_points * num_indices * ch]),
-					&(left_pos2[num_indices * ch]), 
-					&(right_pos2[num_indices * ch]),
-					&(index_priority2[num_indices * ch]),
-					&(cur_pos2[num_indices * ch]), 
-					points_per_block
-				);
-		}
-
-		if (blockIdx.x == 0) {
-			if (threadIdx.x == 0) {
-				printf("init_index_priority left_pos\n");
-				for (int ch = 0; ch < num_heads; ch++) {
-					//printf("head: %d\n", ch);
-					printf("head: %d\n", ch);
-					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%d ", left_pos2[ch * num_indices + ni]);
-					}
-					printf("\n");
-				}
-				printf("\n");
-				printf("init_index_priority right_pos\n");
-				for (int ch = 0; ch < num_heads; ch++) {
-					printf("head: %d\n", ch);
-					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%d ", right_pos2[ch * num_indices + ni]);
-					}
-					printf("\n");
-				}
-				printf("\n");
-				printf("init_index_priority cur_pos\n");
-				for (int ch = 0; ch < num_heads; ch++) {
-					printf("head: %d\n", ch);
-					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%d ", cur_pos2[ch * num_indices + ni]);
-					}
-					printf("\n");
-				}
-				printf("\n");
-				printf("init_index_priority cur_pos\n");
-				for (int ch = 0; ch < num_heads; ch++) {
-					printf("head: %d\n", ch);
-					for (int ni = 0; ni < num_indices; ni++) {
-						printf("%f ", index_priority2[ch * num_indices + ni]);
-					}
-					printf("\n");
-				}
-				printf("\n");
-			}
-		}
 		*/
 
 		//while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
@@ -1010,8 +889,12 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								+ dci_inst->num_points * i[curr_head]
 								+ blockIdx.x * points_per_block].value; // cur_point is index within the head (need adjust to head)
 
-						counts[cur_point + dci_inst->num_points * m
-								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]++;
+						// use atomic operation
+						//counts[cur_point + dci_inst->num_points * m
+						//		+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]++;
+
+						atomicAdd(&(counts[cur_point + dci_inst->num_points * m
+								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]), 1);
 
 						// possible issue 2
 						//int cur_index = position[curr_head] + head_threadIdx;
@@ -1124,7 +1007,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 				if (threadIdx.x == 0) {
 					m = m + 1;
-					//printf("threadID.x = %d | m = %d\n", threadIdx.x, m[curr_head]);
 				}
 				__syncthreads();
 			}
@@ -1145,7 +1027,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			if (threadIdx.x == 0) {
 				k = k + 1;
 			}
-			
+
 			__syncthreads();
 
 			// need to ensure all could_break is could break 
@@ -1713,7 +1595,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				num_queries,
 				&(query[j * dim]), // need work on
 				&(query_proj_column[j * num_indices * num_heads]), 
-				&(query_proj[j * num_indices * num_heads]),
 				*d_query_config,
 				d_top_candidates_dist, 
 				d_top_candidates_index, 
