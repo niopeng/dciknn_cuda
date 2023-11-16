@@ -46,7 +46,7 @@ def main():
     num_pts = 3000
     num_queries = 500
     #num_heads = 1
-    num_heads = 4
+    num_heads = 2
 
     #intrinsic_dim = 100
     intrinsic_dim = 400
@@ -74,7 +74,7 @@ def main():
     #num_simp_indices = 10
     #num_outer_iterations = 80
     block_size = 100
-    thread_size = 40
+    thread_size = 20
     num_comp_indices = 2
     num_simp_indices = 10
     num_outer_iterations = 5000
@@ -111,10 +111,10 @@ def main():
         #print("Query 2:", query[1, :, :])
 
         a = datetime.datetime.now()
-        dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
-        #dci_db = DCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+        ##dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+        dci_db = DCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
-        #dci_db.add(data)
+        dci_db.add(data)
         
         ## Query
         dci_db.query(query, num_neighbours, num_outer_iterations)
