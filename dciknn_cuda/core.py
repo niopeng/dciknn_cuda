@@ -21,7 +21,22 @@ from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _d
 
 from math import sqrt
 
+def get_num_head(num_heads, num_devices):
+    curr_num = num_heads
+    num_head_split = num_heads // num_devices
+    num_head_list = []
 
+    for i in range(num_devices):
+        if (curr_num >= num_head_split):
+            num_head_list.extend(num_head_split)
+            curr_num = curr_num - num_head_split
+        else:
+            num_head_list.extend(curr_num)
+            curr_num = 0
+
+    return num_head_list
+
+# single GPU dci_knn
 class DCI(object):
 
     def __init__(self, dim, num_heads, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10, device=0):
@@ -119,16 +134,23 @@ class DCI(object):
         self._array = None
 
 class MDCI(object):
-    def __init__(self, dim, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10, devices=[0]):
-        # if len(devices) < 2:
-        #     raise RuntimeError("You should specify at least two GPU for multi-GPU DCI to work")
-        
+
+    def __init__(self, dim, num_heads, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10, devices=[0]):
         self.devices = devices
         self.num_devices = len(devices)
-        self.dcis = [DCI(dim, num_comp_indices, num_simp_indices, bs, ts, dev) for dev in devices]
         self.data_per_device = 0
-        
-    
+        self.dcis = []
+
+        # more than one head - assign heads to each device
+        if (num_heads > 1):
+            num_head_list = get_num_head(num_heads, self.num_devices)
+            for i in range(self.num_devices):
+                dci_db = DCI(dim, num_head_list[i], num_comp_indices, num_simp_indices, bs, ts, self.devices[i])
+                self.dcis.extend(dci_db)
+        # one head - assign data to each device
+        else:
+            self.dcis = [DCI(dim, num_heads, num_comp_indices, num_simp_indices, bs, ts, dev) for dev in devices]
+
     def add(self, data):
         self.data_per_device = data.shape[0] // self.num_devices + 1
         for dev_ind in range(self.num_devices):
