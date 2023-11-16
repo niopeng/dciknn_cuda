@@ -96,8 +96,8 @@ class DCI(object):
 
         print(self.num_heads)
         print(num_queries)
-        print(_query.shape())
-        print(_query.flatten().shape())
+        print(_query.shape)
+        print(_query.flatten().shape)
         print(num_neighbours)
 
         #_dci_query(self._dci_inst, self._dim, self.num_heads, num_queries, _query.flatten(),
