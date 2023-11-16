@@ -96,16 +96,16 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
 
     const at::cuda::OptionalCUDAGuard device_guard(device_of(py_query));
 
-    PyObject *py_obj = py_dci_inst_wrapper.ptr();
-    py_dci *py_dci_inst = (py_dci *)PyCapsule_GetPointer(py_obj, "py_dci_inst");
+    //PyObject *py_obj = py_dci_inst_wrapper.ptr();
+    //py_dci *py_dci_inst = (py_dci *)PyCapsule_GetPointer(py_obj, "py_dci_inst");
 
     // Assuming row-major layout, py_query->data is N x D, where N is the number of queries and D is the dimensionality
-    float* query = (float *)py_query.data_ptr();
+    //float* query = (float *)py_query.data_ptr();
 
-    dci_query_config query_config = {blind, num_outer_iterations, max_num_candidates};
-    int*  final_outputs;
-    float* final_distances;
-    const int output_size = num_neighbours * num_queries * num_heads;
+    //dci_query_config query_config = {blind, num_outer_iterations, max_num_candidates};
+    //int*  final_outputs;
+    //float* final_distances;
+    //const int output_size = num_neighbours * num_queries * num_heads;
     //cudaMalloc((void **) &(final_outputs), sizeof(int) * output_size);
     //cudaMalloc((void **) &(final_distances), sizeof(float) * output_size);
 
