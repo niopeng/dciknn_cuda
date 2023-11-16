@@ -92,8 +92,6 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     torch::Tensor py_query, const int num_neighbours, const bool blind, 
     const int num_outer_iterations, const int max_num_candidates, const int block_size, const int thread_size) {
 
-    //printf("py_dci_query in dci_cuda.cpp\n");
-
     const at::cuda::OptionalCUDAGuard device_guard(device_of(py_query));
 
     PyObject *py_obj = py_dci_inst_wrapper.ptr();

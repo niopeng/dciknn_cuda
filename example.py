@@ -46,7 +46,7 @@ def main():
     num_pts = 3000
     num_queries = 500
     #num_heads = 1
-    num_heads = 4
+    num_heads = 2
 
     #intrinsic_dim = 100
     intrinsic_dim = 400

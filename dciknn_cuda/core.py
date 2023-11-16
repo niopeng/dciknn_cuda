@@ -94,18 +94,26 @@ class DCI(object):
         num_queries = _query.shape[1]
         #_query_column = torch.permute(_query, (1, 0, 2))
 
+        print(self._dim)
+        print(self.num_heads)
+        print(num_queries)
         print(_query.shape)
+        print(_query.flatten().shape)
+        print(num_neighbours)
+        print(blind)
+        print(num_outer_iterations)
+        print(max_num_candidates)
+        print(self._block_size)
+        print(self._thread_size)
 
         #_dci_query(self._dci_inst, self._dim, self.num_heads, num_queries, _query.flatten(),
         #           num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
 
-        _query_result = _dci_query(self._dci_inst, self._dim, self.num_heads, num_queries, _query.flatten(),
-                   num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
-        
-        #print(_query_result.shape)
+        #_query_result = _dci_query(self._dci_inst, self._dim, self.num_heads, num_queries, _query.flatten(),
+        #           num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
     
-        half = _query_result.shape[0] // 2
-        return _query_result[:half].reshape(_query.shape[0], -1), _query_result[half:].reshape(_query.shape[0], -1)
+        #half = _query_result.shape[0] // 2
+        #return _query_result[:half].reshape(_query.shape[0], -1), _query_result[half:].reshape(_query.shape[0], -1)
 
     def clear(self):
         _dci_clear(self._dci_inst)
