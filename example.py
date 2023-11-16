@@ -110,9 +110,6 @@ def main():
         #print("Query 1:", query[0, :, :])
         #print("Query 2:", query[1, :, :])
 
-        print(data.shape)
-        print(query.shape)
-
         a = datetime.datetime.now()
         dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
         #dci_db = DCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
@@ -120,7 +117,7 @@ def main():
         #dci_db.add(data)
         
         ## Query
-        #dci_db.query(query, num_neighbours, num_outer_iterations)
+        dci_db.query(query, num_neighbours, num_outer_iterations)
         #indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
         #torch.set_printoptions(threshold=10000)
         #print("Nearest Indices:", indices)

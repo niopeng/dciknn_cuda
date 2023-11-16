@@ -94,8 +94,14 @@ class DCI(object):
         num_queries = _query.shape[1]
         #_query_column = torch.permute(_query, (1, 0, 2))
 
-        _dci_query(self._dci_inst, self._dim, self.num_heads, num_queries, _query.flatten(),
-                   num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
+        print(self.num_heads)
+        print(num_queries)
+        print(_query.shape())
+        print(_query.flatten().shape())
+        print(num_neighbours)
+
+        #_dci_query(self._dci_inst, self._dim, self.num_heads, num_queries, _query.flatten(),
+        #           num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
 
         #_query_result = _dci_query(self._dci_inst, self._dim, self.num_heads, num_queries, _query.flatten(),
         #           num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
