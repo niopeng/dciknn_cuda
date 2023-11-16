@@ -95,7 +95,7 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     // num_heads = 4, thread_size = 40, Segmentation fault
     const at::cuda::OptionalCUDAGuard device_guard(device_of(py_query));
 
-    //PyObject *py_obj = py_dci_inst_wrapper.ptr();
+    PyObject *py_obj = py_dci_inst_wrapper.ptr();
     py_dci *py_dci_inst = (py_dci *)PyCapsule_GetPointer(py_obj, "py_dci_inst");
 
     // Assuming row-major layout, py_query->data is N x D, where N is the number of queries and D is the dimensionality
