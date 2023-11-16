@@ -73,8 +73,8 @@ def main():
     #num_comp_indices = 2
     #num_simp_indices = 10
     #num_outer_iterations = 80
-    block_size = 100
-    thread_size = 40
+    block_size = 200
+    thread_size = 20
     num_comp_indices = 2
     num_simp_indices = 10
     num_outer_iterations = 5000
