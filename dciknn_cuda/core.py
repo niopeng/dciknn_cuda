@@ -139,7 +139,7 @@ class MDCI(object):
         self.devices = devices
         self.num_devices = len(devices)
         self.num_heads = num_heads
-        self.num_head_split = num_heads // self.num_devices
+        self.num_head_split = 0
         self.data_per_device = 0
         self.num_head_list = []
         self.dcis = []
@@ -156,16 +156,21 @@ class MDCI(object):
 
     def add(self, data):
         if (self.num_heads > 1):
+            self.num_head_split = self.num_heads // self.num_devices + 1
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
                 curr_num_head = self.num_head_list[dev_ind]
-                cur_data = data[dev_ind * self.num_head_split: dev_ind * self.num_head_split + curr_num_head, :, :].to(device)
-                self.dcis[dev_ind].add(cur_data)
+
+                #cur_data = data[dev_ind * self.num_head_split: dev_ind * self.num_head_split + curr_num_head, :, :].to(device)
+                #self.dcis[dev_ind].add(cur_data)
         else:
-            self.data_per_device = data.shape[0] // self.num_devices + 1
+            self.data_per_device = data.shape[1] // self.num_devices + 1 
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
                 cur_data = data[:, dev_ind * self.data_per_device: dev_ind * self.data_per_device + self.data_per_device, :].to(device)
+                
+                print(cur_data.shape)
+                
                 self.dcis[dev_ind].add(cur_data)
         
     def query(self, query, num_neighbours=-1, num_outer_iterations=5000, blind=False):
