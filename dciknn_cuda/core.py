@@ -158,11 +158,12 @@ class MDCI(object):
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
                 curr_num_head = self.num_head_list[dev_ind]
+
         else:
             self.data_per_device = data.shape[0] // self.num_devices + 1
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
-                cur_data = data[dev_ind * self.data_per_device: dev_ind * self.data_per_device + self.data_per_device].to(device)
+                cur_data = data[:, dev_ind * self.data_per_device: dev_ind * self.data_per_device + self.data_per_device, :].to(device)
                 self.dcis[dev_ind].add(cur_data)
         
     def query(self, query, num_neighbours=-1, num_outer_iterations=5000, blind=False):
