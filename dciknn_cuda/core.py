@@ -28,10 +28,10 @@ def get_num_head(num_heads, num_devices):
 
     for i in range(num_devices):
         if (curr_num >= num_head_split):
-            num_head_list.extend(num_head_split)
+            num_head_list.append(num_head_split)
             curr_num = curr_num - num_head_split
         else:
-            num_head_list.extend(curr_num)
+            num_head_list.append(curr_num)
             curr_num = 0
 
     return num_head_list
@@ -146,7 +146,7 @@ class MDCI(object):
             num_head_list = get_num_head(num_heads, self.num_devices)
             for i in range(self.num_devices):
                 dci_db = DCI(dim, num_head_list[i], num_comp_indices, num_simp_indices, bs, ts, self.devices[i])
-                self.dcis.extend(dci_db)
+                self.dcis.append(dci_db)
         # one head - assign data to each device
         else:
             self.dcis = [DCI(dim, num_heads, num_comp_indices, num_simp_indices, bs, ts, dev) for dev in devices]
