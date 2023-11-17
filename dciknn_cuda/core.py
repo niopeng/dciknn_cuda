@@ -138,27 +138,32 @@ class MDCI(object):
     def __init__(self, dim, num_heads, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10, devices=[0]):
         self.devices = devices
         self.num_devices = len(devices)
+        self.num_heads = num_heads
         self.data_per_device = 0
+        self.num_head_list = []
         self.dcis = []
 
         # more than one head - assign heads to each device
-        if (num_heads > 1):
-            num_head_list = get_num_head(num_heads, self.num_devices)
+        if (self.num_heads > 1):
+            self.num_head_list = get_num_head(self.num_heads, self.num_devices)
             for i in range(self.num_devices):
-                dci_db = DCI(dim, num_head_list[i], num_comp_indices, num_simp_indices, bs, ts, self.devices[i])
+                dci_db = DCI(dim, self.num_head_list[i], num_comp_indices, num_simp_indices, bs, ts, self.devices[i])
                 self.dcis.append(dci_db)
         # one head - assign data to each device
         else:
-            self.dcis = [DCI(dim, num_heads, num_comp_indices, num_simp_indices, bs, ts, dev) for dev in devices]
+            self.dcis = [DCI(dim, self.num_heads, num_comp_indices, num_simp_indices, bs, ts, dev) for dev in devices]
 
-        print(self.dcis.shape)
+        print(len(self.dcis))
 
     def add(self, data):
-        self.data_per_device = data.shape[0] // self.num_devices + 1
-        for dev_ind in range(self.num_devices):
-            device = self.devices[dev_ind]
-            cur_data = data[dev_ind * self.data_per_device: dev_ind * self.data_per_device + self.data_per_device].to(device)
-            self.dcis[dev_ind].add(cur_data)
+        if (self.num_heads > 0):
+            self.data_per_device = data.shape[0] // self.num_devices + 1
+            for dev_ind in range(self.num_devices):
+                device = self.devices[dev_ind]
+                cur_data = data[dev_ind * self.data_per_device: dev_ind * self.data_per_device + self.data_per_device].to(device)
+                self.dcis[dev_ind].add(cur_data)
+        #else:
+
         
     def query(self, query, num_neighbours=-1, num_outer_iterations=5000, blind=False):
         dists = []
