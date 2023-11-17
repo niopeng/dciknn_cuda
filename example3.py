@@ -84,6 +84,12 @@ def main():
         #a = datetime.datetime.now()
         dci_db = MDCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, devices=[0, 1])
 
+        data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
+        query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
+
+        print(data.shape)
+        print(query.shape)
+
         #dci_db.add(data)
         # Query
         #indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
