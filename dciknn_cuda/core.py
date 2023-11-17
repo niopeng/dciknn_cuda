@@ -151,6 +151,8 @@ class MDCI(object):
         else:
             self.dcis = [DCI(dim, num_heads, num_comp_indices, num_simp_indices, bs, ts, dev) for dev in devices]
 
+        print(self.dcis.shape)
+
     def add(self, data):
         self.data_per_device = data.shape[0] // self.num_devices + 1
         for dev_ind in range(self.num_devices):
