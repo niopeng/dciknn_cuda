@@ -139,6 +139,7 @@ class MDCI(object):
         self.devices = devices
         self.num_devices = len(devices)
         self.num_heads = num_heads
+        self.num_head_split = num_heads // self.num_devices
         self.data_per_device = 0
         self.num_head_list = []
         self.dcis = []
@@ -158,7 +159,8 @@ class MDCI(object):
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
                 curr_num_head = self.num_head_list[dev_ind]
-
+                cur_data = data[dev_ind * self.num_head_split: dev_ind * self.num_head_split + curr_num_head, :, :].to(device)
+                self.dcis[dev_ind].add(cur_data)
         else:
             self.data_per_device = data.shape[0] // self.num_devices + 1
             for dev_ind in range(self.num_devices):
