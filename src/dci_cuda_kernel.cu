@@ -1584,7 +1584,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
-		/*
 		dci_query_single_point_by_block<<<block_size, thread_size>>>(
 				dci_inst,
 				num_neighbours, 
@@ -1601,6 +1600,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
+		/*
 		// candidate_dists
 		int data_total, data_size;
 		float* h_data;
@@ -1864,7 +1864,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		}
 		*/
 
-		//break;
+		break;
 	}
 
 	// free the allocated memories
