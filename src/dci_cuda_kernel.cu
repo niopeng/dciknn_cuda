@@ -1864,7 +1864,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		}
 		*/
 
-		break;
+		//break;
 	}
 
 	// free the allocated memories
