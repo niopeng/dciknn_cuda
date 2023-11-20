@@ -39,8 +39,8 @@ def main():
     #                                                                                                                                           #
     #############################################################################################################################################
     #dim = 10
-    num_pts = 3000
-    num_queries = 100
+    num_pts = 2000 # 2000 - 3000, an illegal memory access was encountered
+    num_queries = 200
     #num_heads = 1
     dim = 100
     #num_pts = 3000
