@@ -39,14 +39,14 @@ def main():
     #                                                                                                                                           #
     #############################################################################################################################################
     #dim = 10
-    #num_pts = 100
-    #num_queries = 50
+    num_pts = 1500
+    num_queries = 250
     #num_heads = 1
     dim = 100
-    num_pts = 3000
-    num_queries = 500
+    #num_pts = 3000
+    #num_queries = 500
     #num_heads = 1
-    num_heads = 2
+    num_heads = 4
 
     #intrinsic_dim = 100
     intrinsic_dim = 400
