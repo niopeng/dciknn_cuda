@@ -1837,7 +1837,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		//		counts, candidate_dists);
 
 		// get the final output
-		/*
 		if (!query_config.blind) {
 			for (int h = 0; h < num_heads; h++) {
 				get_top_candidates(
@@ -1862,7 +1861,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 					block_size * max_possible_num_candidates
 				);
 		}
-		*/
 
 		break;
 	}
