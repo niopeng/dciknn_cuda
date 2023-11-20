@@ -39,12 +39,12 @@ def main():
     #                                                                                                                                           #
     #############################################################################################################################################
     #dim = 10
-    #num_pts = 100
-    #num_queries = 50
+    num_pts = 100
+    num_queries = 50
     #num_heads = 1
     dim = 100
-    num_pts = 3000
-    num_queries = 500
+    #num_pts = 3000
+    #num_queries = 500
     #num_heads = 1
     num_heads = 4
 
@@ -118,8 +118,8 @@ def main():
         ## Query
         ##dci_db.query(query, num_neighbours, num_outer_iterations)
         indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
-        #torch.set_printoptions(threshold=10000)
-        #print("Nearest Indices:", indices)
+        torch.set_printoptions(threshold=10000)
+        print("Nearest Indices:", indices)
         print("Indices Distances:", dists)
         dci_db.clear()
         b = datetime.datetime.now()
