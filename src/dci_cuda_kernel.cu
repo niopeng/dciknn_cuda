@@ -377,7 +377,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	printf("\n");
 	*/
 
-	print("dim = %d | num_indices = %d | num_heads = %d\n", dim, num_indices, num_heads);
+	printf("dim = %d | num_indices = %d | num_heads = %d\n", dim, num_indices, num_heads);
 	
 	/* Synchronize the threads */
 	cudaDeviceSynchronize();
@@ -1611,7 +1611,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	cudaMallocManaged((void **) (&candidate_dists),
 			sizeof(float) * dci_inst->num_points * num_heads);
 
-	print("dim = %d | num_indices = %d | num_heads = %d\n", dim, num_indices, num_heads);
+	printf("dim = %d | num_indices = %d | num_heads = %d\n", dim, num_indices, num_heads);
 
 	for (int j = 0; j < num_queries; j++) { 
 		// need to refresh the result holder to avoid carry over results
