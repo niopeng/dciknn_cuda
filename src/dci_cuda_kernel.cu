@@ -1617,7 +1617,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		for (int j = 0; j < num_heads; j ++) {
 			printf("head %d\n", j);
 			for (int i = 0; i < (dci_inst->num_points * dim); i++) {
-				printf("%f ", h_data[i + dci_inst->num_points * dim * j]);
+				printf("%f ", h_data[j + dci_inst->num_points * dim * i]);
 			}
 			printf("\n");
 		}
