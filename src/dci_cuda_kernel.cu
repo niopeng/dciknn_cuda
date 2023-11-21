@@ -1539,7 +1539,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	cudaMallocManaged((void **) (&query_proj_column),
 			sizeof(float) * num_indices * num_queries * num_heads);		
 
-
 	// testing
 	int data_size = sizeof(float) * dci_inst->dim * num_indices * num_heads;
 	float* h_data = (float *) malloc(data_size);
@@ -1582,8 +1581,10 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			devId
 		);
 	}
+	cudaDeviceSynchronize();
 
 	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
+	cudaDeviceSynchronize();
 
 	/*print result - testing*/
 	/*
