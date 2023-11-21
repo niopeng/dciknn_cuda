@@ -95,7 +95,7 @@ void dci_gen_proj_vec(float* const proj_vec, const int dim,
 void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int num_comp_indices,
 		const int num_simp_indices, const int devId) {
 
-	printf("dci_init in dci_cuda_kernel.cu\n");
+	//printf("dci_init in dci_cuda_kernel.cu\n");
 
 	int num_indices = num_comp_indices * num_simp_indices;
 
@@ -377,7 +377,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	printf("\n");
 	*/
 
-	printf("dim = %d | num_indices = %d | num_heads = %d\n", dim, num_indices, num_heads);
+	//printf("dim = %d | num_indices = %d | num_heads = %d\n", dim, num_indices, num_heads);
 	
 	/* Synchronize the threads */
 	cudaDeviceSynchronize();
@@ -1510,8 +1510,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		float* const nearest_neighbour_dists, const int block_size,
 		const int thread_size) {
 
-	printf("dci_query in dci_cuda_kernel.cu | thread_size = %d\n", thread_size);
-
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	int max_possible_num_candidates = min(query_config.max_num_candidates,
 			query_config.num_outer_iterations);
@@ -1527,6 +1525,28 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	// for fixing timeout
 	void* dummy;
 	cudaMalloc(&dummy, 1);
+
+	// testing
+	int data_size = sizeof(float) * dci_inst->dim * num_indices * num_heads;
+	float* h_data = (float *) malloc(data_size);
+	cudaMemcpy(h_data, dci_inst->data, data_size, cudaMemcpyDeviceToHost);
+	printf("dci_add, dci_inst->data");
+	for (int h = 0; h < num_heads; h++) {
+		printf("head: %d\n", h);
+		for (int i = 0; i < num_indices; i++) {
+			printf("index: %d\n", i);
+			for (int j = 0; j < dim; j++) {
+				printf("%f ", h_data[j + num_indices * i + num_indices * dci_inst->dim * h]);
+			}
+			printf("\n");
+		}
+		printf("head: %d\n", h);
+	}
+	cudaFree(h_data);
+	printf("\n");
+	printf("dci_inst->dim %d\n", dci_inst->dim);
+	printf("dci_inst->num_points %d\n", dci_inst->num_points);
+	// testing
 
 	// calculate query_proj
 	int devId = 0;
@@ -1611,7 +1631,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	cudaMallocManaged((void **) (&candidate_dists),
 			sizeof(float) * dci_inst->num_points * num_heads);
 
-	printf("dim = %d | num_indices = %d | num_heads = %d\n", dim, num_indices, num_heads);
+
 
 	for (int j = 0; j < num_queries; j++) { 
 		// need to refresh the result holder to avoid carry over results
