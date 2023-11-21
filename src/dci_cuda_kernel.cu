@@ -1528,6 +1528,18 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 	// data printf work here
 
+	// calculate query_proj
+	int devId = 0;
+	float* query_proj;
+	float* query_proj_column;
+
+	cudaMallocManaged((void **) (&query_proj),
+			sizeof(float) * num_indices * num_queries * num_heads);
+
+	cudaMallocManaged((void **) (&query_proj_column),
+			sizeof(float) * num_indices * num_queries * num_heads);		
+
+
 	// testing
 	int data_size = sizeof(float) * dci_inst->dim * num_indices * num_heads;
 	float* h_data = (float *) malloc(data_size);
@@ -1549,17 +1561,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	printf("dci_inst->dim %d\n", dci_inst->dim);
 	printf("dci_inst->num_points %d\n", dci_inst->num_points);
 	// testing
-
-	// calculate query_proj
-	int devId = 0;
-	float* query_proj;
-	float* query_proj_column;
-
-	cudaMallocManaged((void **) (&query_proj),
-			sizeof(float) * num_indices * num_queries * num_heads);
-
-	cudaMallocManaged((void **) (&query_proj_column),
-			sizeof(float) * num_indices * num_queries * num_heads);		
 
 	//matmul_device(CUBLAS_OP_N, CUBLAS_OP_T, num_queries, num_indices,
 	//		dci_inst->dim, query, dci_inst->proj_vec, query_proj, devId);
