@@ -1606,7 +1606,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		float* h_data;
 		int * i_data;
 
-		data_total = dci_inst->num_points * dim * num_heads;
+		data_total = dci_inst->num_points * dci_inst->dim * num_heads;
 		data_size = sizeof(float) * data_total;
 		h_data = (float *) malloc(data_size);
 		cudaMemcpy(h_data, dci_inst->data, data_size, cudaMemcpyDeviceToHost);
@@ -1616,8 +1616,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		printf("dci_inst->data\n");
 		for (int j = 0; j < num_heads; j ++) {
 			printf("head %d\n", j);
-			for (int i = 0; i < (dci_inst->num_points * dim); i++) {
-				printf("%f ", h_data[j + dci_inst->num_points * dim * i]);
+			for (int i = 0; i < (dci_inst->num_points * dci_inst->dim); i++) {
+				printf("%f ", h_data[i + dci_inst->num_points * dci_inst->dim * j]);
 			}
 			printf("\n");
 		}
