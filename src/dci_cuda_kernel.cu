@@ -212,6 +212,24 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 
 	dci_inst->num_points = num_points;
 
+	int data_size = sizeof(float) * dim * num_indices * num_heads;
+	float* h_data = (float *) malloc(data_size);
+	cudaMemcpy(h_data, dci_inst->data, data_size, cudaMemcpyDeviceToHost);
+	printf("dci_add, dci_inst->data");
+	for (int h = 0; h < num_heads; h++) {
+		printf("head: %d\n", h);
+		for (int i = 0; i < num_indices; i++) {
+			printf("index: %d\n", i);
+			for (int j = 0; j < dim; j++) {
+				printf("%f ", h_data[j + i * num_indices + h * num_indices * dim]);
+			}
+			printf("\n");
+		}
+		printf("head: %d\n", h);
+	}
+	cudaFree(h_data);
+	printf("\n");
+
     // project vector
 	/*
 	int data_size = sizeof(float) * dim * num_indices * num_heads;
@@ -1602,27 +1620,28 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		cudaDeviceSynchronize();
 		*/
 
+		/*
 		int data_total, data_size;
 		float* h_data;
 		int * i_data;
 
-		data_total = dci_inst->num_points * dci_inst->dim * num_heads;
-		data_size = sizeof(float) * data_total;
-		h_data = (float *) malloc(data_size);
-		cudaMemcpy(h_data, dci_inst->data, data_size, cudaMemcpyDeviceToHost);
-
-		printf("\n");
-		printf("\n");
-		printf("dci_inst->data\n");
-		for (int j = 0; j < num_heads; j ++) {
-			printf("head %d\n", j);
-			for (int i = 0; i < (dci_inst->num_points * dci_inst->dim); i++) {
-				printf("%f ", h_data[i + dci_inst->num_points * dci_inst->dim * j]);
+		int data_size = sizeof(float) * dim * num_indices * num_heads;
+		float* h_data = (float *) malloc(data_size);
+		cudaMemcpy(h_data, dci_inst->proj_vec, data_size, cudaMemcpyDeviceToHost);
+		for (int h = 0; h < num_heads; h++) {
+			printf("head: %d\n", h);
+			for (int i = 0; i < num_indices; i++) {
+				printf("index: %d\n", i);
+				for (int j = 0; j < dim; j++) {
+					printf("%f ", h_data[j + i * num_indices + h * num_indices * dim]);
+				}
+				printf("\n");
 			}
-			printf("\n");
+			printf("head: %d\n", h);
 		}
-		printf("\n");
 		cudaFree(h_data);
+		printf("\n");
+		*/
 
 		/*
 		// candidate_dists
