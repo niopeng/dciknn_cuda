@@ -193,8 +193,6 @@ __global__ void copy_to_indices(dci* const dci_inst, float* const data_proj,
 void dci_add(dci* const dci_inst, const int dim, const int num_points, const int num_heads,
 		float* const data, const int block_size, const int thread_size) {
 
-	printf("dci_add in dci_cuda_kernel.cu | thread_size = %d\n", thread_size);
-
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	float *data_proj;
 	cudaMallocManaged((void **) &data_proj,
@@ -359,6 +357,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	printf("\n");
 	*/
 
+	/*
 	int data_size = sizeof(float) * dim * num_indices * num_heads;
 	float* h_data = (float *) malloc(data_size);
 	cudaMemcpy(h_data, dci_inst->data, data_size, cudaMemcpyDeviceToHost);
@@ -376,6 +375,9 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	}
 	cudaFree(h_data);
 	printf("\n");
+	*/
+
+	print("dim = %d | num_indices = %d | num_heads = %d\n", dim, num_indices, num_heads);
 	
 	/* Synchronize the threads */
 	cudaDeviceSynchronize();
@@ -1609,23 +1611,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	cudaMallocManaged((void **) (&candidate_dists),
 			sizeof(float) * dci_inst->num_points * num_heads);
 
-	int data_size = sizeof(float) * dim * num_indices * num_heads;
-	float* h_data = (float *) malloc(data_size);
-	cudaMemcpy(h_data, dci_inst->data, data_size, cudaMemcpyDeviceToHost);
-	printf("dci_query, dci_inst->data\n");
-	for (int h = 0; h < num_heads; h++) {
-		printf("head: %d\n", h);
-		for (int i = 0; i < num_indices; i++) {
-			printf("index: %d\n", i);
-			for (int j = 0; j < dim; j++) {
-				printf("%f ", h_data[j + i * num_indices + h * num_indices * dim]);
-			}
-			printf("\n");
-		}
-		printf("head: %d\n", h);
-	}
-	cudaFree(h_data);
-	printf("\n");
+	print("dim = %d | num_indices = %d | num_heads = %d\n", dim, num_indices, num_heads);
 
 	for (int j = 0; j < num_queries; j++) { 
 		// need to refresh the result holder to avoid carry over results
