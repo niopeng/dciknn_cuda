@@ -1561,9 +1561,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	}
 	cudaDeviceSynchronize();
 
-	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
-	cudaDeviceSynchronize();
-
 	// testing
 	int data_size = sizeof(float) * dci_inst->dim * num_indices * num_heads;
 	float* h_data = (float *) malloc(data_size);
@@ -1585,6 +1582,11 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	printf("dci_inst->dim %d\n", dci_inst->dim);
 	printf("dci_inst->num_points %d\n", dci_inst->num_points);
 	// testing
+
+
+	// something happened here?
+	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
+	cudaDeviceSynchronize();
 
 	// copy query config to device pointer
 	dci_query_config* d_query_config;
