@@ -1594,7 +1594,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	int data_size = sizeof(float) * dim * num_indices * num_heads;
 	float* h_data = (float *) malloc(data_size);
 	cudaMemcpy(h_data, dci_inst->data, data_size, cudaMemcpyDeviceToHost);
-	printf("dci_query, dci_inst->data");
+	printf("dci_query, dci_inst->data\n");
 	for (int h = 0; h < num_heads; h++) {
 		printf("head: %d\n", h);
 		for (int i = 0; i < num_indices; i++) {
