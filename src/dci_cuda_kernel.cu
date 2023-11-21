@@ -1561,6 +1561,9 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	}
 	cudaDeviceSynchronize();
 
+	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
+	cudaDeviceSynchronize();
+
 	// testing
 	int data_size = sizeof(float) * dci_inst->dim * num_indices * num_heads;
 	float* h_data = (float *) malloc(data_size);
@@ -1582,31 +1585,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	printf("dci_inst->dim %d\n", dci_inst->dim);
 	printf("dci_inst->num_points %d\n", dci_inst->num_points);
 	// testing
-
-	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
-	cudaDeviceSynchronize();
-
-	/*print result - testing*/
-	/*
-	int data_total = num_indices * num_queries * num_heads;
-	int data_size = sizeof(float) * data_total;
-	float* h_data = (float *) malloc(data_size);
-	cudaMemcpy(h_data, query_proj_column, data_size, cudaMemcpyDeviceToHost);
-	for (int h = 0; h < num_queries; h++) {
-		printf("queries: %d\n", h);
-		for (int i = 0; i < num_heads; i++) {
-			printf("head: %d\n", i);
-			for (int j = 0; j < num_indices; j++) {
-				printf("%f ", h_data[j + i * num_indices + h * num_heads * num_indices]);
-			}
-			printf("\n");
-		}
-		printf("queries end\n");
-	}
-	cudaFree(h_data);
-	printf("\n");
-	*/
-	/*testing*/
 
 	// copy query config to device pointer
 	dci_query_config* d_query_config;
