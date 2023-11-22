@@ -1581,11 +1581,10 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	printf("\n");
 	printf("dci_inst->dim %d\n", dci_inst->dim);
 	printf("dci_inst->num_points %d\n", dci_inst->num_points);
-	cudaDeviceSynchronize();
 	// testing
 
 	// something happened here?
-	//dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
+	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
 	//cudaDeviceSynchronize();
 
 	// testing
@@ -1608,7 +1607,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	printf("\n");
 	printf("dci_inst->dim %d\n", dci_inst->dim);
 	printf("dci_inst->num_points %d\n", dci_inst->num_points);
-	cudaDeviceSynchronize();
 	// testing
 
 	/*
