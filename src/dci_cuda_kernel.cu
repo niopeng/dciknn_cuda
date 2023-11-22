@@ -1562,6 +1562,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	cudaDeviceSynchronize();
 
 	// testing
+	/*
 	int data_size = sizeof(float) * dci_inst->dim * num_indices * num_heads;
 	float* h_data = (float *) malloc(data_size);
 	cudaMemcpy(h_data, dci_inst->data, data_size, cudaMemcpyDeviceToHost);
@@ -1582,12 +1583,13 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	printf("dci_inst->dim %d\n", dci_inst->dim);
 	printf("dci_inst->num_points %d\n", dci_inst->num_points);
 	// testing
+	*/
 
-	// something happened here?
 	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
 	//cudaDeviceSynchronize();
 
 	// testing
+	/*
 	int data_size2 = sizeof(float) * dci_inst->dim * num_indices * num_heads;
 	float* h_data2 = (float *) malloc(data_size2);
 	cudaMemcpy(h_data2, dci_inst->data, data_size2, cudaMemcpyDeviceToHost);
@@ -1608,8 +1610,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	printf("dci_inst->dim %d\n", dci_inst->dim);
 	printf("dci_inst->num_points %d\n", dci_inst->num_points);
 	// testing
+	*/
 
-	/*
 	// copy query config to device pointer
 	dci_query_config* d_query_config;
 	cudaMallocManaged((void **) (&d_query_config),
@@ -1649,9 +1651,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				candidate_dists);
 
 		cudaDeviceSynchronize();
-		*/
 
-		/*
 		dci_query_single_point_by_block<<<block_size, thread_size>>>(
 				dci_inst,
 				num_neighbours, 
@@ -1667,7 +1667,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			);
 
 		cudaDeviceSynchronize();
-		*/
 
 		/*
 		// candidate_dists
@@ -1926,7 +1925,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		}
 		*/
 
-	/*
 		break;
 	}
 
@@ -1939,7 +1937,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	cudaFree(d_top_candidates_index);
 	cudaFree(counts);
 	cudaFree(candidate_dists);
-	*/
 }
 
 

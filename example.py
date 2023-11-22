@@ -42,14 +42,17 @@ def main():
     #num_pts = 3000 # 2000 - 3000, an illegal memory access was encountered
     #num_queries = 500 # 100 - 500, all pass
     #num_heads = 1
-    dim = 100
-    num_pts = 2000
-    num_queries = 100
+    #dim = 100
+    dim = 10
+    num_pts = 100 # 2000 - 3000, an illegal memory access was encountered
+    num_queries = 50 # 100 - 500, all pass
+    #num_pts = 2000
+    #num_queries = 100
     #num_heads = 1
-    num_heads = 4
+    num_heads = 24
 
-    #intrinsic_dim = 100
-    intrinsic_dim = 400
+    #intrinsic_dim = 400
+    intrinsic_dim = 20
     
     data_and_queries = gen_data(dim, intrinsic_dim, num_pts + num_queries, num_heads)
 
@@ -74,10 +77,11 @@ def main():
     #num_simp_indices = 10
     #num_outer_iterations = 80
     block_size = 100
-    thread_size = 40
+    thread_size = 48
     num_comp_indices = 2
     num_simp_indices = 10
-    num_outer_iterations = 5000
+    #num_outer_iterations = 5000
+    num_outer_iterations = 80
 
     # initialize the DCI instance
     for i in range(1):
@@ -118,9 +122,9 @@ def main():
         ## Query
         ##dci_db.query(query, num_neighbours, num_outer_iterations)
         indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
-        #torch.set_printoptions(threshold=10000)
-        #print("Nearest Indices:", indices)
-        #print("Indices Distances:", dists)
+        torch.set_printoptions(threshold=10000)
+        print("Nearest Indices:", indices)
+        print("Indices Distances:", dists)
         dci_db.clear()
         b = datetime.datetime.now()
         print(b-a)
