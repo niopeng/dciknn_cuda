@@ -1585,14 +1585,14 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	// testing
 
 	// something happened here?
-	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
-	cudaDeviceSynchronize();
+	//dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
+	//cudaDeviceSynchronize();
 
 	// testing
 	int data_size2 = sizeof(float) * dci_inst->dim * num_indices * num_heads;
 	float* h_data2 = (float *) malloc(data_size2);
 	cudaMemcpy(h_data2, dci_inst->data, data_size2, cudaMemcpyDeviceToHost);
-	printf("dci_add, dci_inst->data, test 1\n");
+	printf("dci_add, dci_inst->data, test 2\n");
 	for (int h = 0; h < num_heads; h++) {
 		printf("head: %d\n", h);
 		for (int i = 0; i < num_indices; i++) {
