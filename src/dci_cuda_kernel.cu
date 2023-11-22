@@ -1611,6 +1611,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	cudaDeviceSynchronize();
 	// testing
 
+	/*
 	// copy query config to device pointer
 	dci_query_config* d_query_config;
 	cudaMallocManaged((void **) (&d_query_config),
@@ -1650,6 +1651,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				candidate_dists);
 
 		cudaDeviceSynchronize();
+		*/
 
 		/*
 		dci_query_single_point_by_block<<<block_size, thread_size>>>(
@@ -1926,6 +1928,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		}
 		*/
 
+	/*
 		break;
 	}
 
@@ -1938,6 +1941,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	cudaFree(d_top_candidates_index);
 	cudaFree(counts);
 	cudaFree(candidate_dists);
+	*/
 }
 
 
