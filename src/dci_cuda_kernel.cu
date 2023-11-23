@@ -1585,8 +1585,23 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	// testing
 	*/
 
+	float free_m,total_m,used_m;
+	size_t free_t,total_t;	
+
+	cudaMemGetInfo(&free_t,&total_t);
+	free_m =(uint)free_t/1048576.0 ;
+	total_m=(uint)total_t/1048576.0;
+	used_m=total_m-free_m;
+	printf ( "  mem free %d .... %f MB mem total %d....%f MB mem used %f MB\n",free_t,free_m,total_t,total_m,used_m);
+
 	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
-	//cudaDeviceSynchronize();
+	cudaDeviceSynchronize();
+
+	cudaMemGetInfo(&free_t,&total_t);
+	free_m =(uint)free_t/1048576.0 ;
+	total_m=(uint)total_t/1048576.0;
+	used_m=total_m-free_m;
+	printf ( "  mem free %d .... %f MB mem total %d....%f MB mem used %f MB\n",free_t,free_m,total_t,total_m,used_m);
 
 	// testing
 	/*
@@ -1613,6 +1628,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	*/
 
 	// copy query config to device pointer
+	/*
 	dci_query_config* d_query_config;
 	cudaMallocManaged((void **) (&d_query_config),
 			sizeof(dci_query_config));
@@ -1667,6 +1683,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			);
 
 		cudaDeviceSynchronize();
+		*/
 
 		/*
 		// candidate_dists
@@ -1925,6 +1942,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		}
 		*/
 
+	/*
 		break;
 	}
 
@@ -1937,6 +1955,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	cudaFree(d_top_candidates_index);
 	cudaFree(counts);
 	cudaFree(candidate_dists);
+	*/
 }
 
 
