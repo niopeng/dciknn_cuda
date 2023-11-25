@@ -927,7 +927,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						for (int ch = 0; ch < num_heads; ch++) {
 							printf("head: %d\n", ch);
 							for (int ni = 0; ni < dci_inst->num_points * dci_inst->num_comp_indices; ni++) {
-								printf("%f ", counts[dci_inst->num_points * dci_inst->num_comp_indices * ch + ni]);
+								printf("%d ", counts[dci_inst->num_points * dci_inst->num_comp_indices * ch + ni]);
 							}
 							printf("\n");
 						}
