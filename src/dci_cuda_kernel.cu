@@ -949,7 +949,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]), 1);
 
 						if (blockIdx.x == 0) {
-							print("%d ", num_candidates);
+							printf("%d ", num_candidates);
 						}
 
 						// current problem: count > 10, possible the pass the counts
