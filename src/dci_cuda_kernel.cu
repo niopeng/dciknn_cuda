@@ -939,6 +939,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 				if (top_h[curr_head] >= 0) {
 
+					/*
 					if (blockIdx.x == 0) {
 						if (curr_head == 1) {
 							printf("top_h = %d | i = %d | position = %d | cur_index = %d\n", 
@@ -949,6 +950,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								);
 						}
 					}
+					*/
 
 					int cur_index = position[curr_head] + head_threadIdx;
 
@@ -980,6 +982,20 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						//		== dci_inst->num_simp_indices) { 
 						if ((old_count + 1) == dci_inst->num_simp_indices) { 
 							// add offset to candidate_dists
+
+							if (blockIdx.x == 0) {
+								if (curr_head == 1) {
+									printf("cur_point = %d | index_value = %d | count_id = %d | old_count = %d\n", 
+										cur_point, 
+										cur_index
+											+ dci_inst->num_points * i[curr_head]
+											+ blockIdx.x * points_per_block,
+										cur_point + dci_inst->num_points * m
+											+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head,
+										old_count
+									);
+								}
+							}
 
 							if (candidate_dists[cur_point + dci_inst->num_points * curr_head] == -2.0) {
 								if (query_config.blind) {
