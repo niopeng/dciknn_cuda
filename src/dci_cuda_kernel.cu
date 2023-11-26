@@ -1033,7 +1033,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 						if (counts[cur_point + dci_inst->num_points * m
 							+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head] > dci_inst->num_simp_indices) {
-							printf("num_candidates = %d | count = %d | count_id = %d\n", num_candidates, 
+							printf("curr_head = %d | num_candidates = %d | count = %d | count_id = %d\n", 
+								curr_head, num_candidates, 
 								counts[cur_point + dci_inst->num_points * m 
 									+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head], 
 								cur_point + dci_inst->num_points * m 
