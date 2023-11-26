@@ -1000,6 +1000,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 													+ dci_inst->num_points * dci_inst->dim * curr_head]), 
 											&(query[dci_inst->dim * num_queries * curr_head]), dci_inst->dim);
 
+									/*
 									if (curr_head == 1) {
 										printf("cur_dist = %f | cur_point = %d | data = %f | data_index = %d | query = %f | query_index = %d\n", 
 											cur_dist, 
@@ -1010,6 +1011,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 											dci_inst->dim * num_queries * curr_head
 										);
 									}
+									*/
 
 									candidate_dists[cur_point + dci_inst->num_points * curr_head] = cur_dist;
 									if (num_candidates < num_neighbours) {
@@ -1842,7 +1844,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			cudaFree(i_data);
 			*/
 
-			/*
 			data_total = dci_inst->num_points * num_heads;
 			data_size = sizeof(float) * data_total;
 			h_data = (float *) malloc(data_size);
@@ -1913,7 +1914,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			}
 			printf("\n");
 			cudaFree(i_data);
-			*/
 		}
 
 		// -------- original result --------
