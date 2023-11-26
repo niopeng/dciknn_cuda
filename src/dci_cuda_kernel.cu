@@ -946,10 +946,12 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								+ blockIdx.x * points_per_block].value; // cur_point is index within the head (need adjust to head)
 
 						if (blockIdx.x == 0) {
-							printf("cur_point = %d | index_value = %d\n", cur_point, 
-								cur_index
-								+ dci_inst->num_points * i[curr_head]
-								+ blockIdx.x * points_per_block);
+							if (curr_head == 1) {
+								printf("cur_point = %d | index_value = %d\n", cur_point, 
+									cur_index
+									+ dci_inst->num_points * i[curr_head]
+									+ blockIdx.x * points_per_block);
+							}
 						}
 
 						int old_count = atomicAdd(&(counts[cur_point + dci_inst->num_points * m
