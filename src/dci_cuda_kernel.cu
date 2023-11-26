@@ -1000,8 +1000,9 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 											&(query[dci_inst->dim * num_queries * curr_head]), dci_inst->dim);
 
 									if (curr_head == 1) {
-										printf("cur_dist = %f | data = %d | data_index = %d | query = %f | query_index = %d\n", 
+										printf("cur_dist = %f | cur_point = %d | data = %f | data_index = %d | query = %f | query_index = %d\n", 
 											cur_dist, 
+											cur_point,
 											dci_inst->data[cur_point * dci_inst->dim + dci_inst->num_points * num_indices * curr_head],
 											cur_point * dci_inst->dim + dci_inst->num_points * num_indices * curr_head,
 											query[dci_inst->dim * num_queries * curr_head],
