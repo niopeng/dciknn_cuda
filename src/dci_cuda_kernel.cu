@@ -835,7 +835,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
-		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				printf("init_index_priority left_pos\n");
@@ -877,7 +876,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
-		*/
 
 		//while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
 		while (k < num_points_in_block * dci_inst->num_simp_indices * blockDim_head) {
@@ -1667,6 +1665,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	printf("\n");
 	*/
 
+	/*
 	int data_size2 = sizeof(float) * num_indices * num_queries * num_heads;
 	float* h_data2 = (float *) malloc(data_size2);
 	cudaMemcpy(h_data2, query_proj, data_size2, cudaMemcpyDeviceToHost);
@@ -1684,6 +1683,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	}
 	cudaFree(h_data2);
 	printf("\n");
+	*/
 
 	/*
 	cudaMemGetInfo(&free_t,&total_t);
