@@ -937,6 +937,17 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				}
 				*/
 
+				if (blockIdx.x == 0) {
+					if (curr_head == 1) {
+						printf("top_h = %d | i = %d | position = %d | cur_index = %d\n", 
+							top_h[curr_head],
+							i[curr_head],
+							position[curr_head],
+							position[curr_head] + head_threadIdx
+							);
+					}
+				}
+
 				if (top_h[curr_head] >= 0) {
 					int cur_index = position[curr_head] + head_threadIdx;
 
@@ -948,6 +959,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						int old_count = atomicAdd(&(counts[cur_point + dci_inst->num_points * m
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]), 1);
 
+						/*
 						if (blockIdx.x == 0) {
 							if (curr_head == 1) {
 								printf("cur_point = %d | index_value = %d | count_id = %d\n", cur_point, 
@@ -959,6 +971,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								);
 							}
 						}
+						*/
 
 						// current problem: count > 10, possible the pass the counts
 						//if (counts[cur_point + dci_inst->num_points * m
