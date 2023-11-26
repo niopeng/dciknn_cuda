@@ -937,18 +937,19 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				}
 				*/
 
-				if (blockIdx.x == 0) {
-					if (curr_head == 1) {
-						printf("top_h = %d | i = %d | position = %d | cur_index = %d\n", 
-							top_h[curr_head],
-							i[curr_head],
-							position[curr_head],
-							position[curr_head] + head_threadIdx
-							);
-					}
-				}
-
 				if (top_h[curr_head] >= 0) {
+
+					if (blockIdx.x == 0) {
+						if (curr_head == 1) {
+							printf("top_h = %d | i = %d | position = %d | cur_index = %d\n", 
+								top_h[curr_head],
+								i[curr_head],
+								position[curr_head],
+								position[curr_head] + head_threadIdx
+								);
+						}
+					}
+
 					int cur_index = position[curr_head] + head_threadIdx;
 
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
