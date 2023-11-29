@@ -77,7 +77,7 @@ def main():
     #num_simp_indices = 10
     #num_outer_iterations = 80
     block_size = 100
-    thread_size = 20
+    thread_size = 10
     num_comp_indices = 2
     num_simp_indices = 10
     #num_outer_iterations = 5000
@@ -97,16 +97,16 @@ def main():
         #b = datetime.datetime.now()
         #print(b-a)
 
-        #data_arr = data_and_queries[:, :num_pts, :]
-        #query_arr = data_and_queries[:, num_pts:, :]
-        #data1 = torch.cat((data_arr, data_arr), 0)
-        #query1 = torch.cat((query_arr, query_arr), 0)
+        data_arr = data_and_queries[:, :num_pts, :]
+        query_arr = data_and_queries[:, num_pts:, :]
+        data1 = torch.cat((data_arr, data_arr), 0)
+        query1 = torch.cat((query_arr, query_arr), 0)
 
-        #data = data1.detach().clone().to(0)
-        #query = query1.detach().clone().to(0)
+        data = data1.detach().clone().to(0)
+        query = query1.detach().clone().to(0)
 
-        data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
-        query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
+        #data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
+        #query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
 
         #torch.set_printoptions(threshold=10000)
         #print("Data 1:", data[0, :, :])
