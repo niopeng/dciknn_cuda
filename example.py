@@ -102,8 +102,8 @@ def main():
         data1 = torch.cat((data_arr, data_arr), 0)
         query1 = torch.cat((query_arr, query_arr), 0)
 
-        data2 = data1.detach().clone().to(0)
-        query2 = query1.detach().clone().to(0)
+        data2 = torch.cat((data1, data1), 0)
+        query2 = torch.cat((query1, query1), 0)
 
         data = data2.detach().clone().to(0)
         query = query2.detach().clone().to(0)
