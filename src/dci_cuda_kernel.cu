@@ -515,7 +515,7 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 			left_pos[idx] = dci_search_index(
 				&(dci_inst->indices[curr_idx * (dci_inst->num_points)	// position of index (single head)
 						+ blockIdx.x * points_per_block // position within each index
-						+ dci_inst->num_points * num_indices * curr_head]),
+						+ dci_inst->num_points * num_indices * curr_head]), // poisition of head
 				query_proj_column[curr_idx + curr_head * num_indices],
 				min(dci_inst->num_points - blockIdx.x * points_per_block,
 							points_per_block)) - blockDim_head + 1;
@@ -722,7 +722,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 	int points_per_block = (dci_inst->num_points + gridDim.x - 1) / gridDim.x; // default number of data processed by a block
 	int num_points_in_block = min(
-			(int) (dci_inst->num_points - blockIdx.x * points_per_block), // should not process data beyond the current block
+			(int) (dci_inst->num_points - blockIdx.x * points_per_block), // should not process data beyond the total number of data
 			points_per_block);
 
 	/*
@@ -758,10 +758,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		// init variables
 		if (threadIdx.x == 0) {
 			top_index_priority = new float[num_heads];
-			//k = new int[num_heads];
 			top_h = new int[num_heads];
 			position = new int[num_heads];
-			//m = new int[num_heads];
 			i = new int[num_heads];
 			could_break =new bool[num_heads];
 
@@ -770,7 +768,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			cur_pos = new int[num_indices * num_heads];
 			index_priority = new float[num_indices * num_heads];
 
-			//k[curr_head] = 0;
 			could_break[curr_head] = false;
 			could_break_all = 0;
 			k = 0;
@@ -938,26 +935,12 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				*/
 
 				if (top_h[curr_head] >= 0) {
-
-					/*
-					if (blockIdx.x == 0) {
-						if (curr_head == 1) {
-							printf("top_h = %d | i = %d | position = %d | cur_index = %d\n", 
-								top_h[curr_head],
-								i[curr_head],
-								position[curr_head],
-								position[curr_head] + head_threadIdx
-								);
-						}
-					}
-					*/
-
 					int cur_index = position[curr_head] + head_threadIdx;
 
 					if (cur_index >= 0 && cur_index < num_points_in_block) {
 						int cur_point = dci_inst->indices[cur_index
 								+ dci_inst->num_points * i[curr_head]
-								+ blockIdx.x * points_per_block].value; // cur_point is index within the head (need adjust to head)
+								+ blockIdx.x * points_per_block].value; // cur_point is index within the head (i[curr_head] already adjust to head)
 
 						int old_count = atomicAdd(&(counts[cur_point + dci_inst->num_points * m
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]), 1);
@@ -2047,7 +2030,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		//		counts, candidate_dists);
 
 		// get the final output
-		/*
 		if (!query_config.blind) {
 			for (int h = 0; h < num_heads; h++) {
 				get_top_candidates(
@@ -2072,7 +2054,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 					block_size * max_possible_num_candidates
 				);
 		}
-		*/
 
 		break;
 	}
