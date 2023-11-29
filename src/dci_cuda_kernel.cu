@@ -1862,6 +1862,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			printf("\n");
 			cudaFree(i_data);
 
+			/*
 			// d_top_candidates_dist
 			data_total = num_neighbours * block_size * thread_size * num_heads;
 			data_size = sizeof(float) * data_total;
@@ -1897,6 +1898,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			}
 			printf("\n");
 			cudaFree(i_data);
+			*/
 		}
 
 		// -------- original result --------

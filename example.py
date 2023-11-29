@@ -77,11 +77,11 @@ def main():
     #num_simp_indices = 10
     #num_outer_iterations = 80
     block_size = 100
-    thread_size = 40
+    thread_size = 10
     num_comp_indices = 2
     num_simp_indices = 10
     #num_outer_iterations = 5000
-    num_outer_iterations = 80
+    num_outer_iterations = 100
 
     # initialize the DCI instance
     for i in range(1):
@@ -97,16 +97,17 @@ def main():
         #b = datetime.datetime.now()
         #print(b-a)
 
+        # for testing 4 same data head
         data_arr = data_and_queries[:, :num_pts, :]
         query_arr = data_and_queries[:, num_pts:, :]
         data1 = torch.cat((data_arr, data_arr), 0)
         query1 = torch.cat((query_arr, query_arr), 0)
 
-        data2 = torch.cat((data1, data1), 0)
-        query2 = torch.cat((query1, query1), 0)
+        #data2 = torch.cat((data1, data1), 0)
+        #query2 = torch.cat((query1, query1), 0)
 
-        data = data2.detach().clone().to(0)
-        query = query2.detach().clone().to(0)
+        data = data1.detach().clone().to(0)
+        query = query1.detach().clone().to(0)
 
         #data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
         #query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
@@ -118,7 +119,7 @@ def main():
         #print("Query 2:", query[1, :, :])
 
         a = datetime.datetime.now()
-        dci_db = DCI(dim, 4, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+        dci_db = DCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
         dci_db.add(data)
         
