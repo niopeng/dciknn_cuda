@@ -1127,12 +1127,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
-		if (blockIdx.x == 0) {
-			if (threadIdx.x == 0) {
-				printf("\n");
-			}
-		}
-
 		// free variables
 		if (threadIdx.x == 0) {
 			free(left_pos);
