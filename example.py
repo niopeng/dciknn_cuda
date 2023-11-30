@@ -43,15 +43,15 @@ def main():
     #num_queries = 500 # 100 - 500, all pass
     num_heads = 2
     #dim = 100
-    dim = 100
-    num_pts = 2000 # 2000 - 3000, an illegal memory access was encountered
-    num_queries = 500 # 100 - 500, all pass
+    dim = 20
+    num_pts = 500 # 2000 - 3000, an illegal memory access was encountered
+    num_queries = 200 # 100 - 500, all pass
     #num_pts = 2000
     #num_queries = 100
     #num_heads = 1
     #num_heads = 24
 
-    intrinsic_dim = 500
+    intrinsic_dim = 100
     #intrinsic_dim = 20
     
     data_and_queries = gen_data(dim, intrinsic_dim, num_pts + num_queries, num_heads)
