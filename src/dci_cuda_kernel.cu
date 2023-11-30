@@ -1794,8 +1794,9 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		float* h_data;
 		int * i_data;
 
+		/*
 		if (j == 0) {
-			/*
+			
 			// d_all_candidates
 			data_total = max_possible_num_candidates * block_size * num_heads;
 			data_size = sizeof(int) * data_total;
@@ -1813,7 +1814,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			}
 			printf("\n");
 			cudaFree(i_data);
-			*/
 
 			data_total = dci_inst->num_points * num_heads;
 			data_size = sizeof(float) * data_total;
@@ -1850,7 +1850,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			printf("\n");
 			cudaFree(i_data);
 
-			/*
 			// d_top_candidates_dist
 			data_total = num_neighbours * block_size * thread_size * num_heads;
 			data_size = sizeof(float) * data_total;
@@ -2044,8 +2043,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 					block_size * max_possible_num_candidates
 				);
 		}
-
-		break;
 	}
 
 	// free the allocated memories
