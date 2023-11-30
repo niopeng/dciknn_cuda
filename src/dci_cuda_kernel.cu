@@ -983,6 +983,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 													+ dci_inst->num_points * dci_inst->dim * curr_head]), 
 											&(query[dci_inst->dim * num_queries * curr_head]), dci_inst->dim);
 
+									/*
 									if (curr_head == 1) {
 										printf("cur_dist = %f | cur_point = %d | data = %f | data_index = %d | query = %f | query_index = %d\n", 
 											cur_dist, 
@@ -993,6 +994,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 											dci_inst->dim * num_queries * curr_head
 										);
 									}
+									*/
 
 									candidate_dists[cur_point + dci_inst->num_points * curr_head] = cur_dist;
 									if (num_candidates < num_neighbours) {
