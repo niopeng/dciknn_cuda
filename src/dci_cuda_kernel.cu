@@ -606,7 +606,7 @@ __device__ void init_index_priority(const dci* const dci_inst,
 
 			assert(position >= 0); // There should be at least one point in the index
 			assert(position < num_points_in_block);
-			index_priority[idx] = abs_d(
+			index_priority[idx + curr_head * num_indices] = abs_d(
 					dci_inst->indices[position + idx * (dci_inst->num_points)	// position of index (single head)
 						+ blockIdx.x * points_per_block // position within each index
 						+ dci_inst->num_points * num_indices * curr_head].key
