@@ -505,7 +505,7 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 
 	int idx;
 	for (int j = 0; j < chunk_size; j++) {
-		idx = curr_head_thread * chunk_size + j;
+		idx = curr_head_thread * chunk_size + j; // idx of indices within each head
 		if (idx < total) {
 			left_pos[idx + curr_head * num_indices] = dci_search_index(
 				&(dci_inst->indices[idx * dci_inst->num_points
@@ -889,7 +889,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
-		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				printf("init_index_priority left_pos\n");
@@ -931,7 +930,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
-		*/
 
 		/*
 		//while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
