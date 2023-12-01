@@ -572,12 +572,49 @@ __device__ void init_index_priority(const dci* const dci_inst,
 		int* const left_pos, int* const right_pos, float* const index_priority,
 		int* const cur_pos, const int points_per_block, const int blockDim_head) {
 
-	int total = num_indices * num_heads;
+	int total = num_indices;
 	int chunk_size = (total + blockDim_head - 1) / blockDim_head;
 	int num_points_in_block = min(
 			(int) (dci_inst->num_points - blockIdx.x * points_per_block),
 			points_per_block);
+
+	int curr_head = (int) (threadIdx.x / blockDim_head);
+	int curr_head_thread = threadIdx.x % blockDim_head;
 	
+	int idx;
+	for (int j = 0; j < chunk_size; j++) {
+		idx = curr_head_thread * chunk_size + j;
+		if (idx < total && num_points_in_block > 0) {
+			cur_pos[idx + curr_head * num_indices] = dci_next_closest_proj(
+				&(dci_inst->indices[idx * (dci_inst->num_points)
+					+ blockIdx.x * points_per_block
+					+ dci_inst->num_points * num_indices * curr_head]),
+				&(left_pos[idx + curr_head * num_indices]), 
+				&(right_pos[idx + curr_head * num_indices]),
+				query_proj_column[idx + curr_head * num_indices],
+				num_points_in_block, blockDim_head);
+
+			int position;
+			if ((cur_pos[idx + curr_head * num_indices] < 0) && (cur_pos[idx + curr_head * num_indices] > -blockDim_head)) {
+				position = 0;
+			} else if ((cur_pos[idx + curr_head * num_indices] < (num_points_in_block + blockDim_head - 1))
+					&& (cur_pos[idx + curr_head * num_indices] >= num_points_in_block)) {
+				position = num_points_in_block - 1;
+			} else {
+				position = cur_pos[idx + curr_head * num_indices];
+			}
+
+			assert(position >= 0); // There should be at least one point in the index
+			assert(position < num_points_in_block);
+			index_priority[idx] = abs_d(
+					dci_inst->indices[position + idx * (dci_inst->num_points)	// position of index (single head)
+						+ blockIdx.x * points_per_block // position within each index
+						+ dci_inst->num_points * num_indices * curr_head].key
+							- query_proj_column[idx + curr_head * num_indices]);
+		}
+	}
+
+	/*
 	int idx, curr_idx, curr_head;
 	for (int j = 0; j < chunk_size; j++) {
 		idx = threadIdx.x * chunk_size + j;
@@ -611,6 +648,7 @@ __device__ void init_index_priority(const dci* const dci_inst,
 							- query_proj_column[curr_idx + curr_head * num_indices]);
 		}
 	}
+	*/
 }
 
 __device__ void init_index_priority_original(const dci* const dci_inst,
