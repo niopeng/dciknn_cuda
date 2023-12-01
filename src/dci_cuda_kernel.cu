@@ -784,19 +784,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			(int) (dci_inst->num_points - blockIdx.x * points_per_block), // should not process data beyond the total number of data
 			points_per_block);
 
-	/*
-	if (blockIdx.x == 0) {
-		if (threadIdx.x == 0) {
-			printf("num_indices: %d\n", num_indices);
-			printf("num_heads: %d\n", num_heads);
-			printf("curr_head: %d\n", curr_head);
-			printf("curr_start: %d\n", curr_start);
-			printf("points_per_block: %d\n", points_per_block);
-			printf("num_points_in_block: %d\n", num_points_in_block);
-		}
-	}
-	*/
-
 	if (num_points_in_block > 0) {
 		// shared value is an array, each value in the array is correspond to a head
 		// the array size is num_heads
@@ -2043,6 +2030,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 					block_size * max_possible_num_candidates
 				);
 		}
+
+		break;
 	}
 
 	// free the allocated memories
