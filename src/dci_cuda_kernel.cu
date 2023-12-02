@@ -1150,10 +1150,10 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 __global__
 static void dci_query_single_point_by_block_original(const dci* const dci_inst,
-		const int num_neighbours, const float* const query,
+		const int num_neighbours, const idx_elem* indices, const float* const query,
 		const float* const query_proj, const dci_query_config query_config,
 		float* const d_top_candidates_dist, int* const d_top_candidates_index,
-		int* const all_candidates, int* counts, float* candidate_dists) {
+		int* const all_candidates, int* counts, float* candidate_dists, const int test_head) {
 	int j, h;
 	float cur_dist;
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
@@ -1193,7 +1193,7 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 		__syncthreads();
 
 		/* Search index */
-		search_index_original(dci_inst, query_proj, num_indices, dci_inst->indices, left_pos, right_pos,
+		search_index_original(dci_inst, query_proj, num_indices, indices, left_pos, right_pos,
 				points_per_block);
 		
 		if (blockIdx.x == 0) {
@@ -1217,7 +1217,7 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 		__syncthreads();
 
 		/* Populate the closest indices */
-		init_index_priority_original(dci_inst, query_proj, num_indices, dci_inst->indices, left_pos, right_pos,
+		init_index_priority_original(dci_inst, query_proj, num_indices, indices, left_pos, right_pos,
 				index_priority, cur_pos, points_per_block);
 
 		if (blockIdx.x == 0) {
@@ -1944,11 +1944,13 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
+		int test_head = 1;
 		dci_query_single_point_by_block_original<<<block_size, thread_size>>>(
 				dci_inst,
 				num_neighbours, 
-				&(query[j * dim]),
-				&(query_proj[j * num_indices]), 
+				&(dci_inst->indices[dci_inst->num_points * dim * test_head])
+				&(query[j * dim + num_queries * dim * test_head]),
+				&(query_proj[j * num_indices + num_indices * num_queries * test_head]), 
 				*d_query_config,
 				d_top_candidates_dist, 
 				d_top_candidates_index, 
