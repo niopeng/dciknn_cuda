@@ -1153,7 +1153,7 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 		const int num_neighbours, const idx_elem* indices, const float* const query,
 		const float* const query_proj, const dci_query_config query_config,
 		float* const d_top_candidates_dist, int* const d_top_candidates_index,
-		int* const all_candidates, int* counts, float* candidate_dists, const int test_head) {
+		int* const all_candidates, int* counts, float* candidate_dists) {
 	int j, h;
 	float cur_dist;
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
@@ -1948,7 +1948,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		dci_query_single_point_by_block_original<<<block_size, thread_size>>>(
 				dci_inst,
 				num_neighbours, 
-				&(dci_inst->indices[dci_inst->num_points * dim * test_head])
+				&(dci_inst->indices[dci_inst->num_points * dim * test_head]),
 				&(query[j * dim + num_queries * dim * test_head]),
 				&(query_proj[j * num_indices + num_indices * num_queries * test_head]), 
 				*d_query_config,
