@@ -43,7 +43,7 @@ def main():
     #num_queries = 500 # 100 - 500, all pass
     num_heads = 2
     #dim = 100
-    dim = 20
+    dim = 10
     num_pts = 500 # 2000 - 3000, an illegal memory access was encountered
     num_queries = 200 # 100 - 500, all pass
     #num_pts = 2000
@@ -127,8 +127,8 @@ def main():
         ##dci_db.query(query, num_neighbours, num_outer_iterations)
         indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
         torch.set_printoptions(threshold=10000)
-        #print("Nearest Indices:", indices)
-        #print("Indices Distances:", dists)
+        print("Nearest Indices:", indices)
+        print("Indices Distances:", dists)
         dci_db.clear()
         b = datetime.datetime.now()
         print(b-a)
