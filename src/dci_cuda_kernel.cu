@@ -1852,7 +1852,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		//float* h_data;
 		//int * i_data;
 
-		/*
 		if (j == 0) {
 			
 			// d_all_candidates
@@ -1943,9 +1942,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			}
 			printf("\n");
 			cudaFree(i_data);
-			
 		}
-		*/
+
 
 		// -------- original result --------
 		
