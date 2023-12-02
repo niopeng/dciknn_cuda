@@ -80,7 +80,7 @@ def main():
     thread_size = 20
     num_comp_indices = 2
     num_simp_indices = 10
-    num_outer_iterations = 5000
+    num_outer_iterations = 100
     #num_outer_iterations = 100
 
     # initialize the DCI instance
