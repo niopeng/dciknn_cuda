@@ -1848,9 +1848,9 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		cudaDeviceSynchronize();
 
 		// candidate_dists
-		//int data_total, data_size;
-		//float* h_data;
-		//int * i_data;
+		int data_total, data_size;
+		float* h_data;
+		int * i_data;
 
 		if (j == 0) {
 			
