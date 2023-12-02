@@ -1965,7 +1965,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
-		int test_head = 1;
+		int test_head = 0;
 		dci_query_single_point_by_block_original<<<block_size, thread_size>>>(
 				dci_inst,
 				num_neighbours, 
