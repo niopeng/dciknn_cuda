@@ -1991,14 +1991,9 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 			printf("\n");
 			printf("candidate_dists\n");
-			for (int j = 0; j < num_heads; j ++) {
-				printf("head %d\n", j);
-				for (int i = 0; i < (dci_inst->num_points); i++) {
-					printf("%f ", h_data[i + dci_inst->num_points * j]);
-				}
-				printf("\n");
+			for (int i = 0; i < (dci_inst->num_points); i++) {
+				printf("%f ", h_data[i + dci_inst->num_points * j]);
 			}
-			printf("\n");
 			cudaFree(h_data); 
 
 			// counts
@@ -2010,12 +2005,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 			printf("\n");
 			printf("counts\n");
-			for (int j = 0; j < num_heads; j ++) {
-				printf("head %d\n", j);
-				for (int i = 0; i < (dci_inst->num_points * dci_inst->num_comp_indices); i++) {
-					printf("%d ", i_data[i + dci_inst->num_points * dci_inst->num_comp_indices * j]);
-				}
-				printf("\n");
+			for (int i = 0; i < (dci_inst->num_points * dci_inst->num_comp_indices); i++) {
+				printf("%d ", i_data[i + dci_inst->num_points * dci_inst->num_comp_indices * j]);
 			}
 			printf("\n");
 			cudaFree(i_data);
