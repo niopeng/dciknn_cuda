@@ -588,9 +588,9 @@ __device__ void init_index_priority(const dci* const dci_inst,
 		idx = curr_head_thread * chunk_size + j;
 		if (idx < total && num_points_in_block > 0) {
 			cur_pos[idx + curr_head * num_indices] = dci_next_closest_proj(
-				&(dci_inst->indices[idx * (dci_inst->num_points)
-					+ blockIdx.x * points_per_block
-					+ dci_inst->num_points * num_indices * curr_head]),
+				&(dci_inst->indices[idx * (dci_inst->num_points) // find the current index within each head
+					+ blockIdx.x * points_per_block // get the point that is processed by this block
+					+ dci_inst->num_points * num_indices * curr_head]), // start of the head
 				&(left_pos[idx + curr_head * num_indices]), 
 				&(right_pos[idx + curr_head * num_indices]),
 				query_proj_column[idx + curr_head * num_indices],
@@ -770,16 +770,16 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			query_config.max_num_candidates,
 			query_config.num_outer_iterations);
 
-	int thread_per_head = (int) (blockDim.x / num_heads);
-	int curr_head = (int) (threadIdx.x / thread_per_head);
+	int blockDim_head = (int) (blockDim.x / num_heads);
+	//int thread_per_head = (int) (blockDim.x / num_heads);
+	int curr_head = (int) (threadIdx.x / blockDim_head);
 	//int curr_start = curr_head * thread_per_head;
 
 	// for each head there are a number of thread assign to each head, and head_threadIdx is just thread id adjust to head
-	int head_threadIdx = threadIdx.x % thread_per_head;
+	int head_threadIdx = threadIdx.x % blockDim_head;
 	
 	// adjust thread_size and blocker_size by the number of head
 	//int gridDim_head = (int) (gridDim.x / num_heads);
-	int blockDim_head = (int) (blockDim.x / num_heads);
 
 	int points_per_block = (dci_inst->num_points + gridDim.x - 1) / gridDim.x; // default number of data processed by a block
 	int num_points_in_block = min(
@@ -803,10 +803,10 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		__shared__ int* cur_pos;
 		__shared__ float* index_priority;
 
-		__shared__ int* left_pos2;
-		__shared__ int* right_pos2;
-		__shared__ int* cur_pos2;
-		__shared__ float* index_priority2;
+		//__shared__ int* left_pos2;
+		//__shared__ int* right_pos2;
+		//__shared__ int* cur_pos2;
+		//__shared__ float* index_priority2;
 
 		// init variables
 		if (threadIdx.x == 0) {
@@ -821,10 +821,10 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			cur_pos = new int[num_indices * num_heads];
 			index_priority = new float[num_indices * num_heads];
 
-			left_pos2 = new int[num_indices * num_heads];
-			right_pos2 = new int[num_indices * num_heads];
-			cur_pos2 = new int[num_indices * num_heads];
-			index_priority2 = new float[num_indices * num_heads];
+			//left_pos2 = new int[num_indices * num_heads];
+			//right_pos2 = new int[num_indices * num_heads];
+			//cur_pos2 = new int[num_indices * num_heads];
+			//index_priority2 = new float[num_indices * num_heads];
 
 			could_break[curr_head] = false;
 			could_break_all = 0;
@@ -950,7 +950,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				// vector), this simple index will be top_h
 
 				// inner loop one
-				if ((threadIdx.x % thread_per_head) == 0) {
+				if ((threadIdx.x % blockDim_head) == 0) {
 					// Get the top priority and data index in priority queue
 					top_index_priority[curr_head] = DBL_MAX;
 					top_h[curr_head] = -1;
@@ -968,7 +968,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				__syncthreads();
 
 				if (top_h[curr_head] >= 0) {
-					if ((threadIdx.x % thread_per_head) == 0) {
+					if ((threadIdx.x % blockDim_head) == 0) {
 						i[curr_head] = top_h[curr_head] + m * dci_inst->num_simp_indices + curr_head * num_indices;
 						position[curr_head] = cur_pos[i[curr_head]];
 					}
@@ -1080,9 +1080,10 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 				__syncthreads();
 
+				// ----------------------------------- check indexing ------------------------------------------ // 
 				if (top_h[curr_head] >= 0) {
 					// use the first thread to update
-					if ((threadIdx.x % thread_per_head) == 0) {
+					if ((threadIdx.x % blockDim_head) == 0) {
 
 						cur_pos[i[curr_head]] = dci_next_closest_proj(
 								&(dci_inst->indices[i[curr_head] * (dci_inst->num_points)
@@ -1112,6 +1113,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						}
 					}
 				}
+				// ----------------------------------- check indexing ------------------------------------------ // 
 
 				if (threadIdx.x == 0) {
 					m = m + 1;
@@ -1119,7 +1121,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				__syncthreads();
 			}
 		
-			if ((threadIdx.x % thread_per_head) == 0) {
+			if ((threadIdx.x % blockDim_head) == 0) {
 				if (!could_break[curr_head]) {
 					if (num_candidates >= num_neighbours) {
 						if (k + 1 >= query_config.num_outer_iterations
@@ -1265,7 +1267,6 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 
 		__syncthreads();
 
-		/*
 		while (k < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
 
 			//if (blockIdx.x == 0) {
@@ -1426,7 +1427,6 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 			    break;
 			}
 		}
-		*/
 
 		// free variables
 		if (threadIdx.x == 0) {
