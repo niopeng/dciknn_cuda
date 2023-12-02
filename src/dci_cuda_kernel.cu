@@ -336,6 +336,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	sort_indices<<<block_size, thread_size>>>(dci_inst, num_indices, num_points, num_heads,
 			points_per_block);
 
+	/*
 	int data_size = sizeof(idx_elem) * num_heads * num_points * num_indices;
 	idx_elem* h_data = (idx_elem *) malloc(data_size);
 	cudaMemcpy(h_data, dci_inst->indices, data_size, cudaMemcpyDeviceToHost);
@@ -354,6 +355,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 
 	cudaFree(h_data);
 	printf("\n");
+	*/
 
 	/*
 	int data_size = sizeof(float) * dim * num_indices * num_heads;
@@ -801,6 +803,11 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 		__shared__ int* cur_pos;
 		__shared__ float* index_priority;
 
+		__shared__ int* left_pos2;
+		__shared__ int* right_pos2;
+		__shared__ int* cur_pos2;
+		__shared__ float* index_priority2;
+
 		// init variables
 		if (threadIdx.x == 0) {
 			top_index_priority = new float[num_heads];
@@ -813,6 +820,11 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			right_pos = new int[num_indices * num_heads];
 			cur_pos = new int[num_indices * num_heads];
 			index_priority = new float[num_indices * num_heads];
+
+			left_pos2 = new int[num_indices * num_heads];
+			right_pos2 = new int[num_indices * num_heads];
+			cur_pos2 = new int[num_indices * num_heads];
+			index_priority2 = new float[num_indices * num_heads];
 
 			could_break[curr_head] = false;
 			could_break_all = 0;
@@ -1183,6 +1195,23 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 		/* Search index */
 		search_index_original(dci_inst, query_proj, num_indices, dci_inst->indices, left_pos, right_pos,
 				points_per_block);
+		
+		if (blockIdx.x == 0) {
+			if (threadIdx.x == 0) {
+				//for (int b = 0; b < block_size; b++) {
+				//printf("block: %d\n", b);
+				printf("search_index left_pos\n");
+				for (int ni = 0; ni < num_indices; ni++) {
+					printf("%d ", left_pos[ni]);
+				}
+				printf("\n");
+				printf("search_index right_pos\n");
+				for (int ni = 0; ni < num_indices; ni++) {
+					printf("%d ", right_pos[ni]);
+				}
+				printf("\n");
+			}
+		}
 
 		/* Synchronize the threads */
 		__syncthreads();
@@ -1191,9 +1220,36 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 		init_index_priority_original(dci_inst, query_proj, num_indices, dci_inst->indices, left_pos, right_pos,
 				index_priority, cur_pos, points_per_block);
 
-		/* Synchronize the threads */
+		if (blockIdx.x == 0) {
+			if (threadIdx.x == 0) {
+				//for (int b = 0; b < block_size; b++) {
+				//printf("block: %d\n", b);
+				printf("search_index_original left_pos\n");
+				for (int ni = 0; ni < num_indices; ni++) {
+					printf("%d ", left_pos[ni]);
+				}
+				printf("\n");
+				printf("search_index_original right_pos\n");
+				for (int ni = 0; ni < num_indices; ni++) {
+					printf("%d ", right_pos[ni]);
+				}
+				printf("\n");
+				printf("search_index_original cur_pos\n");
+				for (int ni = 0; ni < num_indices; ni++) {
+					printf("%d ", cur_pos[ni]);
+				}
+				printf("\n");
+				printf("search_index_original index_priority\n");
+				for (int ni = 0; ni < num_indices; ni++) {
+					printf("%f ", index_priority[ni]);
+				}
+				printf("\n");
+			}
+		}
+
 		__syncthreads();
 
+		/*
 		while (k < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
 
 			//if (blockIdx.x == 0) {
@@ -1209,7 +1265,6 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 			while (m < dci_inst->num_comp_indices) {
 				// only one thread to get the top
 				if (threadIdx.x == 0) {
-					/* Get the top priority and data index in priority queue */
 					top_index_priority = DBL_MAX;
 					top_h = -1;
 					for (h = 0; h < dci_inst->num_simp_indices; h++) {
@@ -1221,7 +1276,6 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 						}
 					}
 				}
-				/* Synchronize the threads */
 				__syncthreads();
 				if (top_h >= 0) {
 					if (threadIdx.x == 0) {
@@ -1305,7 +1359,6 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 							}
 						}
 					}
-					/* Synchronize the threads */
 					__syncthreads();
 					// use the first thread to update
 					if (threadIdx.x == 0) {
@@ -1352,12 +1405,13 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 				}
 				k++;
 			}
-			/* Synchronize the threads */
 			__syncthreads();
 			if (could_break) {
 			    break;
 			}
 		}
+		*/
+
 		// free variables
 		if (threadIdx.x == 0) {
 			free(left_pos);
@@ -1879,7 +1933,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		// -------- original result --------
 		
-		/*
 		// need to refresh the result holder to avoid carry over results
 		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
 				num_neighbours * block_size * thread_size * num_heads, DBL_MAX);
@@ -1907,6 +1960,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		// candidate_dists
 
+		/*
 		data_total = dci_inst->num_points * num_heads;
 		data_size = sizeof(float) * data_total;
 		h_data = (float *) malloc(data_size);
