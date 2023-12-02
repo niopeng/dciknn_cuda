@@ -847,6 +847,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
+		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				//for (int b = 0; b < block_size; b++) {
@@ -872,6 +873,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
+		*/
 
 		init_index_priority(
 			dci_inst, 
@@ -888,6 +890,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 		__syncthreads();
 
+		/*
 		if (blockIdx.x == 0) {
 			if (threadIdx.x == 0) {
 				printf("init_index_priority left_pos\n");
@@ -929,8 +932,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				printf("\n");
 			}
 		}
+		*/
 
-		/*
 		//while (k[curr_head] < num_points_in_block * dci_inst->num_simp_indices * blockDim.x) {
 		while (k < num_points_in_block * dci_inst->num_simp_indices * blockDim_head) {
 
@@ -1126,7 +1129,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 			    break;
 			}
 		}
-		*/
 
 		__syncthreads();
 
@@ -1934,6 +1936,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		// -------- original result --------
 		
 		// need to refresh the result holder to avoid carry over results
+		/*
 		init_dist<<<block_size, thread_size>>>(d_top_candidates_dist,
 				num_neighbours * block_size * thread_size * num_heads, DBL_MAX);
 
@@ -1962,7 +1965,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		// candidate_dists
 
-		/*
 		data_total = dci_inst->num_points * num_heads;
 		data_size = sizeof(float) * data_total;
 		h_data = (float *) malloc(data_size);
@@ -2088,8 +2090,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 					block_size * max_possible_num_candidates
 				);
 		}
-
-		break;
 	}
 
 	// free the allocated memories
