@@ -1491,14 +1491,16 @@ __global__ void get_blind_candidate_count(idx_elem* const candidate_map,
 
 		if (idx < total) {
 			candidate_map[d_all_candidates[idx]].key--;
-			candidate_map[d_all_candidates[idx]].value =
-					d_all_candidates[idx] + num_points * num_indices * curr_head;
+			candidate_map[d_all_candidates[idx]].value = 
+					d_all_candidates[idx];
+					//d_all_candidates[idx] + num_points * curr_head; // error
 		}
 	}
 }
 
 /*
  * Update the top nearest neighbors from the partial results
+ * total = block_size * max_possible_num_candidates
  */
 void get_top_blind_candidates(int* const nearest_neighbours,
 		int* const d_all_candidates, const int max_possible_num_candidates,
