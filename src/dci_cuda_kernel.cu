@@ -549,7 +549,7 @@ __device__ void search_index(const dci* const dci_inst, const float* const query
 }
 
 __device__ void search_index_original(const dci* const dci_inst,
-		const float* const query_proj, const int num_indices, const idx_elem* indices,
+		const float* const query_proj, const int num_indices, //const idx_elem* indices,
 		int* const left_pos, int* const right_pos, const int points_per_block) {
 	int total = num_indices;
 	int chunk_size = (total + blockDim.x - 1) / blockDim.x;
@@ -558,7 +558,7 @@ __device__ void search_index_original(const dci* const dci_inst,
 		idx = threadIdx.x * chunk_size + j;
 		if (idx < total) {
 			left_pos[idx] = dci_search_index(
-					&(indices[idx * (dci_inst->num_points)
+					&(dci_inst->indices[idx * (dci_inst->num_points)
 							+ blockIdx.x * points_per_block]),
 					query_proj[idx],
 					min(dci_inst->num_points - blockIdx.x * points_per_block,
@@ -654,7 +654,7 @@ __device__ void init_index_priority(const dci* const dci_inst,
 }
 
 __device__ void init_index_priority_original(const dci* const dci_inst,
-		const float* const query_proj, const int num_indices, const idx_elem* indices,
+		const float* const query_proj, const int num_indices, //const idx_elem* indices,
 		int* const left_pos, int* const right_pos, float* const index_priority,
 		int* const cur_pos, const int points_per_block) {
 	
@@ -670,7 +670,7 @@ __device__ void init_index_priority_original(const dci* const dci_inst,
 
 		if (idx < total && num_points_in_block > 0) {
 			cur_pos[idx] = dci_next_closest_proj(
-					&(indices[idx * (dci_inst->num_points)
+					&(dci_inst->indices[idx * (dci_inst->num_points)
 							+ blockIdx.x * points_per_block]),
 					&(left_pos[idx]), &(right_pos[idx]), query_proj[idx],
 					num_points_in_block, blockDim.x);
@@ -695,7 +695,7 @@ __device__ void init_index_priority_original(const dci* const dci_inst,
 			assert(position >= 0); // There should be at least one point in the index
 			assert(position < num_points_in_block);
 			index_priority[idx] = abs_d(
-					indices[position + idx * (dci_inst->num_points)
+					dci_inst->indices[position + idx * (dci_inst->num_points)
 							+ blockIdx.x * points_per_block].key
 							- query_proj[idx]);
 		}
@@ -1170,7 +1170,8 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 __global__
 static void dci_query_single_point_by_block_original(const dci* const dci_inst,
-		const int num_neighbours, const idx_elem* indices, const float* const query,
+		//const int num_neighbours, const idx_elem* indices, const float* const query,
+		const int num_neighbours, const float* const query,
 		const float* const query_proj, const dci_query_config query_config,
 		float* const d_top_candidates_dist, int* const d_top_candidates_index,
 		int* const all_candidates, int* counts, float* candidate_dists) {
@@ -1213,7 +1214,7 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 		__syncthreads();
 
 		/* Search index */
-		search_index_original(dci_inst, query_proj, num_indices, indices, left_pos, right_pos,
+		search_index_original(dci_inst, query_proj, num_indices, left_pos, right_pos,
 				points_per_block);
 		
 		/*
@@ -1239,7 +1240,7 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 		__syncthreads();
 
 		/* Populate the closest indices */
-		init_index_priority_original(dci_inst, query_proj, num_indices, indices, left_pos, right_pos,
+		init_index_priority_original(dci_inst, query_proj, num_indices, left_pos, right_pos,
 				index_priority, cur_pos, points_per_block);
 
 		/*
@@ -1973,7 +1974,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		dci_query_single_point_by_block_original<<<block_size, thread_size>>>(
 				dci_inst,
 				num_neighbours, 
-				&(dci_inst->indices[dci_inst->num_points * dim * test_head]),
+				//&(dci_inst->indices[dci_inst->num_points * dim * test_head]),
 				&(query[j * dim + num_queries * dim * test_head]),
 				&(query_proj[j * num_indices + num_indices * num_queries * test_head]), 
 				*d_query_config,
