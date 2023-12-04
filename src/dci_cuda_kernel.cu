@@ -613,7 +613,7 @@ __device__ void init_index_priority(const dci* const dci_inst,
 	for (int j = 0; j < chunk_size; j++) {
 		idx = curr_head_thread * chunk_size + j;
 		if (idx < total && num_points_in_block > 0) {
-			cur_pos[idx + curr_head * num_indices] = dci_next_closest_proj_original(
+			cur_pos[idx + curr_head * num_indices] = dci_next_closest_proj(
 				&(dci_inst->indices[idx * (dci_inst->num_points) // find the current index within each head
 					+ blockIdx.x * points_per_block // get the point that is processed by this block
 					+ dci_inst->num_points * num_indices * curr_head]), // start of the head
@@ -692,7 +692,7 @@ __device__ void init_index_priority_original(const dci* const dci_inst,
 	for (int j = 0; j < chunk_size; j++) {
 		idx = threadIdx.x * chunk_size + j;
 		if (idx < total && num_points_in_block > 0) {
-			cur_pos[idx] = dci_next_closest_proj(
+			cur_pos[idx] = dci_next_closest_proj_original(
 					&(dci_inst->indices[idx * (dci_inst->num_points)
 							+ blockIdx.x * points_per_block]),
 					&(left_pos[idx]), &(right_pos[idx]), query_proj[idx],
@@ -1352,7 +1352,7 @@ static void dci_query_single_point_by_block_original(const dci* const dci_inst,
 					__syncthreads();
 					// use the first thread to update
 					if (threadIdx.x == 0) {
-						cur_pos[i] = dci_next_closest_proj(
+						cur_pos[i] = dci_next_closest_proj_original(
 								&(dci_inst->indices[i * (dci_inst->num_points)
 										+ blockIdx.x * points_per_block]),
 								&(left_pos[i]), &(right_pos[i]), query_proj[i],
