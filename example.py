@@ -44,7 +44,7 @@ def main():
     num_heads = 1
     #dim = 100
     dim = 100
-    num_pts = 2000 # 2000 - 3000, an illegal memory access was encountered
+    num_pts = 500 # 2000 - 3000, an illegal memory access was encountered
     num_queries = 200 # 100 - 500, all pass
     #num_pts = 2000
     #num_queries = 100
@@ -77,7 +77,7 @@ def main():
     #num_simp_indices = 10
     #num_outer_iterations = 80
     block_size = 100
-    thread_size = 20
+    thread_size = 40
     num_comp_indices = 2
     num_simp_indices = 10
     num_outer_iterations = 5000
