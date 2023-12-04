@@ -1840,13 +1840,12 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
-		int test_head = 0;
 		dci_query_single_point_by_block_original<<<block_size, thread_size>>>(
 				dci_inst,
 				num_neighbours, 
 				//&(dci_inst->indices[dci_inst->num_points * dim * test_head]),
-				&(query[j * dim + num_queries * dim * test_head]),
-				&(query_proj[j * num_indices + num_indices * num_queries * test_head]), 
+				&(query[j * dim]),
+				&(query_proj[j * num_indices]), 
 				*d_query_config,
 				d_top_candidates_dist, 
 				d_top_candidates_index, 
@@ -1855,7 +1854,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				candidate_dists);
 
 		cudaDeviceSynchronize();
-		
+
 		// candidate_dists
 		int data_total, data_size;
 		float* h_data;
@@ -1870,7 +1869,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			printf("\n");
 			printf("candidate_dists\n");
 			for (int i = 0; i < (dci_inst->num_points); i++) {
-				printf("%f ", h_data[i + dci_inst->num_points * j]);
+				printf("%f ", h_data[i]);
 			}
 			cudaFree(h_data); 
 
@@ -1884,7 +1883,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			printf("\n");
 			printf("counts\n");
 			for (int i = 0; i < (dci_inst->num_points * dci_inst->num_comp_indices); i++) {
-				printf("%d ", i_data[i + dci_inst->num_points * dci_inst->num_comp_indices * j]);
+				printf("%d ", i_data[i]);
 			}
 			printf("\n");
 			cudaFree(i_data);
@@ -1898,8 +1897,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 			printf("\n");
 			printf("d_top_candidates_dist\n");
-			for (int j = 0; j < num_heads; j ++) {
-				printf("head %d\n", j);
+			for (int h = 0; h < num_heads; h ++) {
+				printf("head %d\n", h);
 				for (int i = 0; i < (num_neighbours * block_size * thread_size); i++) {
 					printf("%f ", h_data[i + num_neighbours * block_size * thread_size * j]);
 				}
@@ -1917,10 +1916,10 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 			printf("\n");
 			printf("d_top_candidates_index\n");
-			for (int j = 0; j < num_heads; j ++) {
-				printf("head %d\n", j);
+			for (int h = 0; h < num_heads; h ++) {
+				printf("head %d\n", h);
 				for (int i = 0; i < (num_neighbours * block_size * thread_size); i++) {
-					printf("%d ", i_data[i + num_neighbours * block_size * thread_size * j]);
+					printf("%d ", i_data[i + num_neighbours * block_size * thread_size * h]);
 				}
 				printf("\n");
 			}
@@ -1969,10 +1968,10 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 			printf("\n");
 			printf("d_all_candidates\n");
-			for (int j = 0; j < num_heads; j ++) {
-				printf("head %d\n", j);
+			for (int h = 0; h < num_heads; h ++) {
+				printf("head %d\n", h);
 				for (int i = 0; i < (max_possible_num_candidates * block_size); i++) {
-					printf("%d ", i_data[i + max_possible_num_candidates * block_size * j]);
+					printf("%d ", i_data[i + max_possible_num_candidates * block_size * h]);
 				}
 				printf("\n");
 			}
@@ -1988,10 +1987,10 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			printf("\n");
 			printf("\n");
 			printf("candidate_dists\n");
-			for (int j = 0; j < num_heads; j ++) {
-				printf("head %d\n", j);
+			for (int h = 0; h < num_heads; h ++) {
+				printf("head %d\n", h);
 				for (int i = 0; i < (dci_inst->num_points); i++) {
-					printf("%f ", h_data[i + dci_inst->num_points * j]);
+					printf("%f ", h_data[i + dci_inst->num_points * h]);
 				}
 				printf("\n");
 			}
@@ -2005,10 +2004,10 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 			printf("\n");
 			printf("counts\n");
-			for (int j = 0; j < num_heads; j ++) {
-				printf("head %d\n", j);
+			for (int h = 0; h < num_heads; h ++) {
+				printf("head %d\n", h);
 				for (int i = 0; i < (dci_inst->num_points * dci_inst->num_comp_indices); i++) {
-					printf("%d ", i_data[i + dci_inst->num_points * dci_inst->num_comp_indices * j]);
+					printf("%d ", i_data[i + dci_inst->num_points * dci_inst->num_comp_indices * h]);
 				}
 				printf("\n");
 			}
@@ -2025,10 +2024,10 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 			printf("\n");
 			printf("d_top_candidates_dist\n");
-			for (int j = 0; j < num_heads; j ++) {
-				printf("head %d\n", j);
+			for (int h = 0; h < num_heads; h ++) {
+				printf("head %d\n", h);
 				for (int i = 0; i < (num_neighbours * block_size * thread_size); i++) {
-					printf("%f ", h_data[i + num_neighbours * block_size * thread_size * j]);
+					printf("%f ", h_data[i + num_neighbours * block_size * thread_size * h]);
 				}
 				printf("\n");
 			}
@@ -2043,10 +2042,10 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 			printf("\n");
 			printf("d_top_candidates_index\n");
-			for (int j = 0; j < num_heads; j ++) {
-				printf("head %d\n", j);
+			for (int h = 0; h < num_heads; h ++) {
+				printf("head %d\n", h);
 				for (int i = 0; i < (num_neighbours * block_size * thread_size); i++) {
-					printf("%d ", i_data[i + num_neighbours * block_size * thread_size * j]);
+					printf("%d ", i_data[i + num_neighbours * block_size * thread_size * h]);
 				}
 				printf("\n");
 			}
@@ -2054,12 +2053,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			cudaFree(i_data);
 			*/
 		}
-
-		//dci_query_single_point_by_block<<<block_size, thread_size>>>(dci_inst,
-		//		num_neighbours, &(query[j * dim]),
-		//		&(query_proj[j * num_indices]), *d_query_config,
-		//		d_top_candidates_dist, d_top_candidates_index, d_all_candidates,
-		//		counts, candidate_dists);
 
 		// get the final output
 		if (!query_config.blind) {
