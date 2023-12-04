@@ -44,7 +44,7 @@ def main():
     num_heads = 1
     #dim = 100
     dim = 100
-    num_pts = 500 # 2000 - 3000, an illegal memory access was encountered
+    num_pts = 2000 # 2000 - 3000, an illegal memory access was encountered
     num_queries = 200 # 100 - 500, all pass
     #num_pts = 2000
     #num_queries = 100
