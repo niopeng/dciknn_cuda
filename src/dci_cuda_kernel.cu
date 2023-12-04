@@ -1097,7 +1097,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 
 				__syncthreads();
 
-				// ----------------------------------- check indexing ------------------------------------------ // 
 				if (top_h[curr_head] >= 0) {
 					// use the first thread to update
 					if ((threadIdx.x % blockDim_head) == 0) {
@@ -1130,7 +1129,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 						}
 					}
 				}
-				// ----------------------------------- check indexing ------------------------------------------ // 
 
 				if (threadIdx.x == 0) {
 					m = m + 1;
