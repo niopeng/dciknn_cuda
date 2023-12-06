@@ -1628,6 +1628,9 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	float* query_proj;
 	float* query_proj_column;
 
+	//int blockDim_head = (int) (blockDim.x / num_heads);
+	//int head_threadIdx = threadIdx.x % blockDim_head;
+
 	cudaMallocManaged((void **) (&query_proj),
 			sizeof(float) * num_indices * num_queries * num_heads);
 
