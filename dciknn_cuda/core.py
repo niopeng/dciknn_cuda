@@ -16,8 +16,8 @@ Copyright (C) 2020    Ke Li, Shichong Peng, Mehran Aghabozorgi
 '''
 
 import torch
-#from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _dci_free, _dci_multi_query
-from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _dci_free
+from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _dci_free, _dci_multi_query
+#from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _dci_free
 
 from math import sqrt
 
@@ -27,7 +27,7 @@ def get_num_head(num_heads, num_devices):
     num_head_list = []
 
     for i in range(num_devices):
-        if (curr_num >= num_head_split):
+        if (curr_num >= (num_head_split * 2)):
             num_head_list.append(num_head_split)
             curr_num = curr_num - num_head_split
         else:
@@ -156,22 +156,25 @@ class MDCI(object):
 
     def add(self, data):
         if (self.num_heads > 1):
-            self.num_head_split = self.num_heads // self.num_devices + 1
+            self.num_head_split = self.num_heads // self.num_devices
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
                 curr_num_head = self.num_head_list[dev_ind]
-
-                #cur_data = data[dev_ind * self.num_head_split: dev_ind * self.num_head_split + curr_num_head, :, :].to(device)
-                #self.dcis[dev_ind].add(cur_data)
+                cur_data = data[dev_ind * self.num_head_split: dev_ind * self.num_head_split + curr_num_head + 1, :, :].to(device)
+                self.dcis[dev_ind].add(cur_data)
         else:
-            self.data_per_device = data.shape[1] // self.num_devices + 1 
+            self.data_per_device = data.shape[1] // self.num_devices
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
-                cur_data = data[:, dev_ind * self.data_per_device: dev_ind * self.data_per_device + self.data_per_device, :].to(device)
-                
+                cur_data = data[:, dev_ind * self.data_per_device: dev_ind * self.data_per_device + self.data_per_device + 1, :].to(device)
                 print(cur_data.shape)
-                
                 self.dcis[dev_ind].add(cur_data)
+
+            #self.data_per_device = data.shape[1] // self.num_devices + 1 
+            #for dev_ind in range(self.num_devices):
+            #    device = self.devices[dev_ind]
+            #    cur_data = data[:, dev_ind * self.data_per_device: dev_ind * self.data_per_device + self.data_per_device, :].to(device)
+            #    self.dcis[dev_ind].add(cur_data)
         
     def query(self, query, num_neighbours=-1, num_outer_iterations=5000, blind=False):
         dists = []
@@ -185,12 +188,12 @@ class MDCI(object):
             _query = query
         _query = _query.detach().clone()
 
-
         max_num_candidates = 10 * num_neighbours
 
         queries = [_query.to(self.devices[dev_ind]).flatten() for dev_ind in self.devices]
-        #res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, 1, _query.shape[0], queries, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
-
+        res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], self.num_head_list, queries, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
+        #res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[0], queries, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
+        
         #for ind, cur_res in enumerate(res):
         #    half = cur_res.shape[0] // 2
         #    cur_nns, cur_dist = cur_res[:half].reshape(_query.shape[0], -1), cur_res[half:].reshape(_query.shape[0], -1)
