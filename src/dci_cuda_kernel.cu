@@ -1603,6 +1603,8 @@ __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const 
 	}
 }
 
+
+
 // If blind querying is used, nearest_neighbours must be of size num_queries * max_possible_num_candidates; otherwise, it must be of size num_queries * num_neighbours
 // nearest_neighbour_dists can be NULL when blind querying is used
 void dci_query(dci* const dci_inst, const int dim, const int num_heads, const int num_queries,
@@ -1661,9 +1663,9 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	cudaDeviceSynchronize();
 
 
-	int blockDim_head = (int) (blockDim.x / num_heads);
-	int head_threadIdx = threadIdx.x % blockDim_head;
-	printf("blockDim_head = %d | head_threadIdx = %d\n", blockDim_head, head_threadIdx);
+	//int blockDim_head = (int) (blockDim.x / num_heads);
+	//int head_threadIdx = threadIdx.x % blockDim_head;
+	//printf("blockDim_head = %d | head_threadIdx = %d\n", blockDim_head, head_threadIdx);
 	printf("num_heads = %d | num_querries = %d | num_indices = %d\n", num_heads, num_queries, num_indices);
 
 	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
