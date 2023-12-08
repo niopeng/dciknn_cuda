@@ -1582,10 +1582,15 @@ __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const 
 		head = (int) (idx / num_queries);
 		query = idx % num_queries;
 
+		if (query == 2) {
+			if (head == 1) {
+				printf("start index = %d\n", query * num_heads * num_indices + head * num_indices]);
+			}
+		}
+
 		for (int k = 0; k < num_indices; k++) {
 			query_proj_column[query * num_heads * num_indices + head * num_indices + k] =
 				query_proj[head * num_queries * num_indices + query * num_indices + k];
-
 
 			if (query == 2) {
 				if (head == 1) {
@@ -1690,6 +1695,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	h_data2 = (float *) malloc(data_size2);
 	cudaMemcpy(h_data2, query_proj_column, data_size2, cudaMemcpyDeviceToHost);
 	printf("query_proj_column, test\n");
+	printf("start_index 1 = %d\n", 2 * num_indices * num_heads + num_indices * 0);
+	printf("start_index 1 = %d\n", 2 * num_indices * num_heads + num_indices * 1);
 	for (int h = 0; h < num_heads; h++) {
 		printf("head: %d\n", h);
 		for (int i = 0; i < num_indices; i++) {
