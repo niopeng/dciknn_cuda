@@ -195,6 +195,8 @@ __global__ void copy_to_indices(dci* const dci_inst, float* const data_proj,
 void dci_add(dci* const dci_inst, const int dim, const int num_points, const int num_heads,
 		float* const data, const int block_size, const int thread_size) {
 
+	printf("At dci_add\n");
+
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	float *data_proj;
 	cudaMallocManaged((void **) &data_proj,
@@ -212,6 +214,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 
 	dci_inst->num_points = num_points;
 
+	/*
 	printf("h = 0\n");
 	int h = 0;
 	for (int j = 0; j < 5 * dim; j++) {
@@ -226,6 +229,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 		printf("%f ", dci_inst->data[i]);
 	}
 	printf("\n");
+	*/
 
 	/*
 	int data_size = sizeof(float) * dim * num_indices * num_heads;
