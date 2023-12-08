@@ -207,7 +207,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	assert(dci_inst->num_points == 0);
 
 	cudaMallocManaged((void **) &dci_inst->data,
-			sizeof(float) * num_points * dim * num_points);
+			sizeof(float) * num_points * dim * num_heads);
 	dci_inst->data = data;
 	cudaMallocManaged((void **) &dci_inst->indices,
 			sizeof(idx_elem) * num_points * num_indices * num_heads);
@@ -238,17 +238,16 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	printf("\n");
 	*/
 
-	/*
-	int data_size = sizeof(float) * dim * num_indices * num_heads;
+	int data_size = sizeof(float) * num_points * dim * num_heads;
 	float* h_data = (float *) malloc(data_size);
 	cudaMemcpy(h_data, dci_inst->data, data_size, cudaMemcpyDeviceToHost);
 	printf("dci_add, dci_inst->data");
 	for (int h = 0; h < num_heads; h++) {
 		printf("head: %d\n", h);
-		for (int i = 0; i < num_indices; i++) {
+		for (int i = 0; i < num_points; i++) {
 			printf("index: %d\n", i);
 			for (int j = 0; j < dim; j++) {
-				printf("%f ", h_data[j + i * num_indices + h * num_indices * dim]);
+				printf("%f ", h_data[j + i * num_points + h * num_points * dim]);
 			}
 			printf("\n");
 		}
@@ -256,7 +255,6 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	}
 	cudaFree(h_data);
 	printf("\n");
-	*/
 
     // project vector
 	/*
