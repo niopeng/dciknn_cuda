@@ -1568,6 +1568,13 @@ __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const 
 		for (int k = 0; k < num_indices; k++) {
 			query_proj_column[query * num_heads * num_indices + head * num_indices + k] =
 				query_proj[head * num_queries * num_indices + query * num_indices + k];
+
+			if (head == 1) {
+				if (quert == 2) {
+					printf("new index = %d\n", query * num_heads * num_indices + head * num_indices + k);
+					printf("old index = %d\n", head * num_queries * num_indices + query * num_indices + k);
+				}
+			}
 		}
 	}
 }
