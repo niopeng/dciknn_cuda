@@ -1552,6 +1552,22 @@ void get_top_blind_candidates(int* const nearest_neighbours,
 	}
 }
 
+/*
+__global__ void init_counts(const dci* const dci_inst, int* counts) {
+	int i = blockDim.x * blockIdx.x + threadIdx.x;
+	int total = dci_inst->num_comp_indices * dci_inst->num_points;
+	total = dci_inst->num_heads * total;
+	int chunk_size = (total + blockDim.x * gridDim.x - 1)
+			/ (blockDim.x * gridDim.x);
+	for (int j = 0; j < chunk_size; j++) {
+		int l = i * chunk_size + j;
+		if (l < total) {
+			counts[l] = 0;
+		}
+	}
+}
+*/
+
 // change the dimension of query project from (head, query, indices) to (query, head, indices)
 __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const query_proj_column, 
 		const int num_heads, const int num_queries, const int num_indices) {
@@ -1569,13 +1585,6 @@ __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const 
 		for (int k = 0; k < num_indices; k++) {
 			query_proj_column[query * num_heads * num_indices + head * num_indices + k] =
 				query_proj[head * num_queries * num_indices + query * num_indices + k];
-
-			if (head == 1) {
-				if (query == 2) {
-					printf("new index = %d\n", query * num_heads * num_indices + head * num_indices + k);
-					printf("old index = %d\n", head * num_queries * num_indices + query * num_indices + k);
-				}
-			}
 		}
 	}
 }
@@ -1642,6 +1651,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
 	cudaDeviceSynchronize();
+	printf("\n");
 
 	int data_size2 = sizeof(float) * num_indices * num_queries * num_heads;
 	float* h_data2 = (float *) malloc(data_size2);
@@ -1665,14 +1675,10 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	h_data2 = (float *) malloc(data_size2);
 	cudaMemcpy(h_data2, query_proj_column, data_size2, cudaMemcpyDeviceToHost);
 	printf("query_proj_column, test\n");
-	for (int i_query = 0; i_query < 5; i_query++) {
-		printf("query: %d\n", i_query);
-		for (int i_head = 0; i_head < num_heads; i_head++) {
-			printf("head: %d\n", i_head);
-			for (int i_indices = 0; i_indices < num_indices; i_indices++) {
-				printf("%f ", h_data2[i_indices + num_indices * i_head + num_indices * num_heads * i_query]);
-			}
-			printf("\n");
+	for (int h = 0; h < num_heads; h++) {
+		printf("head: %d\n", h);
+		for (int i = 0; i < num_indices; i++) {
+			printf("%f ", h_data2[2 * num_indices * num_heads + num_indices * h + i]);
 		}
 		printf("\n");
 	}
