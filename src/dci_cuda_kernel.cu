@@ -108,7 +108,7 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 
 	// ---------------- testing: same project vector for same head ---------------- //
 	for (int i = 0; i < dim * num_indices; i++) {
-		dci_inst->proj_vec[i + dim * num_indices * i] = dci_inst->proj_vec[i];
+		dci_inst->proj_vec[i + dim * num_indices * num_heads] = dci_inst->proj_vec[i];
 	}
 
 	printf("h = 0\n");
