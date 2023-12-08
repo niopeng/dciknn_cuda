@@ -1588,12 +1588,12 @@ __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const 
 
 
 			if (query == 2) {
-				if (head == 0) {
+				if (head == 1) {
 					printf("%f ", query_proj_column[query * num_heads * num_indices + head * num_indices + k]);
 				}
 			}
 		}
-		
+
 		if (query == 2) {
 			if (head == 0) {
 				printf("\n");
