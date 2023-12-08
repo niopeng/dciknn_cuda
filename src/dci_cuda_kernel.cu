@@ -1574,7 +1574,8 @@ __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const 
 
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
 	int total = num_heads * num_queries;
-	int chunk_size = (total + blockDim.x * gridDim.x - 1) / (blockDim.x * gridDim.x);
+	int chunk_size = (total + blockDim.x * gridDim.x - 1)
+			/ (blockDim.x * gridDim.x);
 
 	int idx, head, query;
 	for (int j = 0; j < chunk_size; j++) {
@@ -1583,7 +1584,8 @@ __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const 
 		query = idx % num_queries;
 
 		if (query == 2) {
-			printf("start index = %d\n", query * num_heads * num_indices + head * num_indices);
+			printf("head = %d\n", head);
+			//printf("start index = %d\n", query * num_heads * num_indices + head * num_indices);
 		}
 
 		for (int k = 0; k < num_indices; k++) {
@@ -1630,9 +1632,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	float* query_proj;
 	float* query_proj_column;
 
-	//int blockDim_head = (int) (blockDim.x / num_heads);
-	//int head_threadIdx = threadIdx.x % blockDim_head;
-
 	cudaMallocManaged((void **) (&query_proj),
 			sizeof(float) * num_indices * num_queries * num_heads);
 
@@ -1661,6 +1660,10 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	}
 	cudaDeviceSynchronize();
 
+
+	int blockDim_head = (int) (blockDim.x / num_heads);
+	int head_threadIdx = threadIdx.x % blockDim_head;
+	printf("blockDim_head = %d | head_threadIdx = %d\n", blockDim_head, head_threadIdx);
 	printf("num_heads = %d | num_querries = %d | num_indices = %d\n", num_heads, num_queries, num_indices);
 
 	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
