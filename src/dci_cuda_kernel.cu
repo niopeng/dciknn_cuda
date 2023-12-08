@@ -1585,6 +1585,19 @@ __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const 
 		for (int k = 0; k < num_indices; k++) {
 			query_proj_column[query * num_heads * num_indices + head * num_indices + k] =
 				query_proj[head * num_queries * num_indices + query * num_indices + k];
+
+
+			if (query == 2) {
+				if (head == 0) {
+					printf("%f ", query_proj_column[query * num_heads * num_indices + head * num_indices + k]);
+				}
+			}
+		}
+		
+		if (query == 2) {
+			if (head == 0) {
+				printf("\n");
+			}
 		}
 	}
 }
@@ -1649,10 +1662,12 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	}
 	cudaDeviceSynchronize();
 
+	printf("num_heads = %d | num_querries = %d | num_indices = %d\n", num_heads, num_queries, num_indices);
+
 	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
 	cudaDeviceSynchronize();
-	printf("\n");
 
+	printf("\n");
 	int data_size2 = sizeof(float) * num_indices * num_queries * num_heads;
 	float* h_data2 = (float *) malloc(data_size2);
 	cudaMemcpy(h_data2, query_proj, data_size2, cudaMemcpyDeviceToHost);
