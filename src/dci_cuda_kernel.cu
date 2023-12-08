@@ -214,6 +214,12 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 
 	dci_inst->num_points = num_points;
 
+	printf("num_points = %d\n", dci_inst->num_points);
+	printf("num_points = %f\n", dci_inst->data[0]);
+	printf("num_points = %f\n", dci_inst->data[1]);
+
+
+	/*
 	printf("h = 0\n");
 	//int h = 0;
 	for (int j = 0; j < (5 * dim); j++) {
@@ -221,6 +227,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 		printf("%f ", dci_inst->data[j]);
 	}
 	printf("\n");
+	*/
 	/*
 	printf("h = 1\n");
 	h = 1;
