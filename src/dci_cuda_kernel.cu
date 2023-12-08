@@ -1656,7 +1656,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	*/
 
 	int data_size2 = sizeof(float) * num_indices * num_queries * num_heads;
-	int h_data2 = (float *) malloc(data_size2);
+	float* h_data2 = (float *) malloc(data_size2);
 	cudaMemcpy(h_data2, query_proj_column, data_size2, cudaMemcpyDeviceToHost);
 	printf("query_proj_column, test\n");
 	for (int i_query = 0; i_query < 5; i_query++) {
@@ -1668,7 +1668,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			}
 			printf("\n");
 		}
-		printf("\n")
+		printf("\n");
 	}
 	cudaFree(h_data2);
 	printf("\n");
