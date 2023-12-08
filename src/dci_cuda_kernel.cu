@@ -1657,7 +1657,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 	int data_size2 = sizeof(float) * num_indices * num_queries * num_heads;
 	float* h_data2 = (float *) malloc(data_size2);
-	cudaMemcpy(h_data2, dci_query_proj_3d_permute, data_size2, cudaMemcpyDeviceToHost);
+	cudaMemcpy(h_data2, query_proj_column, data_size2, cudaMemcpyDeviceToHost);
 	printf("query_proj, test\n");
 	for (int h = 0; h < 2; h++) {
 		printf("query: %d\n", h);
