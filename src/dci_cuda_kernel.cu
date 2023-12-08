@@ -1583,7 +1583,7 @@ __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const 
 		query = idx % num_queries;
 
 		if (query == 2) {
-			if (head == 1) {
+			if (head == 0) {
 				printf("start index = %d\n", query * num_heads * num_indices + head * num_indices);
 			}
 		}
@@ -1593,14 +1593,14 @@ __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const 
 				query_proj[head * num_queries * num_indices + query * num_indices + k];
 
 			if (query == 2) {
-				if (head == 1) {
+				if (head == 0) {
 					printf("%f ", query_proj_column[query * num_heads * num_indices + head * num_indices + k]);
 				}
 			}
 		}
 
 		if (query == 2) {
-			if (head == 1) {
+			if (head == 0) {
 				printf("\n");
 			}
 		}
