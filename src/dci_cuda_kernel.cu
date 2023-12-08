@@ -137,6 +137,7 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 }
 
 /* Sort indices */
+/*
 __global__ void sort_indices(dci* const dci_inst, const int num_indices,
 		const int num_points, const int num_heads, const int points_per_block) {
 	//int chunk_size = (num_indices + blockDim.x - 1) / blockDim.x;
@@ -168,6 +169,33 @@ __global__ void sort_indices(dci* const dci_inst, const int num_indices,
 			//		&(dci_inst->indices[idx * dci_inst->num_points
 			//				+ points_per_block * blockIdx.x]),
 			//		num_points_in_block);
+		}
+	}
+}
+*/
+
+__global__ void sort_indices(dci* const dci_inst, const int num_indices,
+		const int num_points, const int points_per_block) {
+
+	int blockDim_head = (int) (blockDim.x / num_heads);
+	
+	int total = num_indices;
+	int chunk_size = (total + blockDim_head - 1) / blockDim_head;
+	int curr_head = (int) (threadIdx.x / blockDim_head);
+	int curr_head_thread = threadIdx.x % blockDim_head;
+
+	int idx;
+	int num_points_in_block = min(
+			(int) (dci_inst->num_points - blockIdx.x * points_per_block),
+			points_per_block);
+	for (int j = 0; j < chunk_size; j++) {
+		idx = curr_head_thread * chunk_size + j;
+		if (idx < total) {
+			mix_sort(
+					&(dci_inst->indices[idx * dci_inst->num_points
+							+ blockIdx.x * points_per_block 
+							+ num_points * num_indices * curr_head]),
+					num_points_in_block);
 		}
 	}
 }
@@ -302,44 +330,21 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	/* Add to indices */
 	copy_to_indices	<<<block_size, thread_size>>>(dci_inst, data_proj, num_indices, num_points, num_heads);
 
-	/*print result - testing*/
-	int data_size = sizeof(idx_elem) * num_heads * num_points * num_indices;
-	idx_elem* h_data = (idx_elem *) malloc(data_size);
-	cudaMemcpy(h_data, dci_inst->indices, data_size, cudaMemcpyDeviceToHost);
-
-	for (int h = 0; h < num_heads; h++) {
-		printf("head: %d\n", h);
-		for (int i = 0; i < 2; i++) {
-			printf("index: %d\n", i);
-			for (int j = 0; j < num_points; j++) {
-				printf("%d ", h_data[j + i * num_points + h * num_points * num_indices].value);
-			}
-			printf("\n");
-		}
-		printf("head: %d\n", h);
-	}
-
-	cudaFree(h_data);
-	printf("\n");
-	/*testing*/
-
 	/* Synchronize the threads */
 	cudaDeviceSynchronize();
 
-	//int points_per_block = (dci_inst->num_points + block_size - 1) / block_size;
-	//int points_per_block = (dci_inst->num_points * num_heads + block_size - 1) / block_size;
+	int points_per_block = (dci_inst->num_points + block_size - 1) / block_size;
 	/* Sort the indices */
-	//sort_indices<<<block_size, thread_size>>>(dci_inst, num_indices, num_points, num_heads,
-	//		points_per_block);
+	sort_indices<<<block_size, thread_size>>>(dci_inst, num_indices, num_points, num_heads,
+			points_per_block);
 
-	/*
 	int data_size = sizeof(idx_elem) * num_heads * num_points * num_indices;
 	idx_elem* h_data = (idx_elem *) malloc(data_size);
 	cudaMemcpy(h_data, dci_inst->indices, data_size, cudaMemcpyDeviceToHost);
 
 	for (int h = 0; h < num_heads; h++) {
 		printf("head: %d\n", h);
-		for (int i = 0; i < num_indices; i++) {
+		for (int i = 0; i < 3; i++) {
 			printf("index: %d\n", i);
 			for (int j = 0; j < num_points; j++) {
 				printf("%d ", h_data[j + i * num_points + h * num_points * num_indices].value);
@@ -351,7 +356,6 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 
 	cudaFree(h_data);
 	printf("\n");
-	*/
 
 	/*
 	int data_size = sizeof(float) * dim * num_indices * num_heads;
