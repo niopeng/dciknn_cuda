@@ -195,7 +195,7 @@ __global__ void copy_to_indices(dci* const dci_inst, float* const data_proj,
 void dci_add(dci* const dci_inst, const int dim, const int num_points, const int num_heads,
 		float* const data, const int block_size, const int thread_size) {
 
-	printf("At dci_add\n");
+	printf("At dci_add | dim = %d | num_points = %d | num_heads = %d\n", dim, num_points, num_heads);
 
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	float *data_proj;
@@ -214,20 +214,22 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 
 	dci_inst->num_points = num_points;
 
+	/*
 	printf("h = 0\n");
 	int h = 0;
-	for (int j = 0; j < 4 * dim; j++) {
-		int i = j + num_points * dim * h;
+	for (int j = 0; j < 5 * dim; j++) {
+		int i = j;
 		printf("%f ", dci_inst->data[i]);
 	}
 	printf("\n");
 	printf("h = 1\n");
 	h = 1;
-	for (int j = 0; j < 4 * dim; j++) {
+	for (int j = 0; j < 5 * dim; j++) {
 		int i = j + num_points * dim * h;
 		printf("%f ", dci_inst->data[i]);
 	}
 	printf("\n");
+	*/
 
 	/*
 	int data_size = sizeof(float) * dim * num_indices * num_heads;

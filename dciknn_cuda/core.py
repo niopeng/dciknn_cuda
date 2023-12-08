@@ -88,6 +88,9 @@ class DCI(object):
         self.num_heads = data.shape[0]
         self.num_points = data.shape[1]
 
+        print(self.num_heads)
+        print(self.num_points)
+
         #print("core.py add function num_points: " + str(self.num_points))
 
         _dci_add(self._dci_inst, self._dim, self.num_points, self.num_heads, data.flatten(), self._block_size, self._thread_size)
