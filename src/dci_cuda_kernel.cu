@@ -108,24 +108,26 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 			sizeof(float) * dim * num_indices * num_heads);
 	dci_gen_proj_vec(dci_inst->proj_vec, dim, num_indices, num_heads);
 
-	// check gen_proj_vec
-	//for (int i = 0; i < num_heads; i++) {
-	//	printf("num_heads: %d\n", i);
-	//	for (int j = 0; j < dim * num_indices; j++) {
-	//		printf("%f ", dci_inst->proj_vec[]);
-	//	}
-	//	printf("\n");
-	//}
+	// ---------------- testing: same project vector for same head ---------------- //
+	for (int i = 0; i < dim * num_indices; i++) {
+		dci_inst->proj_vec[i + dim * num_indices * num_heads] = dci_inst->proj_vec[i];
+	}
+	// ---------------- testing: same project vector for same head ---------------- //
 
-	/*
-	printf("\n");
-	int h = 1;
-	for (int j = 0; j < dim * num_indices; j++) {
+	printf("h = 0\n");
+	int h = 0;
+	for (int j = 0; j < dim * 5; j++) {
 		int i = j + dim * num_indices * h;
 		printf("%f ", dci_inst->proj_vec[i]);
 	}
 	printf("\n");
-	*/
+	printf("h = 1\n");
+	h = 1;
+	for (int j = 0; j < dim * 5; j++) {
+		int i = j + dim * num_indices * h;
+		printf("%f ", dci_inst->proj_vec[i]);
+	}
+	printf("\n");
 
 	/* Variables that initialize to default values */
 	dci_inst->num_points = 0;
@@ -1027,8 +1029,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 								+ dci_inst->num_comp_indices * dci_inst->num_points * curr_head]
 								== dci_inst->num_simp_indices) { 
 						
-						// add offset to candidate_dists
-
+							// add offset to candidate_dists
 							if (candidate_dists[cur_point + dci_inst->num_points * curr_head] == -2.0) {
 								if (query_config.blind) {
 									candidate_dists[cur_point + dci_inst->num_points * curr_head] = -1.0;
@@ -1040,7 +1041,6 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 									num_candidates++;		
 								} else {
 									// Compute distance
-
 									cur_dist = compute_dist_device(
 											&(dci_inst->data[cur_point * dci_inst->dim
 													+ dci_inst->num_points * dci_inst->dim * curr_head]), 
@@ -1139,7 +1139,7 @@ static void dci_query_single_point_by_block(const dci* const dci_inst,
 				}
 				__syncthreads();
 			}
-		
+
 			if ((threadIdx.x % blockDim_head) == 0) {
 				if (!could_break[curr_head]) {
 					if (num_candidates >= num_neighbours) {
