@@ -1584,7 +1584,7 @@ __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const 
 		query = idx % num_queries;
 
 		if (query == 2) {
-			printf("head = %d\n", head);
+			printf("head = %d | num_heads = %d | num_queries = %d | num_indices = %d\n", head, num_heads, num_queries, num_indices);
 			//printf("start index = %d\n", query * num_heads * num_indices + head * num_indices);
 		}
 
