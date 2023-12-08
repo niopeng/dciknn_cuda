@@ -1552,22 +1552,6 @@ void get_top_blind_candidates(int* const nearest_neighbours,
 	}
 }
 
-/*
-__global__ void init_counts(const dci* const dci_inst, int* counts) {
-	int i = blockDim.x * blockIdx.x + threadIdx.x;
-	int total = dci_inst->num_comp_indices * dci_inst->num_points;
-	total = dci_inst->num_heads * total;
-	int chunk_size = (total + blockDim.x * gridDim.x - 1)
-			/ (blockDim.x * gridDim.x);
-	for (int j = 0; j < chunk_size; j++) {
-		int l = i * chunk_size + j;
-		if (l < total) {
-			counts[l] = 0;
-		}
-	}
-}
-*/
-
 // change the dimension of query project from (head, query, indices) to (query, head, indices)
 __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const query_proj_column, 
 		const int num_heads, const int num_queries, const int num_indices) {
@@ -1583,12 +1567,6 @@ __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const 
 		if (idx < total) {
 			head = (int) (idx / num_queries);
 			query = idx % num_queries;
-
-			if (query == 2) {
-				printf("head = %d | num_heads = %d | num_queries = %d | num_indices = %d\n", head, num_heads, num_queries, num_indices);
-				//printf("start index = %d\n", query * num_heads * num_indices + head * num_indices);
-			}
-
 			for (int k = 0; k < num_indices; k++) {
 				query_proj_column[query * num_heads * num_indices + head * num_indices + k] =
 					query_proj[head * num_queries * num_indices + query * num_indices + k];
@@ -1597,15 +1575,9 @@ __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const 
 					printf("%f ", query_proj_column[query * num_heads * num_indices + head * num_indices + k]);
 				}
 			}
-
-			if (query == 2) {
-				printf("\n");
-			}
 		}
 	}
 }
-
-
 
 // If blind querying is used, nearest_neighbours must be of size num_queries * max_possible_num_candidates; otherwise, it must be of size num_queries * num_neighbours
 // nearest_neighbour_dists can be NULL when blind querying is used
@@ -1692,14 +1664,14 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	h_data2 = (float *) malloc(data_size2);
 	cudaMemcpy(h_data2, query_proj_column, data_size2, cudaMemcpyDeviceToHost);
 	printf("query_proj_column, test\n");
-	printf("start_index 1 = %d\n", 2 * num_indices * num_heads + num_indices * 0);
-	printf("start_index 1 = %d\n", 2 * num_indices * num_heads + num_indices * 1);
-	for (int h = 0; h < num_heads; h++) {
-		printf("head: %d\n", h);
-		for (int i = 0; i < num_indices; i++) {
-			printf("%f ", h_data2[2 * num_indices * num_heads + num_indices * h + i]);
+	for (int q = 0; q < num_queries; q++) {
+		for (int h = 0; h < num_heads; h++) {
+			printf("head: %d\n", h);
+			for (int i = 0; i < num_indices; i++) {
+				printf("%f ", h_data2[q * num_indices * num_heads + num_indices * h + i]);
+			}
+			printf("\n");
 		}
-		printf("\n");
 	}
 	cudaFree(h_data2);
 	printf("\n");
