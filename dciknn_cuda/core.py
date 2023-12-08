@@ -90,6 +90,7 @@ class DCI(object):
 
         print(self.num_heads)
         print(self.num_points)
+        print(data.flatten().shape)
 
         #print("core.py add function num_points: " + str(self.num_points))
 
