@@ -127,8 +127,6 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     return final_result;
 }
 
-const int num_heads,
-
 std::vector<torch::Tensor> py_dci_multi_query(std::vector<py::handle> py_dci_inst_wrapper, const int dim,  
     const int num_queries, torch::Tensor num_head_list, std::vector<torch::Tensor> py_query, const int num_neighbours, 
     const bool blind, const int num_outer_iterations, const int max_num_candidates, const int block_size,

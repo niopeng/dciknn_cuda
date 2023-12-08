@@ -152,6 +152,7 @@ class MDCI(object):
                 self.dcis.append(dci_db)
         # one head - assign data to each device
         else:
+            self.num_head_list = [1 for dev in devices]
             self.dcis = [DCI(dim, self.num_heads, num_comp_indices, num_simp_indices, bs, ts, dev) for dev in devices]
 
     def add(self, data):
