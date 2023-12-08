@@ -1635,6 +1635,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
 	cudaDeviceSynchronize();
 
+	/*
 	int data_size2 = sizeof(float) * num_indices * num_queries * num_heads;
 	float* h_data2 = (float *) malloc(data_size2);
 	cudaMemcpy(h_data2, query_proj, data_size2, cudaMemcpyDeviceToHost);
@@ -1652,13 +1653,13 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	}
 	cudaFree(h_data2);
 	printf("\n");
+	*/
 
-	/*
 	int data_size2 = sizeof(float) * num_indices * num_queries * num_heads;
 	float* h_data2 = (float *) malloc(data_size2);
-	cudaMemcpy(h_data2, query_proj, data_size2, cudaMemcpyDeviceToHost);
+	cudaMemcpy(h_data2, dci_query_proj_3d_permute, data_size2, cudaMemcpyDeviceToHost);
 	printf("query_proj, test\n");
-	for (int h = 0; h < num_queries; h++) {
+	for (int h = 0; h < 2; h++) {
 		printf("query: %d\n", h);
 		for (int i = 0; i < num_heads; i++) {
 			printf("head: %d\n", i);
@@ -1671,7 +1672,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	}
 	cudaFree(h_data2);
 	printf("\n");
-	*/
 
 	/*
 	cudaMemGetInfo(&free_t,&total_t);
@@ -1856,6 +1856,12 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
+		/*
+		// candidate_dists
+		int data_total, data_size;
+		float* h_data;
+		int * i_data;
+
 		if (j == 0) {
 			data_total = dci_inst->num_points * num_heads;
 			data_size = sizeof(float) * data_total;
@@ -1928,6 +1934,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			printf("\n");
 			cudaFree(i_data);
 		}
+		*/
 
 		// get the final output
 		if (!query_config.blind) {
