@@ -1552,24 +1552,6 @@ void get_top_blind_candidates(int* const nearest_neighbours,
 	}
 }
 
-__global__ void copy_to_indices(dci* const dci_inst, float* const data_proj,
-		const int num_indices, const int num_points, const int num_heads) {
-	int i = blockDim.x * blockIdx.x + threadIdx.x;
-	int n = num_indices * num_points * num_heads;
-	int chunk_size = (n + blockDim.x * gridDim.x - 1)
-			/ (blockDim.x * gridDim.x);
-	int idx;
-	for (int j = 0; j < chunk_size; j++) {
-		idx = i * chunk_size + j;
-		if (idx < n) {
-			//int head = (int) (idx / (num_indices * num_points)); // start from head 0
-			dci_inst->indices[idx].key = data_proj[idx];
-			//dci_inst->indices[idx].value = (idx % num_points) + (head * num_points);
-			dci_inst->indices[idx].value = (idx % num_points); // only consider the position in the current head
-		}
-	}
-}
-
 // change the dimension of query project from (head, query, indices) to (query, head, indices)
 __global__ void dci_query_proj_3d_permute(float* const query_proj, float* const query_proj_column, 
 		const int num_heads, const int num_queries, const int num_indices) {
