@@ -218,7 +218,6 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	printf("num_points = %f\n", dci_inst->data[0]);
 	printf("num_points = %f\n", dci_inst->data[1]);
 
-
 	/*
 	printf("h = 0\n");
 	//int h = 0;
