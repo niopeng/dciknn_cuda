@@ -214,8 +214,8 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 
 	dci_inst->num_points = num_points;
 
+	/*
 	printf("num_points = %d\n", dci_inst->num_points);
-
 	int data_size = sizeof(float) * num_points * dim * num_heads;
 	float* h_data = (float *) malloc(data_size);
 	cudaMemcpy(h_data, dci_inst->data, data_size, cudaMemcpyDeviceToHost);
@@ -223,25 +223,6 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	for (int h = 0; h < num_heads; h++) {
 		printf("head: %d\n", h);
 		for (int i = 0; i < 6; i++) {
-			printf("point: %d\n", i);
-			for (int j = 0; j < dim; j++) {
-				printf("%f ", h_data[j + i * dim + h * num_points * dim]);
-			}
-			printf("\n");
-		}
-		printf("head: %d\n", h);
-	}
-	cudaFree(h_data);
-	printf("\n");
-
-	/*
-	int data_size = sizeof(float) * num_points * dim * num_heads;
-	float* h_data = (float *) malloc(data_size);
-	cudaMemcpy(h_data, dci_inst->data, data_size, cudaMemcpyDeviceToHost);
-	printf("dci_add, dci_inst->data");
-	for (int h = 0; h < num_heads; h++) {
-		printf("head: %d\n", h);
-		for (int i = 0; i < num_points; i++) {
 			printf("point: %d\n", i);
 			for (int j = 0; j < dim; j++) {
 				printf("%f ", h_data[j + i * dim + h * num_points * dim]);
@@ -279,7 +260,6 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	//		dci_inst->devID);
 	//cudaDeviceSynchronize();
 
-	/*
 	for (int i = 0; i < num_heads; i++) {
 		int proj_vec_id = i * dim * num_indices;
 		int data_id = i * num_points * dim;
@@ -297,17 +277,15 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 		);
 	}
 	cudaDeviceSynchronize();
-	*/
 
 	/*print result - testing*/
-	/*
 	int data_size = sizeof(float) * num_points * num_indices * num_heads;
 	float* h_data = (float *) malloc(data_size);
 	cudaMemcpy(h_data, data_proj, data_size, cudaMemcpyDeviceToHost);
 
 	for (int h = 0; h < num_heads; h++) {
 		printf("head: %d\n", h);
-		for (int i = 0; i < num_indices; i++) {
+		for (int i = 0; i < 5; i++) {
 			printf("index: %d\n", i);
 			for (int j = 0; j < num_points; j++) {
 				printf("%f ", h_data[j + i * num_points + h * num_points * num_indices]);
@@ -319,7 +297,6 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 
 	cudaFree(h_data);
 	printf("\n");
-	*/
 	/*testing*/
 
 	/* Add to indices */
