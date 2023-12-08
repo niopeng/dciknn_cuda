@@ -207,22 +207,20 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	assert(dci_inst->num_points == 0);
 
 	cudaMallocManaged((void **) &dci_inst->data,
-			sizeof(float) * num_points * dim * num_heads);
+			sizeof(float) * num_points * dim * num_points);
 	dci_inst->data = data;
 	cudaMallocManaged((void **) &dci_inst->indices,
 			sizeof(idx_elem) * num_points * num_indices * num_heads);
 
 	dci_inst->num_points = num_points;
 
-	/*
 	printf("h = 0\n");
-	int h = 0;
-	for (int j = 0; j < 5 * dim; j++) {
-		int i = j;
-		printf("%f ", dci_inst->data[i]);
+	//int h = 0;
+	for (int j = 0; j < (5 * dim); j++) {
+		//int i = j;
+		printf("%f ", dci_inst->data[j]);
 	}
 	printf("\n");
-	*/
 	/*
 	printf("h = 1\n");
 	h = 1;
@@ -278,6 +276,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	//		dci_inst->devID);
 	//cudaDeviceSynchronize();
 
+	/*
 	for (int i = 0; i < num_heads; i++) {
 		int proj_vec_id = i * dim * num_indices;
 		int data_id = i * num_points * dim;
@@ -293,13 +292,9 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 			&(data_proj[data_proj_id]), 
 			dci_inst->devID
 		);
-
-		//printf("proj_vec_id: %d\n", proj_vec_id);
-		//printf("data_id: %d\n", data_id);
-		//printf("data_proj_id: %d\n", data_proj_id);
-
 	}
 	cudaDeviceSynchronize();
+	*/
 
 	/*print result - testing*/
 	/*
@@ -325,7 +320,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	/*testing*/
 
 	/* Add to indices */
-	copy_to_indices	<<<block_size, thread_size>>>(dci_inst, data_proj, num_indices, num_points, num_heads);
+	//copy_to_indices	<<<block_size, thread_size>>>(dci_inst, data_proj, num_indices, num_points, num_heads);
 
 	/*print result - testing*/
 	/*
@@ -351,13 +346,13 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	/*testing*/
 
 	/* Synchronize the threads */
-	cudaDeviceSynchronize();
+	//cudaDeviceSynchronize();
 
 	//int points_per_block = (dci_inst->num_points + block_size - 1) / block_size;
-	int points_per_block = (dci_inst->num_points * num_heads + block_size - 1) / block_size;
+	//int points_per_block = (dci_inst->num_points * num_heads + block_size - 1) / block_size;
 	/* Sort the indices */
-	sort_indices<<<block_size, thread_size>>>(dci_inst, num_indices, num_points, num_heads,
-			points_per_block);
+	//sort_indices<<<block_size, thread_size>>>(dci_inst, num_indices, num_points, num_heads,
+	//		points_per_block);
 
 	/*
 	int data_size = sizeof(idx_elem) * num_heads * num_points * num_indices;
@@ -403,7 +398,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	//printf("dim = %d | num_indices = %d | num_heads = %d\n", dim, num_indices, num_heads);
 	
 	/* Synchronize the threads */
-	cudaDeviceSynchronize();
+	//cudaDeviceSynchronize();
 
 	cudaFree(data_proj);
 }
