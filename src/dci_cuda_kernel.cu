@@ -237,6 +237,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	printf("\n");
 	*/
 
+	/*
 	int data_size = sizeof(float) * num_points * dim * num_heads;
 	float* h_data = (float *) malloc(data_size);
 	cudaMemcpy(h_data, dci_inst->data, data_size, cudaMemcpyDeviceToHost);
@@ -254,6 +255,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	}
 	cudaFree(h_data);
 	printf("\n");
+	*/
 
     // project vector
 	/*
