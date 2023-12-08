@@ -346,7 +346,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 		for (int i = 0; i < 3; i++) {
 			printf("index: %d\n", i);
 			for (int j = 0; j < num_points; j++) {
-				printf("%d ", h_data[j + i * num_points + h * num_points * num_indices].value);
+				printf("%f ", h_data[j + i * num_points + h * num_points * num_indices].key);
 			}
 			printf("\n");
 		}
@@ -379,7 +379,7 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 	//printf("dim = %d | num_indices = %d | num_heads = %d\n", dim, num_indices, num_heads);
 	
 	/* Synchronize the threads */
-	//cudaDeviceSynchronize();
+	cudaDeviceSynchronize();
 
 	cudaFree(data_proj);
 }
