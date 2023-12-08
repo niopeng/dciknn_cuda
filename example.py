@@ -77,7 +77,7 @@ def main():
     #num_simp_indices = 10
     #num_outer_iterations = 80
     block_size = 100
-    thread_size = 10
+    thread_size = 20
     num_comp_indices = 2
     num_simp_indices = 10
     num_outer_iterations = 100
@@ -127,8 +127,8 @@ def main():
         ##dci_db.query(query, num_neighbours, num_outer_iterations)
         indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
         torch.set_printoptions(threshold=10000)
-        print("Nearest Indices:", indices)
-        print("Indices Distances:", dists)
+        #print("Nearest Indices:", indices)
+        #print("Indices Distances:", dists)
         dci_db.clear()
         b = datetime.datetime.now()
         print(b-a)

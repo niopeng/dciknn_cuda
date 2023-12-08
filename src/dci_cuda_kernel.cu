@@ -95,8 +95,6 @@ void dci_gen_proj_vec(float* const proj_vec, const int dim,
 void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int num_comp_indices,
 		const int num_simp_indices, const int devId) {
 
-	//printf("dci_init in dci_cuda_kernel.cu\n");
-
 	int num_indices = num_comp_indices * num_simp_indices;
 
 	dci_inst->dim = dim;
@@ -110,9 +108,8 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 
 	// ---------------- testing: same project vector for same head ---------------- //
 	for (int i = 0; i < dim * num_indices; i++) {
-		dci_inst->proj_vec[i + dim * num_indices * num_heads] = dci_inst->proj_vec[i];
+		dci_inst->proj_vec[i + dim * num_indices * i] = dci_inst->proj_vec[i];
 	}
-	// ---------------- testing: same project vector for same head ---------------- //
 
 	printf("h = 0\n");
 	int h = 0;
@@ -128,6 +125,7 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 		printf("%f ", dci_inst->proj_vec[i]);
 	}
 	printf("\n");
+	// ---------------- testing: same project vector for same head ---------------- //
 
 	/* Variables that initialize to default values */
 	dci_inst->num_points = 0;
