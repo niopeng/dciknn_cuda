@@ -174,7 +174,7 @@ __global__ void sort_indices(dci* const dci_inst, const int num_indices,
 }
 */
 
-__global__ void sort_indices(dci* const dci_inst, const int num_indices, const int num_heads
+__global__ void sort_indices(dci* const dci_inst, const int num_indices, const int num_heads,
 		const int num_points, const int points_per_block) {
 
 	int blockDim_head = (int) (blockDim.x / num_heads);
