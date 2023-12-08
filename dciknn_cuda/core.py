@@ -21,20 +21,19 @@ from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _d
 
 from math import sqrt
 
-def get_num_head(num_heads, num_devices):
-    curr_num = num_heads
-    num_head_split = num_heads // num_devices
-    num_head_list = []
+#def get_num_head(num_heads, num_devices):
+    #curr_num = num_heads
+    #num_head_split = num_heads // num_devices
+    #num_head_list = []
 
-    for i in range(num_devices):
-        if (curr_num >= (num_head_split * 2)):
-            num_head_list.append(num_head_split)
-            curr_num = curr_num - num_head_split
-        else:
-            num_head_list.append(curr_num)
-            curr_num = 0
-
-    return num_head_list
+    #for i in range(num_devices):
+    #    if (curr_num >= (num_head_split * 2)):
+    #        num_head_list.append(num_head_split)
+    #        curr_num = curr_num - num_head_split
+    #    else:
+    #        num_head_list.append(curr_num)
+    #        curr_num = 0
+    #return num_head_list
 
 # single GPU dci_knn
 class DCI(object):
@@ -141,14 +140,15 @@ class MDCI(object):
         self.num_heads = num_heads
         self.num_head_split = 0
         self.data_per_device = 0
-        self.num_head_list = []
+        #self.num_head_list = []
         self.dcis = []
 
         # more than one head - assign heads to each device
         if (self.num_heads > 1):
-            self.num_head_list = get_num_head(self.num_heads, self.num_devices)
+            #self.num_head_list = get_num_head(self.num_heads, self.num_devices)
+            self.num_head_split = self.num_heads // self.num_devices
             for i in range(self.num_devices):
-                dci_db = DCI(dim, self.num_head_list[i], num_comp_indices, num_simp_indices, bs, ts, self.devices[i])
+                dci_db = DCI(dim, self.num_head_split, num_comp_indices, num_simp_indices, bs, ts, self.devices[i])
                 self.dcis.append(dci_db)
         # one head - assign data to each device
         else:
@@ -157,11 +157,10 @@ class MDCI(object):
 
     def add(self, data):
         if (self.num_heads > 1):
-            self.num_head_split = self.num_heads // self.num_devices
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
-                curr_num_head = self.num_head_list[dev_ind]
-                cur_data = data[dev_ind * self.num_head_split: dev_ind * self.num_head_split + curr_num_head + 1, :, :].to(device)
+                #curr_num_head = self.num_head_list[dev_ind]
+                cur_data = data[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split + 1, :, :].to(device)
                 self.dcis[dev_ind].add(cur_data)
         else:
             self.data_per_device = data.shape[1] // self.num_devices
@@ -192,7 +191,7 @@ class MDCI(object):
         max_num_candidates = 10 * num_neighbours
 
         queries = [_query.to(self.devices[dev_ind]).flatten() for dev_ind in self.devices]
-        res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], self.num_head_list, queries, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
+        res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], self.num_head_split, queries, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
         #res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[0], queries, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
         
         #for ind, cur_res in enumerate(res):
