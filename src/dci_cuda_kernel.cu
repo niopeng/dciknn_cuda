@@ -111,6 +111,7 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 		dci_inst->proj_vec[i + dim * num_indices * 1] = dci_inst->proj_vec[i];
 	}
 
+	/*
 	printf("h = 0\n");
 	int h = 0;
 	for (int j = 0; j < dim * 5; j++) {
@@ -125,6 +126,7 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 		printf("%f ", dci_inst->proj_vec[i]);
 	}
 	printf("\n");
+	*/
 	// ---------------- testing: same project vector for same head ---------------- //
 
 	/* Variables that initialize to default values */
@@ -209,6 +211,21 @@ void dci_add(dci* const dci_inst, const int dim, const int num_points, const int
 			sizeof(idx_elem) * num_points * num_indices * num_heads);
 
 	dci_inst->num_points = num_points;
+
+	printf("h = 0\n");
+	int h = 0;
+	for (int j = 0; j < 5 * dim; j++) {
+		int i = j + num_points * dim * h;
+		printf("%f ", dci_inst->data[i]);
+	}
+	printf("\n");
+	printf("h = 1\n");
+	h = 1;
+	for (int j = 0; j < dim * 5; j++) {
+		int i = j + num_points * dim * h;
+		printf("%f ", dci_inst->data[i]);
+	}
+	printf("\n");
 
 	/*
 	int data_size = sizeof(float) * dim * num_indices * num_heads;
@@ -1906,8 +1923,8 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 				dci_inst,
 				num_neighbours, 
 				num_queries,
-				&(query[j * dim]), // need work on
-				&(query_proj_column[j * num_indices * num_heads]), 
+				&(query[j * dim]), 
+				&(query_proj_column[j * num_indices * num_heads]),
 				*d_query_config,
 				d_top_candidates_dist, 
 				d_top_candidates_index, 
