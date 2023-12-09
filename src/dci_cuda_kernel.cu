@@ -1828,6 +1828,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		cudaDeviceSynchronize();
 
 		// candidate_dists
+		/*
 		int data_total, data_size;
 		float* h_data;
 		int * i_data;
@@ -1904,6 +1905,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			printf("\n");
 			cudaFree(i_data);
 		}
+		*/
 
 		// get the final output
 		if (!query_config.blind) {
@@ -1930,8 +1932,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 					block_size * max_possible_num_candidates
 				);
 		}
-
-		break;
 	}
 
 	// free the allocated memories
