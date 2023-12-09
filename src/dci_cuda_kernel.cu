@@ -107,8 +107,10 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 	dci_gen_proj_vec(dci_inst->proj_vec, dim, num_indices, num_heads);
 
 	// ---------------- testing: same project vector for same head ---------------- //
-	for (int i = 0; i < dim * num_indices; i++) {
-		dci_inst->proj_vec[i + dim * num_indices * 1] = dci_inst->proj_vec[i];
+	for (int h = 0; h < num_heads; h++) {
+		for (int i = 0; i < dim * num_indices; i++) {
+			dci_inst->proj_vec[i + dim * num_indices * h] = dci_inst->proj_vec[i];
+		}
 	}
 
 	/*
