@@ -1636,12 +1636,11 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	}
 	cudaDeviceSynchronize();
 
-	printf("num_heads = %d | num_querries = %d | num_indices = %d\n", num_heads, num_queries, num_indices);
-
 	dci_query_proj_3d_permute<<<block_size, thread_size>>>(query_proj, query_proj_column, num_heads, num_queries, num_indices);
 	cudaDeviceSynchronize();
 
-	printf("\n");
+	/*
+	printf("num_heads = %d | num_querries = %d | num_indices = %d\n", num_heads, num_queries, num_indices);
 	int data_size2 = sizeof(float) * num_indices * num_queries * num_heads;
 	float* h_data2 = (float *) malloc(data_size2);
 	cudaMemcpy(h_data2, query_proj, data_size2, cudaMemcpyDeviceToHost);
@@ -1675,37 +1674,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	}
 	cudaFree(h_data2);
 	printf("\n");
-
-	/*
-	cudaMemGetInfo(&free_t,&total_t);
-	free_m =(uint)free_t/1048576.0 ;
-	total_m=(uint)total_t/1048576.0;
-	used_m=total_m-free_m;
-	printf ( "  mem free %d .... %f MB mem total %d....%f MB mem used %f MB\n",free_t,free_m,total_t,total_m,used_m);
-	*/
-
-	// testing
-	/*
-	int data_size2 = sizeof(float) * dci_inst->dim * num_indices * num_heads;
-	float* h_data2 = (float *) malloc(data_size2);
-	cudaMemcpy(h_data2, dci_inst->data, data_size2, cudaMemcpyDeviceToHost);
-	printf("dci_add, dci_inst->data, test 2\n");
-	for (int h = 0; h < num_heads; h++) {
-		printf("head: %d\n", h);
-		for (int i = 0; i < num_indices; i++) {
-			printf("index: %d\n", i);
-			for (int j = 0; j < dim; j++) {
-				printf("%f ", h_data2[j + num_indices * i + num_indices * dci_inst->dim * h]);
-			}
-			printf("\n");
-		}
-		printf("head: %d\n", h);
-	}
-	cudaFree(h_data2);
-	printf("\n");
-	printf("dci_inst->dim %d\n", dci_inst->dim);
-	printf("dci_inst->num_points %d\n", dci_inst->num_points);
-	// testing
 	*/
 
 	// copy query config to device pointer
@@ -1859,7 +1827,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 
 		cudaDeviceSynchronize();
 
-		/*
 		// candidate_dists
 		int data_total, data_size;
 		float* h_data;
@@ -1937,7 +1904,6 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 			printf("\n");
 			cudaFree(i_data);
 		}
-		*/
 
 		// get the final output
 		if (!query_config.blind) {
