@@ -43,15 +43,15 @@ def main():
     #num_queries = 500 # 100 - 500, all pass
     num_heads = 1
     #dim = 100
-    dim = 50
-    num_pts = 200 # 2000 - 3000, an illegal memory access was encountered
-    num_queries = 100 # 100 - 500, all pass
+    dim = 100
+    num_pts = 2000 # 2000 - 3000, an illegal memory access was encountered
+    num_queries = 500 # 100 - 500, all pass
     #num_pts = 2000
     #num_queries = 100
     #num_heads = 1
     #num_heads = 24
 
-    intrinsic_dim = 200
+    intrinsic_dim = 400
     #intrinsic_dim = 400
     
     data_and_queries = gen_data(dim, intrinsic_dim, num_pts + num_queries, num_heads)
@@ -103,11 +103,8 @@ def main():
         data1 = torch.cat((data_arr, data_arr), 0)
         query1 = torch.cat((query_arr, query_arr), 0)
 
-        data2 = torch.cat((data1, data1), 0)
-        query2 = torch.cat((query1, query1), 0)
-
-        data = data2.detach().clone().to(0)
-        query = query2.detach().clone().to(0)
+        data = data1.detach().clone().to(0)
+        query = query1.detach().clone().to(0)
 
         #data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
         #query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
@@ -119,7 +116,7 @@ def main():
         #print("Query 2:", query[1, :, :])
 
         a = datetime.datetime.now()
-        dci_db = DCI(dim, 4, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+        dci_db = DCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
         dci_db.add(data)
         
