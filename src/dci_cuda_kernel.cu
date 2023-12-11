@@ -107,11 +107,11 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 	dci_gen_proj_vec(dci_inst->proj_vec, dim, num_indices, num_heads);
 
 	// ---------------- testing: same project vector for same head ---------------- //
-	for (int h = 0; h < num_heads; h++) {
-		for (int i = 0; i < dim * num_indices; i++) {
-			dci_inst->proj_vec[i + dim * num_indices * h] = dci_inst->proj_vec[i];
-		}
-	}
+	//for (int h = 0; h < num_heads; h++) {
+	//	for (int i = 0; i < dim * num_indices; i++) {
+	//		dci_inst->proj_vec[i + dim * num_indices * h] = dci_inst->proj_vec[i];
+	//	}
+	//}
 
 	/*
 	printf("h = 0\n");
@@ -137,44 +137,6 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 	dci_inst->data = NULL;
 	dci_inst->devID = devId;
 }
-
-/* Sort indices */
-/*
-__global__ void sort_indices(dci* const dci_inst, const int num_indices,
-		const int num_points, const int num_heads, const int points_per_block) {
-	//int chunk_size = (num_indices + blockDim.x - 1) / blockDim.x;
-	int chunk_size = (num_heads * num_indices + blockDim.x - 1) / blockDim.x;
-	int idx;
-	//int num_points_in_block = min(
-	//		(int) (dci_inst->num_points - blockIdx.x * points_per_block),
-	//		points_per_block);
-	int num_points_in_block = min(
-			(int) (dci_inst->num_points * num_heads - blockIdx.x * points_per_block),
-			points_per_block);
-
-	for (int j = 0; j < chunk_size; j++) {
-		idx = threadIdx.x * chunk_size + j;
-		if (idx < num_indices * num_heads) {
-
-			// calculate the distance to the start index of next head, this index should not include
-			// in the sorting
-			int head = (int) (idx / num_indices);
-			int num_elems_to_next_head = 
-				(head + 1) * num_indices * (dci_inst->num_points) - idx * (dci_inst->num_points);
-
-			mix_sort(
-					&(dci_inst->indices[idx * (dci_inst->num_points)
-							+ points_per_block * blockIdx.x]),
-					min(num_points_in_block, num_elems_to_next_head));
-
-			//mix_sort(
-			//		&(dci_inst->indices[idx * dci_inst->num_points
-			//				+ points_per_block * blockIdx.x]),
-			//		num_points_in_block);
-		}
-	}
-}
-*/
 
 __global__ void sort_indices(dci* const dci_inst, const int num_indices, const int num_heads,
 		const int num_points, const int points_per_block) {
