@@ -129,9 +129,10 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
 
 // current design can only work on situation where each GPU process data of same number of heads
 std::vector<torch::Tensor> py_dci_multi_query(std::vector<py::handle> py_dci_inst_wrapper, const int dim,  
-    const int num_queries, const int num_heads, std::vector<torch::Tensor> py_query, const int num_neighbours, 
+    const int num_queries, std::vector<torch::Tensor> py_query, const int num_heads, const int num_neighbours, 
     const bool blind, const int num_outer_iterations, const int max_num_candidates, const int block_size,
     const int thread_size) {
+
     std::vector<torch::Tensor> results;
     std::vector<std::future<torch::Tensor>> calcs;
     for (unsigned int i = 0; i < py_query.size(); i++) {
