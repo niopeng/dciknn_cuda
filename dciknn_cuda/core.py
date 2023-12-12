@@ -171,7 +171,7 @@ class MDCI(object):
         if num_neighbours <= 0:
             raise RuntimeError('num_neighbours must be positive')
 
-        if len(query.shape) < 2:
+        if len(query.shape) < 3:
             _query = query.unsqueeze(0)
         else:
             _query = query

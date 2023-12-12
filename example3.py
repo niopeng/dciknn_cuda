@@ -46,7 +46,7 @@ def main():
     #num_pts = 3000
     #num_queries = 500
     #num_heads = 1
-    num_heads = 1
+    num_heads = 2
 
     #intrinsic_dim = 100
     intrinsic_dim = 400
@@ -84,12 +84,12 @@ def main():
 
         dci_db.add(data)
         # Query
-        indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
-        print("Nearest Indices:", indices)
-        print("Indices Distances:", dists)
-        dci_db.clear()
-        b = datetime.datetime.now()
-        print(b-a)
+        #indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
+        #print("Nearest Indices:", indices)
+        #print("Indices Distances:", dists)
+        #dci_db.clear()
+        #b = datetime.datetime.now()
+        #print(b-a)
 
         #data_arr = data_and_queries[:, :num_pts, :]
         #query_arr = data_and_queries[:, num_pts:, :]
