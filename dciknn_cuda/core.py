@@ -130,6 +130,7 @@ class DCI(object):
         self.num_points = 0
         self._array = None
 
+# currently can only work on situation where number of head evenly divided to each gpu
 class MDCI(object):
 
     def __init__(self, dim, num_heads, num_comp_indices=2, num_simp_indices=7, bs=100, ts=10, devices=[0]):
@@ -138,26 +139,23 @@ class MDCI(object):
         self.num_heads = num_heads
         self.num_head_split = 0
         self.data_per_device = 0
-        #self.num_head_list = []
         self.dcis = []
 
         # more than one head - assign heads to each device
         if (self.num_heads > 1):
-            #self.num_head_list = get_num_head(self.num_heads, self.num_devices)
             self.num_head_split = self.num_heads // self.num_devices
             for i in range(self.num_devices):
                 dci_db = DCI(dim, self.num_head_split, num_comp_indices, num_simp_indices, bs, ts, self.devices[i])
                 self.dcis.append(dci_db)
+
         # one head - assign data to each device
         else:
-            self.num_head_list = [1 for dev in devices]
             self.dcis = [DCI(dim, self.num_heads, num_comp_indices, num_simp_indices, bs, ts, dev) for dev in devices]
 
     def add(self, data):
         if (self.num_heads > 1):
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
-                #curr_num_head = self.num_head_list[dev_ind]
                 cur_data = data[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split + 1, :, :].to(device)
                 self.dcis[dev_ind].add(cur_data)
         else:

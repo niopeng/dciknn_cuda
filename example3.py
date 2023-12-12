@@ -38,9 +38,9 @@ def main():
     # Data Generation Hyperparameters                                                                                                           #
     #                                                                                                                                           #
     #############################################################################################################################################
-    dim = 10
-    num_pts = 100
-    num_queries = 50
+    dim = 100
+    num_pts = 500
+    num_queries = 100
     #num_heads = 1
     #dim = 100
     #num_pts = 3000
@@ -68,16 +68,11 @@ def main():
     # DCI Hyperparameters                                                                                                                       #
     #                                                                                                                                           #
     #############################################################################################################################################
-    #block_size = 100
-    #thread_size = 10
-    #num_comp_indices = 2
-    #num_simp_indices = 10
-    num_outer_iterations = 80
     block_size = 100
-    thread_size = 20
+    thread_size = 10
     num_comp_indices = 2
     num_simp_indices = 10
-    #num_outer_iterations = 5000
+    num_outer_iterations = 5000
 
     # initialize the DCI instance
     for i in range(1):
