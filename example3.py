@@ -76,7 +76,7 @@ def main():
 
     # initialize the DCI instance
     for i in range(1):
-        #a = datetime.datetime.now()
+        a = datetime.datetime.now()
         dci_db = MDCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, devices=[0, 1])
 
         data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
@@ -87,9 +87,9 @@ def main():
         #indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
         #print("Nearest Indices:", indices)
         #print("Indices Distances:", dists)
-        #dci_db.clear()
-        #b = datetime.datetime.now()
-        #print(b-a)
+        dci_db.clear()
+        b = datetime.datetime.now()
+        print(b-a)
 
         #data_arr = data_and_queries[:, :num_pts, :]
         #query_arr = data_and_queries[:, num_pts:, :]
