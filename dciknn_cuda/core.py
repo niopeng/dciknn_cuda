@@ -195,8 +195,8 @@ class MDCI(object):
         else:
             queries = []
             for dev_ind in range(self.num_devices):
-                device = self.devices[dev_ind]
-                cur_queries = _query[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split, :, :].to(device)
+                #device = self.devices[dev_ind]
+                cur_queries = _query[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split, :, :].flatten()
                 queries.append(cur_queries)
             print("core.py query function")
             print(query.shape)
