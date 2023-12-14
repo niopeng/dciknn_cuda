@@ -153,18 +153,19 @@ class MDCI(object):
             self.dcis = [DCI(dim, self.num_heads, num_comp_indices, num_simp_indices, bs, ts, dev) for dev in devices]
 
     def add(self, data):
-        if (self.num_heads > 1):
-            for dev_ind in range(self.num_devices):
-                device = self.devices[dev_ind]
-                cur_data = data[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split, :, :].to(device)
-                self.dcis[dev_ind].add(cur_data)
-                print(dev_ind * self.num_head_split + "|" + dev_ind * self.num_head_split + self.num_head_split)
-        else:
+
+        if (self.num_heads == 1):
             self.data_per_device = data.shape[1] // self.num_devices
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
                 cur_data = data[:, dev_ind * self.data_per_device: dev_ind * self.data_per_device + self.data_per_device, :].to(device)
                 self.dcis[dev_ind].add(cur_data)
+        else:
+            for dev_ind in range(self.num_devices):
+                device = self.devices[dev_ind]
+                cur_data = data[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split, :, :].to(device)
+                self.dcis[dev_ind].add(cur_data)
+                print(dev_ind * self.num_head_split + "|" + dev_ind * self.num_head_split + self.num_head_split)
         
     def query(self, query, num_neighbours=-1, num_outer_iterations=5000, blind=False):
         dists = []
@@ -180,21 +181,7 @@ class MDCI(object):
 
         max_num_candidates = 10 * num_neighbours
 
-        if (self.num_heads > 1):
-            queries = []
-            for dev_ind in range(self.num_devices):
-                device = self.devices[dev_ind]
-                cur_queries = _query[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split, :, :].to(device)
-                queries.append(cur_queries)
-            print(queries.shape)
-            res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], queries, self.dcis[0].num_heads, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
-            for ind, cur_res in enumerate(res):
-                half = cur_res.shape[0] // 2
-                cur_nns, cur_dist = cur_res[:half].reshape(self.num_head_split * _query.shape[1], -1), cur_res[half:].reshape(self.num_head_split * _query.shape[1], -1)
-                cur_nns = cur_nns + self.num_head_split * self.dcis[0].num_points * ind
-                dists.append(cur_dist.detach().clone().to(self.devices[0]))
-                nns.append(cur_nns.detach().clone().to(self.devices[0]))
-        else:
+        if (self.num_heads == 1):
             queries = [_query.to(self.devices[dev_ind]).flatten() for dev_ind in self.devices]
             res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], queries, self.dcis[0].num_heads, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
             for ind, cur_res in enumerate(res):
@@ -203,6 +190,21 @@ class MDCI(object):
                 cur_nns = cur_nns + self.data_per_device * ind
                 dists.append(cur_dist.detach().clone().to(self.devices[0]))
                 nns.append(cur_nns.detach().clone().to(self.devices[0]))
+        else:
+            queries = []
+            for dev_ind in range(self.num_devices):
+                device = self.devices[dev_ind]
+                cur_queries = _query[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split, :, :].to(device)
+                queries.append(cur_queries)
+            print("query shape = " + query.shape)
+            print("_query shape = " + _query.shape)
+            res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], queries, self.dcis[0].num_heads, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
+            for ind, cur_res in enumerate(res):
+                half = cur_res.shape[0] // 2
+                cur_nns, cur_dist = cur_res[:half].reshape(self.num_head_split * _query.shape[1], -1), cur_res[half:].reshape(self.num_head_split * _query.shape[1], -1)
+                #cur_nns = cur_nns + self.num_head_split * self.dcis[0].num_points * ind
+                dists.append(cur_dist.detach().clone().to(self.devices[0]))
+                nns.append(cur_nns.detach().clone().to(self.devices[0]))             
 
         merged_dists = torch.cat(dists, dim=1)
         merged_nns = torch.cat(nns, dim=1)
