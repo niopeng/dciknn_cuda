@@ -165,6 +165,7 @@ class MDCI(object):
                 device = self.devices[dev_ind]
                 cur_data = data[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split, :, :].to(device)
                 self.dcis[dev_ind].add(cur_data)
+                print("core.py add function")
                 print(dev_ind * self.num_head_split + "|" + dev_ind * self.num_head_split + self.num_head_split)
         
     def query(self, query, num_neighbours=-1, num_outer_iterations=5000, blind=False):
@@ -196,8 +197,9 @@ class MDCI(object):
                 device = self.devices[dev_ind]
                 cur_queries = _query[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split, :, :].to(device)
                 queries.append(cur_queries)
-            print("query shape = " + query.shape)
-            print("_query shape = " + _query.shape)
+            print("core.py query function")
+            print(query.shape)
+            print(_query.shape)
             res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], queries, self.dcis[0].num_heads, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
             for ind, cur_res in enumerate(res):
                 half = cur_res.shape[0] // 2
