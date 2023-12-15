@@ -204,9 +204,12 @@ class MDCI(object):
             res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], queries, self.dcis[0].num_heads, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
             print("core.py query function last")
             for ind, cur_res in enumerate(res):
-                print(cur_res.shape)
+                #print(cur_res.shape) # result [2000]
                 half = cur_res.shape[0] // 2
                 cur_nns, cur_dist = cur_res[:half].reshape(self.num_head_split * _query.shape[1], -1), cur_res[half:].reshape(self.num_head_split * _query.shape[1], -1)
+                print(ind)
+                print(cur_nns.shape)
+                print(cur_dist.shape)
             #    #cur_nns = cur_nns + self.num_head_split * self.dcis[0].num_points * ind
             #    dists.append(cur_dist.detach().clone().to(self.devices[0]))
             #    nns.append(cur_nns.detach().clone().to(self.devices[0]))             
