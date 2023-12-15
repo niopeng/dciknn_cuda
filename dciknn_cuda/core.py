@@ -193,14 +193,15 @@ class MDCI(object):
                 nns.append(cur_nns.detach().clone().to(self.devices[0]))
         else:
             queries = []
+            print("core.py query function first")
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
                 cur_queries = _query[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split, :, :].to(device).flatten()
                 queries.append(cur_queries)
                 print(cur_queries.shape)
-            print("core.py query function")
+            print("core.py query function last")
             print(_query.shape)
-            print(queries.shape)
+            print(len(queries))
             #res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], queries, self.dcis[0].num_heads, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
             #for ind, cur_res in enumerate(res):
             #    half = cur_res.shape[0] // 2
