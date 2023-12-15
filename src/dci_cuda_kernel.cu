@@ -1545,7 +1545,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		float* const nearest_neighbour_dists, const int block_size,
 		const int thread_size) {
 
-	//printf("dci_query\n");
+	printf("At dci_query | dim = %d | num_queries = %d | num_heads = %d | num_neighbours = %d\n", dim, num_queries, num_heads, num_neighbours);
 
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	int max_possible_num_candidates = min(query_config.max_num_candidates,
