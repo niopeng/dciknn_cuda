@@ -133,6 +133,8 @@ std::vector<torch::Tensor> py_dci_multi_query(std::vector<py::handle> py_dci_ins
     const bool blind, const int num_outer_iterations, const int max_num_candidates, const int block_size,
     const int thread_size) {
 
+    printf("py_dci_multi_query | dim = %d | num_heads = %d | num_queries = %d | num_neighbours = %d | num_outer_iterations = %d | max_num_candidates = %d\n", dim, num_heads, num_queries, num_neighbours, num_outer_iterations, max_num_candidates);
+
     std::vector<torch::Tensor> results;
     std::vector<std::future<torch::Tensor>> calcs;
     for (unsigned int i = 0; i < py_query.size(); i++) {
