@@ -154,12 +154,14 @@ class MDCI(object):
 
     def add(self, data):
 
+        print("core.py add function")
         if (self.num_heads == 1):
             self.data_per_device = data.shape[1] // self.num_devices
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
                 cur_data = data[:, dev_ind * self.data_per_device: dev_ind * self.data_per_device + self.data_per_device, :].to(device)
                 self.dcis[dev_ind].add(cur_data)
+                print(cur_data.shape)
         else:
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
@@ -195,6 +197,7 @@ class MDCI(object):
                 device = self.devices[dev_ind]
                 cur_queries = _query[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split, :, :].to(device).flatten()
                 queries.append(cur_queries)
+                print(cur_queries.shape)
             print("core.py query function")
             print(_query.shape)
             print(queries.shape)
