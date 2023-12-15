@@ -205,8 +205,8 @@ class MDCI(object):
             print("core.py query function last")
             for ind, cur_res in enumerate(res):
                 print(cur_res.shape)
-            #    half = cur_res.shape[0] // 2
-            #    cur_nns, cur_dist = cur_res[:half].reshape(self.num_head_split * _query.shape[1], -1), cur_res[half:].reshape(self.num_head_split * _query.shape[1], -1)
+                half = cur_res.shape[0] // 2
+                cur_nns, cur_dist = cur_res[:half].reshape(self.num_head_split * _query.shape[1], -1), cur_res[half:].reshape(self.num_head_split * _query.shape[1], -1)
             #    #cur_nns = cur_nns + self.num_head_split * self.dcis[0].num_points * ind
             #    dists.append(cur_dist.detach().clone().to(self.devices[0]))
             #    nns.append(cur_nns.detach().clone().to(self.devices[0]))             
