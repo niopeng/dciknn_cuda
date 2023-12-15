@@ -165,9 +165,6 @@ class MDCI(object):
                 device = self.devices[dev_ind]
                 cur_data = data[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split, :, :].to(device)
                 self.dcis[dev_ind].add(cur_data)
-                print("core.py add function")
-                print(dev_ind * self.num_head_split)
-                print(dev_ind * self.num_head_split + self.num_head_split)
         
     def query(self, query, num_neighbours=-1, num_outer_iterations=5000, blind=False):
         dists = []
