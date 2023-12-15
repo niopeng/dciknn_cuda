@@ -111,7 +111,7 @@ class DCI(object):
 
         _query_result = _dci_query(self._dci_inst, self._dim, self.num_heads, num_queries, _query.flatten(),
                    num_neighbours, blind, num_outer_iterations, max_num_candidates, self._block_size, self._thread_size)
-
+        
         half = _query_result.shape[0] // 2
         return _query_result[:half].reshape(_query.shape[0], -1), _query_result[half:].reshape(_query.shape[0], -1)
 
@@ -154,19 +154,19 @@ class MDCI(object):
 
     def add(self, data):
 
-        print("core.py add function")
         if (self.num_heads == 1):
             self.data_per_device = data.shape[1] // self.num_devices
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
                 cur_data = data[:, dev_ind * self.data_per_device: dev_ind * self.data_per_device + self.data_per_device, :].to(device)
                 self.dcis[dev_ind].add(cur_data)
-                print(cur_data.shape)
         else:
+            print("core.py add function")
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
                 cur_data = data[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split, :, :].to(device)
                 self.dcis[dev_ind].add(cur_data)
+                print(cur_data.shape)
         
     def query(self, query, num_neighbours=-1, num_outer_iterations=5000, blind=False):
         dists = []
