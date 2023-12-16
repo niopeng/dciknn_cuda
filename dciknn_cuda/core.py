@@ -161,12 +161,10 @@ class MDCI(object):
                 cur_data = data[:, dev_ind * self.data_per_device: dev_ind * self.data_per_device + self.data_per_device, :].to(device)
                 self.dcis[dev_ind].add(cur_data)
         else:
-            print("core.py add function")
             for dev_ind in range(self.num_devices):
                 device = self.devices[dev_ind]
                 cur_data = data[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split, :, :].to(device)
                 self.dcis[dev_ind].add(cur_data)
-                print(cur_data.shape)
         
     def query(self, query, num_neighbours=-1, num_outer_iterations=5000, blind=False):
         dists = []
@@ -202,11 +200,7 @@ class MDCI(object):
                 device = self.devices[dev_ind]
                 cur_queries = _query[dev_ind * self.num_head_split: dev_ind * self.num_head_split + self.num_head_split, :, :].to(device).flatten()
                 queries.append(cur_queries)
-                print(cur_queries.shape)
-            print("core.py query function")
-            print(_query.shape)
             res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], queries, self.dcis[0].num_heads, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
-            print("core.py query function last")
             for ind, cur_res in enumerate(res):
                 #print(cur_res.shape) # result [2000]
                 half = cur_res.shape[0] // 2
@@ -214,11 +208,9 @@ class MDCI(object):
                 #cur_nns = cur_nns + self.num_head_split * self.dcis[0].num_points * ind
                 dists.append(cur_dist.detach().clone().to(self.devices[0]))
                 nns.append(cur_nns.detach().clone().to(self.devices[0]))      
-            merged_dists = torch.cat(dists, dim=0)
-            merged_nns = torch.cat(nns, dim=0)
-            print(merged_dists.shape)
-            print(merged_nns.shape)
-            #return torch.cat(nns, dim=0), torch.cat(dists, dim=0)
+            #merged_dists = torch.cat(dists, dim=0)
+            #merged_nns = torch.cat(nns, dim=0)
+            return torch.cat(nns, dim=0), torch.cat(dists, dim=0)
 
     def clear(self):
         for dci in self.dcis:

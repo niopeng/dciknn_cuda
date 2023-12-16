@@ -187,7 +187,7 @@ __global__ void copy_to_indices(dci* const dci_inst, float* const data_proj,
 void dci_add(dci* const dci_inst, const int dim, const int num_points, const int num_heads,
 		float* const data, const int block_size, const int thread_size) {
 
-	printf("At dci_add | dim = %d | num_points = %d | num_heads = %d\n", dim, num_points, num_heads);
+	//printf("At dci_add | dim = %d | num_points = %d | num_heads = %d\n", dim, num_points, num_heads);
 
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	float *data_proj;
@@ -1545,7 +1545,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 		float* const nearest_neighbour_dists, const int block_size,
 		const int thread_size) {
 
-	printf("At dci_query | dim = %d | num_queries = %d | num_heads = %d | num_neighbours = %d\n", dim, num_queries, num_heads, num_neighbours);
+	//printf("At dci_query | dim = %d | num_queries = %d | num_heads = %d | num_neighbours = %d\n", dim, num_queries, num_heads, num_neighbours);
 
 	int num_indices = dci_inst->num_comp_indices * dci_inst->num_simp_indices;
 	int max_possible_num_candidates = min(query_config.max_num_candidates,
@@ -1555,7 +1555,7 @@ void dci_query(dci* const dci_inst, const int dim, const int num_heads, const in
 	assert(num_neighbours > 0);
 	assert(num_neighbours <= dci_inst->num_points);
 
-	printf("dci_query in dci_cuda_kernel.cu\n");
+	//printf("dci_query in dci_cuda_kernel.cu\n");
 
 	// for fixing timeout
 	void* dummy;
