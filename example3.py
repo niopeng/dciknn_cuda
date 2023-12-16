@@ -84,10 +84,10 @@ def main():
 
         dci_db.add(data)
         # Query
-        #indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
-        dci_db.query(query, num_neighbours, num_outer_iterations)
-        #print("Nearest Indices:", indices)
-        #print("Indices Distances:", dists)
+        indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
+        #dci_db.query(query, num_neighbours, num_outer_iterations)
+        print("Nearest Indices:", indices)
+        print("Indices Distances:", dists)
         dci_db.clear()
         b = datetime.datetime.now()
         print(b-a)
