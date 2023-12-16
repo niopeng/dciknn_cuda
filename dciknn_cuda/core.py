@@ -193,7 +193,7 @@ class MDCI(object):
             merged_nns = torch.cat(nns, dim=1)
             _, sort_indices = torch.sort(merged_dists, dim=1)
             sort_indices = sort_indices[:, :num_neighbours]
-            #return torch.gather(merged_nns, 1, sort_indices), torch.gather(merged_dists, 1, sort_indices)
+            return torch.gather(merged_nns, 1, sort_indices), torch.gather(merged_dists, 1, sort_indices)
         else:
             queries = []
             for dev_ind in range(self.num_devices):
