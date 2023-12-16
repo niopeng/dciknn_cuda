@@ -213,9 +213,13 @@ class MDCI(object):
 
         merged_dists = torch.cat(dists, dim=1)
         merged_nns = torch.cat(nns, dim=1)
-        _, sort_indices = torch.sort(merged_dists, dim=1)
-        sort_indices = sort_indices[:, :num_neighbours]
-        return torch.gather(merged_nns, 1, sort_indices), torch.gather(merged_dists, 1, sort_indices)
+        print(merged_dists.shape)
+        print(merged_nns.shape)
+
+        # last remaining problem
+        #_, sort_indices = torch.sort(merged_dists, dim=1)
+        #sort_indices = sort_indices[:, :num_neighbours]
+        #return torch.gather(merged_nns, 1, sort_indices), torch.gather(merged_dists, 1, sort_indices)
 
     def clear(self):
         for dci in self.dcis:
