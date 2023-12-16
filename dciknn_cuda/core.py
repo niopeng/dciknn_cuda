@@ -207,18 +207,15 @@ class MDCI(object):
                 #print(cur_res.shape) # result [2000]
                 half = cur_res.shape[0] // 2
                 cur_nns, cur_dist = cur_res[:half].reshape(self.num_head_split * _query.shape[1], -1), cur_res[half:].reshape(self.num_head_split * _query.shape[1], -1)
-                print(ind)
-                print(cur_nns.shape)
-                print(cur_dist.shape)
-            #    #cur_nns = cur_nns + self.num_head_split * self.dcis[0].num_points * ind
-            #    dists.append(cur_dist.detach().clone().to(self.devices[0]))
-            #    nns.append(cur_nns.detach().clone().to(self.devices[0]))             
+                #cur_nns = cur_nns + self.num_head_split * self.dcis[0].num_points * ind
+                dists.append(cur_dist.detach().clone().to(self.devices[0]))
+                nns.append(cur_nns.detach().clone().to(self.devices[0]))             
 
-        #merged_dists = torch.cat(dists, dim=1)
-        #merged_nns = torch.cat(nns, dim=1)
-        #_, sort_indices = torch.sort(merged_dists, dim=1)
-        #sort_indices = sort_indices[:, :num_neighbours]
-        #return torch.gather(merged_nns, 1, sort_indices), torch.gather(merged_dists, 1, sort_indices)
+        merged_dists = torch.cat(dists, dim=1)
+        merged_nns = torch.cat(nns, dim=1)
+        _, sort_indices = torch.sort(merged_dists, dim=1)
+        sort_indices = sort_indices[:, :num_neighbours]
+        return torch.gather(merged_nns, 1, sort_indices), torch.gather(merged_dists, 1, sort_indices)
 
     def clear(self):
         for dci in self.dcis:
