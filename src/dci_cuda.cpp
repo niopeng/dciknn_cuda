@@ -153,10 +153,12 @@ std::vector<torch::Tensor> py_dci_multi_query(std::vector<py::handle> py_dci_ins
                 num_heads = num_head_split;
                 num_head_curr = num_head_curr - num_head_split;
             }
+            printf("num_heads = %d\n", num_heads);
         }
 
         calcs.push_back(std::async(py_dci_query, py_dci_inst_wrapper[i], dim, num_heads, num_queries, 
             py_query[i], num_neighbours, blind, num_outer_iterations, max_num_candidates, block_size, thread_size));
+
     }
     for (unsigned int i = 0; i < py_query.size(); i++) {
         results.push_back(calcs[i].get());

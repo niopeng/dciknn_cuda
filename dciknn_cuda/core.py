@@ -169,6 +169,7 @@ class MDCI(object):
                 device = self.devices[ind]
                 cur_data = data[ind * self.num_head_split: ind * self.num_head_split + self.num_head_list[ind], :, :].to(device)
                 self.dcis[ind].add(cur_data)
+                print(cur_data.shape)
         
     def query(self, query, num_neighbours=-1, num_outer_iterations=5000, blind=False):
         dists = []
