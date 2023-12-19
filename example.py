@@ -103,7 +103,7 @@ def main():
         #query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
 
         a = datetime.datetime.now()
-        #dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+        #dci_db = DCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
         dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
         dci_db.add(data)
