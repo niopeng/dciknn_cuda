@@ -42,9 +42,9 @@ def main():
     intrinsic_dim = 400
     #num_pts = 3000
     #num_queries = 500
-    num_pts = 500
-    num_queries = 100
-    num_heads = 2
+    num_pts = 3000
+    num_queries = 500
+    num_heads = 1
     
     data_and_queries = gen_data(dim, intrinsic_dim, num_pts + num_queries, num_heads)
 
@@ -91,23 +91,22 @@ def main():
         # for testing 4 same data head
         data_arr = data_and_queries[:, :num_pts, :]
         query_arr = data_and_queries[:, num_pts:, :]
-        #data1 = torch.cat((data_arr, data_arr), 0)
-        #query1 = torch.cat((query_arr, query_arr), 0)
-
-        data = data_arr.detach().clone().to(0)
-        query = query_arr.detach().clone().to(0)
+        #data = data_arr.detach().clone().to(0)
+        #query = query_arr.detach().clone().to(0)
+        
+        data1 = torch.cat((data_arr, data_arr), 0)
+        query1 = torch.cat((query_arr, query_arr), 0)
+        data2 = torch.cat((data1, data1), 0)
+        query2 = torch.cat((query1, query1), 0)
+        data = data2.detach().clone().to(0)
+        query = query2.detach().clone().to(0)
 
         #data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
         #query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
 
-        #torch.set_printoptions(threshold=10000)
-        #print("Data 1:", data[0, :, :])
-        #print("Data 2:", data[1, :, :])
-        #print("Query 1:", query[0, :, :])
-        #print("Query 2:", query[1, :, :])
-
         a = datetime.datetime.now()
-        dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+        #dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+        dci_db = DCI(dim, 4, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
         dci_db.add(data)
         
