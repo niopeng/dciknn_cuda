@@ -22,17 +22,17 @@ from _dci_cuda import _dci_new, _dci_add, _dci_query, _dci_clear, _dci_reset, _d
 from math import sqrt
 
 def get_num_head(num_heads, num_devices):
-    curr_num = num_heads
     num_head_split = num_heads // num_devices
     num_head_list = []
 
     for i in range(num_devices):
-        if (curr_num >= (num_head_split * 2)):
+
+        if ( (i+1) < num_devices):
             num_head_list.append(num_head_split)
-            curr_num = curr_num - num_head_split
         else:
+            curr_num = num_heads - i * num_head_split
             num_head_list.append(curr_num)
-            curr_num = 0
+
     return num_head_list
 
 # single GPU dci_knn
