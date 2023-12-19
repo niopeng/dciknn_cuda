@@ -140,20 +140,14 @@ std::vector<torch::Tensor> py_dci_multi_query(std::vector<py::handle> py_dci_ins
 
     int num_heads = 1;
     int num_head_split = (int) (num_heads_total / py_query.size());
-    int num_head_curr = num_heads_total;
 
     for (unsigned int i = 0; i < py_query.size(); i++) {
 
-        if (num_heads_total > 1) {
-            if (num_head_curr < num_head_split * 2) {
-                num_heads = num_head_curr;
-                num_head_curr = 0;
-            }
-            else {
-                num_heads = num_head_split;
-                num_head_curr = num_head_curr - num_head_split;
-            }
-            printf("num_heads = %d\n", num_heads);
+        if ( (i+1) < py_query.size() ) {
+            num_heads = num_head_split;
+        }
+        else {
+            num_heads = num_heads_total - i * num_head_split;
         }
 
         calcs.push_back(std::async(py_dci_query, py_dci_inst_wrapper[i], dim, num_heads, num_queries, 
