@@ -183,12 +183,12 @@ class MDCI(object):
         _query = _query.detach().clone()
 
         max_num_candidates = 10 * num_neighbours
-        head_list = self.num_head_list.detach().clone().to(0)
+        #head_list = self.num_head_list.detach().clone().to(0)
 
         if (self.num_heads == 1):
             queries = [_query.to(self.devices[dev_ind]).flatten() for dev_ind in self.devices]
             #res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], queries, self.dcis[0].num_heads, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
-            res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], queries, head_list, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
+            res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], queries, self.num_heads, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
             for ind, cur_res in enumerate(res):
                 half = cur_res.shape[0] // 2
                 cur_nns, cur_dist = cur_res[:half].reshape(_query.shape[1], -1), cur_res[half:].reshape(_query.shape[1], -1)
@@ -206,7 +206,7 @@ class MDCI(object):
                 device = self.devices[ind]
                 cur_queries = _query[ind * self.num_head_split: ind * self.num_head_split + self.num_head_list[ind], :, :].to(device).flatten()
                 queries.append(cur_queries)      
-            res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], queries, head_list, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
+            res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], queries, self.num_heads, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
             #res = _dci_multi_query([dc._dci_inst for dc in self.dcis], self.dcis[0]._dim, _query.shape[1], queries, self.dcis[0].num_heads, num_neighbours, blind, num_outer_iterations, max_num_candidates, self.dcis[0]._block_size, self.dcis[0]._thread_size)
             for ind, cur_res in enumerate(res):
                 #print(cur_res.shape) # result [2000]
