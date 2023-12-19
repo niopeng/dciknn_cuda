@@ -107,20 +107,11 @@ void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int
 	dci_gen_proj_vec(dci_inst->proj_vec, dim, num_indices, num_heads);
 
 	// ---------------- testing: same project vector for same head ---------------- //
-	printf("h = 0\n");
-	int h = 0;
-	for (int j = 0; j < dim * 5; j++) {
-		int i = j + dim * num_indices * h;
-		printf("%f ", dci_inst->proj_vec[i]);
+	for (int h = 0; h < num_heads; h++) {
+		for (int i = 0; i < dim * num_indices; i++) {
+			dci_inst->proj_vec[i + dim * num_indices * h] = dci_inst->proj_vec[i];
+		}
 	}
-	printf("\n");
-	printf("h = 1\n");
-	h = 1;
-	for (int j = 0; j < dim * 5; j++) {
-		int i = j + dim * num_indices * h;
-		printf("%f ", dci_inst->proj_vec[i]);
-	}
-	printf("\n");
 	// ---------------- testing: same project vector for same head ---------------- //
 
 	/* Variables that initialize to default values */
