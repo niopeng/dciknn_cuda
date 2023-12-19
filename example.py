@@ -91,20 +91,20 @@ def main():
         # for testing 4 same data head
         data_arr = data_and_queries[:, :num_pts, :]
         query_arr = data_and_queries[:, num_pts:, :]
-        #data = data_arr.detach().clone().to(0)
-        #query = query_arr.detach().clone().to(0)
+        data = data_arr.detach().clone().to(0)
+        query = query_arr.detach().clone().to(0)
         
-        data1 = torch.cat((data_arr, data_arr), 0)
-        query1 = torch.cat((query_arr, query_arr), 0)
-        data = data1.detach().clone().to(0)
-        query = query1.detach().clone().to(0)
+        #data1 = torch.cat((data_arr, data_arr), 0)
+        #query1 = torch.cat((query_arr, query_arr), 0)
+        #data = data1.detach().clone().to(0)
+        #query = query1.detach().clone().to(0)
 
         #data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
         #query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
 
         a = datetime.datetime.now()
         #dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
-        dci_db = DCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
+        dci_db = DCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, device=0)
 
         dci_db.add(data)
         
