@@ -146,6 +146,7 @@ class MDCI(object):
         if (self.num_heads > 1):
             self.num_head_split = self.num_heads // self.num_devices
             self.num_head_list = get_num_head(num_heads, self.num_devices)
+            print(self.num_head_list)
             for i in range(self.num_devices):
                 #dci_db = DCI(dim, self.num_head_split, num_comp_indices, num_simp_indices, bs, ts, self.devices[i])
                 dci_db = DCI(dim, self.num_head_list[i], num_comp_indices, num_simp_indices, bs, ts, self.devices[i])
@@ -159,7 +160,6 @@ class MDCI(object):
 
         if (self.num_heads == 1):
             self.data_per_device = data.shape[1] // self.num_devices
-            self.num_head_list = [1 for dev_ind in self.devices]
             for ind in range(self.num_devices):
                 device = self.devices[ind]
                 cur_data = data[:, ind * self.data_per_device: ind * self.data_per_device + self.data_per_device, :].to(device)
