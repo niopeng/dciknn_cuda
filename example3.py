@@ -89,9 +89,9 @@ def main():
         a = datetime.datetime.now()
         dci_db = MDCI(dim, 3, num_comp_indices, num_simp_indices, block_size, thread_size, devices=[0, 1])
 
-        #dci_db.add(data)
+        dci_db.add(data)
         # Query
-        #indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
+        indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
         #torch.set_printoptions(threshold=10000)
         #print("Nearest Indices:", indices)
         #print("Indices Distances:", dists)
