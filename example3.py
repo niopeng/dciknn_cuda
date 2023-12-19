@@ -46,7 +46,7 @@ def main():
     #num_pts = 3000
     #num_queries = 500
     #num_heads = 1
-    num_heads = 2
+    num_heads = 1
 
     #intrinsic_dim = 100
     intrinsic_dim = 400
@@ -76,11 +76,18 @@ def main():
 
     # initialize the DCI instance
     for i in range(1):
-        a = datetime.datetime.now()
-        dci_db = MDCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, devices=[0, 1])
+        data_arr = data_and_queries[:, :num_pts, :]
+        query_arr = data_and_queries[:, num_pts:, :]
+        data1 = torch.cat((data_arr, data_arr), 0)
+        query1 = torch.cat((query_arr, query_arr), 0)
+        data = data1.detach().clone().to(0)
+        query = query1.detach().clone().to(0)
 
-        data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
-        query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
+        #data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
+        #query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
+        
+        a = datetime.datetime.now()
+        dci_db = MDCI(dim, 2, num_comp_indices, num_simp_indices, block_size, thread_size, devices=[0, 1])
 
         dci_db.add(data)
         # Query
