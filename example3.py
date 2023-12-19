@@ -92,9 +92,9 @@ def main():
         dci_db.add(data)
         # Query
         indices, dists = dci_db.query(query, num_neighbours, num_outer_iterations)
-        #torch.set_printoptions(threshold=10000)
-        #print("Nearest Indices:", indices)
-        #print("Indices Distances:", dists)
+        torch.set_printoptions(threshold=10000)
+        print("Nearest Indices:", indices)
+        print("Indices Distances:", dists)
         dci_db.clear()
         b = datetime.datetime.now()
         print(b-a)
