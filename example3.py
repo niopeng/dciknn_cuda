@@ -76,18 +76,19 @@ def main():
 
     # initialize the DCI instance
     for i in range(1):
-        data_arr = data_and_queries[:, :num_pts, :]
-        query_arr = data_and_queries[:, num_pts:, :]
-        data1 = torch.cat((data_arr, data_arr, data_arr), 0)
-        query1 = torch.cat((query_arr, query_arr, query_arr), 0)
-        data = data1.detach().clone().to(0)
-        query = query1.detach().clone().to(0)
+        data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
+        query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
 
-        #data = data_and_queries[:, :num_pts, :].detach().clone().to(0)
-        #query = data_and_queries[:, num_pts:, :].detach().clone().to(0)
-        
+        #data_arr = data_and_queries[:, :num_pts, :]
+        #query_arr = data_and_queries[:, num_pts:, :]
+        #data1 = torch.cat((data_arr, data_arr, data_arr), 0)
+        #query1 = torch.cat((query_arr, query_arr, query_arr), 0)
+        #data = data1.detach().clone().to(0)
+        #query = query1.detach().clone().to(0)
+        #num_heads = 3
+
         a = datetime.datetime.now()
-        dci_db = MDCI(dim, 3, num_comp_indices, num_simp_indices, block_size, thread_size, devices=[0, 1])
+        dci_db = MDCI(dim, num_heads, num_comp_indices, num_simp_indices, block_size, thread_size, devices=[0, 1])
 
         dci_db.add(data)
         # Query

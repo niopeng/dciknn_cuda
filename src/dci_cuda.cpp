@@ -53,9 +53,7 @@ static void py_tensor_free(PyObject *py_tensor_wrapper) {
 
 py::handle py_dci_new(const int dim, const int num_heads, const int num_comp_indices,
     const int num_simp_indices, const int deviceId) {
-
-    //printf("py_dci_new in dci_cuda.cpp\n");
-
+    
     const at::cuda::OptionalCUDAGuard device_guard(deviceId);
     py_dci *py_dci_inst;
     cudaMallocManaged((void **) &py_dci_inst, sizeof(py_dci));
@@ -71,8 +69,6 @@ py::handle py_dci_new(const int dim, const int num_heads, const int num_comp_ind
 void py_dci_add(py::handle py_dci_inst_wrapper, const int dim, const int num_points, const int num_heads,
     torch::Tensor py_data, const int block_size, const int thread_size) {
 
-    //printf("py_dci_add in dci_cuda.cpp\n");
-
     const at::cuda::OptionalCUDAGuard device_guard(device_of(py_data));
 
     PyObject *py_obj = py_dci_inst_wrapper.ptr();
@@ -86,7 +82,6 @@ void py_dci_add(py::handle py_dci_inst_wrapper, const int dim, const int num_poi
     py_dci_inst->py_array = py_tensor_wrapper;
     Py_INCREF(py_tensor_wrapper);
 }
-
 
 torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const int num_heads, const int num_queries,
     torch::Tensor py_query, const int num_neighbours, const bool blind, 
@@ -108,8 +103,6 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
     cudaMalloc((void **) &(final_outputs), sizeof(int) * output_size);
     cudaMalloc((void **) &(final_distances), sizeof(float) * output_size);
 
-    //printf("output size: %d\n", output_size);
-
     // query using DCI
     dci_query(&(py_dci_inst->dci_inst), dim, num_heads, num_queries, query, num_neighbours, query_config, 
         final_outputs, final_distances, block_size, thread_size);
@@ -128,26 +121,28 @@ torch::Tensor py_dci_query(py::handle py_dci_inst_wrapper, const int dim, const 
 }
 
 // current design can only work on situation where each GPU process data of same number of heads
+// num_heads_total: total number of head
 std::vector<torch::Tensor> py_dci_multi_query(std::vector<py::handle> py_dci_inst_wrapper, const int dim,  
     const int num_queries, std::vector<torch::Tensor> py_query, const int num_heads_total, const int num_neighbours, 
     const bool blind, const int num_outer_iterations, const int max_num_candidates, const int block_size,
     const int thread_size) {
 
-    //printf("py_dci_multi_query | dim = %d | num_heads = %d | num_queries = %d | num_neighbours = %d | num_outer_iterations = %d | max_num_candidates = %d\n", dim, num_heads, num_queries, num_neighbours, num_outer_iterations, max_num_candidates);
-
     std::vector<torch::Tensor> results;
     std::vector<std::future<torch::Tensor>> calcs;
 
     int num_heads = 1;
-    int num_head_split = (int) (num_heads_total / py_query.size());
+    int num_head_split = (int) (num_heads_total / py_query.size()); // number of head assign to each device
 
     for (unsigned int i = 0; i < py_query.size(); i++) {
 
-        if ( (i+1) < py_query.size() ) {
-            num_heads = num_head_split;
-        }
-        else {
-            num_heads = num_heads_total - i * num_head_split;
+        // calculate number of head assign, only used when thare are more than one head
+        if (num_heads_total > 1) {
+            if ( (i+1) < py_query.size() ) {
+                num_heads = num_head_split;
+            }
+            else {
+                num_heads = num_heads_total - i * num_head_split; // last device will process all the remaining head
+            }
         }
 
         calcs.push_back(std::async(py_dci_query, py_dci_inst_wrapper[i], dim, num_heads, num_queries, 
