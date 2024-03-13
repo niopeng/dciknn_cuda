@@ -41,6 +41,7 @@ typedef struct dci {
 	int num_comp_indices;   // Number of composite indices
 	int num_simp_indices;   // Number of simple indices in each composite index
 	int num_points;
+	int num_heads;
 	idx_elem* indices; // Assuming row-major layout, matrix of size required_num_points x (num_comp_indices*num_simp_indices)
 	float* proj_vec; // Assuming row-major layout, matrix of size dim x (num_comp_indices*num_simp_indices)
 	float* data_proj;    // Device copy of data_proj
@@ -56,22 +57,21 @@ typedef struct dci_query_config {
 } dci_query_config;
 
 void dci_gen_proj_vec(float* proj_vec, const int dim,
-		const int num_indices);
+		const int num_indices, const int num_heads);
 
-void dci_init(dci* const dci_inst, const int dim, const int num_comp_indices,
+void dci_init(dci* const dci_inst, const int dim, const int num_heads, const int num_comp_indices,
 		const int num_simp_indices, const int devId);
 
 __device__
 void insertion_sort(idx_elem arr[], int n);
 
 // // Note: the data itself is not kept in the index and must be kept in-place
-void dci_add(dci* const dci_inst, const int dim, const int num_points,
+void dci_add(dci* const dci_inst, const int dim, const int num_points, const int num_heads,
 		float* const data, const int block_size, const int thread_size);
 
-void dci_query(dci* const dci_inst, const int dim, const int num_queries,
-		const float* const query, const int num_neighbours,
-		const dci_query_config query_config, int* const nearest_neighbours,
-		float* const nearest_neighbour_dists, const int block_size,
+void dci_query(dci* const dci_inst, const int dim, const int num_heads, const int num_queries,
+		const float* const query, const int num_neighbours, const dci_query_config query_config, 
+		int* const nearest_neighbours, float* const nearest_neighbour_dists, const int block_size,
 		const int thread_size);
 
 void dci_clear(dci* const dci_inst);
